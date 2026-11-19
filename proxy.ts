@@ -14,6 +14,7 @@ const VALID_PUBLIC_SUBPATHS = new Set([
   "accommodation",
   "transfers",
   "blog",
+  "faq",
 ]);
 
 const VALID_ADMIN_SUBPATHS = new Set([

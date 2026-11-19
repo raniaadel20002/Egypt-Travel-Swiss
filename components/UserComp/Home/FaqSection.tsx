@@ -4,59 +4,44 @@ import { useState } from "react";
 import Link from "next/link";
 import { FiPlus, FiMinus } from "react-icons/fi";
 import { useLocale } from "@/shared/providers/LocaleProvider";
+import { useFaqList } from "@/features/faq/useFaq";
+import { QuestionItem } from "@/models/question";
 
-interface FaqItem {
-  id: string;
-  question: string;
-  answer: string;
+const VALID_API_LANGS = ["en", "fr", "ru", "ro", "it"] as const;
+type ApiLang = (typeof VALID_API_LANGS)[number];
+
+function getValidApiLang(locale: string): ApiLang {
+  const code = locale.toLowerCase().slice(0, 2);
+  if (VALID_API_LANGS.includes(code as ApiLang)) {
+    return code as ApiLang;
+  }
+  return "en";
 }
-
-const FAQ_ITEMS: FaqItem[] = [
-  {
-    id: "how-to-book",
-    question: "How do I book a trip?",
-    answer:
-      "Choose a trip, select your date and guests, then add it to your cart and complete the booking form. You'll receive a confirmation by email.",
-  },
-  {
-    id: "hotel-pickup",
-    question: "Is hotel pick-up included?",
-    answer:
-      "Yes, complimentary hotel pick-up and drop-off is included for all central hotels in Hurghada, Cairo, Sharm El Sheikh, Luxor, and Marsa Alam.",
-  },
-  {
-    id: "cancellation",
-    question: "Can I cancel or change my booking?",
-    answer:
-      "Yes, you can cancel or change your booking up to 24 hours before the scheduled departure for a full refund.",
-  },
-  {
-    id: "diving-experience",
-    question: "Do I need diving experience?",
-    answer:
-      "No prior diving experience is needed for our beginner courses (such as Discover Scuba Diving). Full equipment and certified PADI instructors are provided.",
-  },
-  {
-    id: "payment-methods",
-    question: "Which payment methods do you accept?",
-    answer:
-      "We accept major credit and debit cards (Visa, MasterCard, American Express), bank transfers, and cash payment upon arrival.",
-  },
-  {
-    id: "safety-in-egypt",
-    question: "Is Egypt safe for tourists?",
-    answer:
-      "Egypt is very safe and welcoming for international travelers. Tourist destinations and resorts have dedicated tourism police and modern security standards.",
-  },
-];
 
 export default function FaqSection() {
   const { locale } = useLocale();
+  const apiLang = getValidApiLang(locale);
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+
+  const { data, isLoading, isError } = useFaqList(
+    { PageNumber: 1, PageSize: 50 },
+    apiLang
+  );
+
+  const rawQuestions: QuestionItem[] = data?.data ?? [];
+
+  // Filter questions with valid translations; do not invent or fall back to English
+  const questions = rawQuestions.filter(
+    (q) => Boolean(q.text && q.text.trim() && q.answer && q.answer.trim())
+  );
 
   const toggleAccordion = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
   };
+
+  const showSkeleton = isLoading;
+  const showEmpty = !isLoading && !isError && questions.length === 0;
+  const showItems = !isLoading && !isError && questions.length > 0;
 
   return (
     <section id="faq" className="relative w-full py-16 sm:py-20 lg:py-24 bg-[#F7EDE1] overflow-hidden">
@@ -86,43 +71,78 @@ export default function FaqSection() {
 
           {/* Right Column: Accordion List */}
           <div className="space-y-3.5 sm:space-y-4">
-            {FAQ_ITEMS.map((item, index) => {
-              const isOpen = openIndex === index;
-
-              return (
+            {/* Loading Skeletons */}
+            {showSkeleton &&
+              Array.from({ length: 4 }).map((_, i) => (
                 <div
-                  key={item.id}
-                  className="bg-white rounded-[20px] sm:rounded-[24px] overflow-hidden shadow-[0px_4px_14px_0px_#013E510D] transition-all duration-300"
+                  key={i}
+                  className="bg-white rounded-[20px] sm:rounded-[24px] overflow-hidden shadow-[0px_4px_14px_0px_#013E510D] animate-pulse"
                 >
-                  <button
-                    type="button"
-                    onClick={() => toggleAccordion(index)}
-                    aria-expanded={isOpen}
-                    className="w-full text-left p-5 sm:p-6 lg:px-7 flex items-center justify-between gap-4 cursor-pointer group"
-                  >
-                    <span className="font-[family-name:var(--font-cormorant)] text-xl sm:text-2xl font-bold text-[#013E51] leading-snug group-hover:text-[#E8B34A] transition-colors">
-                      {item.question}
-                    </span>
-
-                    <span className="shrink-0 flex items-center justify-center w-7 h-7">
-                      {isOpen ? (
-                        <FiMinus className="text-[#E07A5F] text-xl" />
-                      ) : (
-                        <FiPlus className="text-gray-400 group-hover:text-[#013E51] transition-colors text-xl" />
-                      )}
-                    </span>
-                  </button>
-
-                  {isOpen && (
-                    <div className="px-5 pb-5 sm:px-7 sm:pb-6 pt-0">
-                      <p className="font-[family-name:var(--font-lato)] text-xs sm:text-sm text-[#013E51]/75 leading-relaxed">
-                        {item.answer}
-                      </p>
-                    </div>
-                  )}
+                  <div className="p-5 sm:p-6 lg:px-7">
+                    <div className="h-5 bg-gray-200 rounded-lg w-3/4" />
+                  </div>
                 </div>
-              );
-            })}
+              ))}
+
+            {/* Error State */}
+            {isError && !isLoading && (
+              <div className="bg-white rounded-[20px] sm:rounded-[24px] p-6 shadow-[0px_4px_14px_0px_#013E510D] text-center">
+                <p className="font-[family-name:var(--font-lato)] text-sm text-[#888888]">
+                  Unable to load questions at this time.
+                </p>
+              </div>
+            )}
+
+            {/* Empty State */}
+            {showEmpty && (
+              <div className="bg-white rounded-[20px] sm:rounded-[24px] p-8 sm:p-10 shadow-[0px_4px_14px_0px_#013E510D] text-center">
+                <p className="font-[family-name:var(--font-cormorant)] text-xl sm:text-2xl font-bold text-[#013E51] mb-2">
+                  No questions have been added yet.
+                </p>
+                <p className="font-[family-name:var(--font-lato)] text-xs sm:text-sm text-[#888888]">
+                  Check back soon or reach out to us directly.
+                </p>
+              </div>
+            )}
+
+            {/* Accordion Items from Questions API */}
+            {showItems &&
+              questions.map((item, index) => {
+                const isOpen = openIndex === index;
+                return (
+                  <div
+                    key={item.id}
+                    className="bg-white rounded-[20px] sm:rounded-[24px] overflow-hidden shadow-[0px_4px_14px_0px_#013E510D] transition-all duration-300"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => toggleAccordion(index)}
+                      aria-expanded={isOpen}
+                      className="w-full text-left p-5 sm:p-6 lg:px-7 flex items-center justify-between gap-4 cursor-pointer group"
+                    >
+                      <span className="font-[family-name:var(--font-cormorant)] text-xl sm:text-2xl font-bold text-[#013E51] leading-snug group-hover:text-[#E8B34A] transition-colors">
+                        {item.text}
+                      </span>
+
+                      <span className="shrink-0 flex items-center justify-center w-7 h-7">
+                        {isOpen ? (
+                          <FiMinus className="text-[#E07A5F] text-xl" />
+                        ) : (
+                          <FiPlus className="text-gray-400 group-hover:text-[#013E51] transition-colors text-xl" />
+                        )}
+                      </span>
+                    </button>
+
+                    {isOpen && (
+                      <div className="px-5 pb-5 sm:px-7 sm:pb-6 pt-0">
+                        <p className="font-[family-name:var(--font-lato)] text-xs sm:text-sm text-[#013E51]/75 leading-relaxed">
+                          {item.answer}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
           </div>
         </div>
       </div>

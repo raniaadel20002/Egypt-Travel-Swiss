@@ -2,7 +2,7 @@
 
 import { FiStar, FiArrowRight } from "react-icons/fi";
 
-const RATING_BREAKDOWN = [
+const DEFAULT_BREAKDOWN = [
   { star: 5, percent: 86 },
   { star: 4, percent: 10 },
   { star: 3, percent: 3 },
@@ -12,17 +12,25 @@ const RATING_BREAKDOWN = [
 
 interface ReviewRatingCardProps {
   onWriteReview: () => void;
+  averageRating?: number;
+  totalReviews?: number;
+  breakdown?: { star: number; percent: number }[];
 }
 
 export default function ReviewRatingCard({
   onWriteReview,
+  averageRating = 4.9,
+  totalReviews,
+  breakdown = DEFAULT_BREAKDOWN,
 }: ReviewRatingCardProps) {
+  const formattedRating = averageRating.toFixed(1);
+
   return (
     <div className="bg-white rounded-[28px] sm:rounded-[32px] p-6 sm:p-8 shadow-sm border border-black/5 flex flex-col justify-between">
       <div>
         <div className="flex items-baseline gap-2 mb-2">
           <span className="font-[family-name:var(--font-lato)] text-5xl sm:text-6xl font-bold text-[#013E51] leading-none">
-            4.9
+            {formattedRating}
           </span>
           <span className="font-[family-name:var(--font-lato)] text-2xl font-normal text-[#013E51]/50">
             / 5
@@ -37,14 +45,16 @@ export default function ReviewRatingCard({
         </div>
 
         <p className="font-[family-name:var(--font-lato)] text-xs text-[#013E51]/70 font-medium mb-6">
-          Based on 2,400+ verified traveler reviews
+          {totalReviews !== undefined
+            ? `Based on ${totalReviews} verified traveler review${totalReviews === 1 ? "" : "s"}`
+            : "Based on verified traveler reviews"}
         </p>
 
         <div className="w-full h-px bg-black/5 mb-6" />
 
         {/* Rating Bars */}
         <div className="space-y-3">
-          {RATING_BREAKDOWN.map((item) => (
+          {breakdown.map((item) => (
             <div
               key={item.star}
               className="flex items-center gap-2.5 font-[family-name:var(--font-lato)] text-xs"

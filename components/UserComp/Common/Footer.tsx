@@ -24,7 +24,7 @@ export default function Footer() {
 
   const companyLinks = [
     { label: "About Us", href: `/${locale}#why-choose-us` },
-    { label: "FAQ", href: `/${locale}#faq` },
+    { label: "FAQ", href: `/${locale}/faq` },
     { label: "Contact Us", href: `/${locale}#reviews` },
   ];
 

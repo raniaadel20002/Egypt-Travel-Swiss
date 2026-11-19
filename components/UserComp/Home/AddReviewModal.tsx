@@ -1,18 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { FiX, FiStar } from "react-icons/fi";
+import { FiX, FiStar, FiLoader } from "react-icons/fi";
 import { toast } from "sonner";
+import { useCreateReviewProject } from "@/features/reviews/useReviewsProject";
 
 interface AddReviewModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onReviewSubmitted?: (review: {
-    name: string;
-    email: string;
-    rating: number;
-    details: string;
-  }) => void;
+  onReviewSubmitted?: () => void;
 }
 
 export default function AddReviewModal({
@@ -20,34 +16,47 @@ export default function AddReviewModal({
   onClose,
   onReviewSubmitted,
 }: AddReviewModalProps) {
-  const [fullName, setFullName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
-  const [rating, setRating] = useState(0);
+  const [phone, setPhone] = useState("");
+  const [rating, setRating] = useState(5);
   const [hoverRating, setHoverRating] = useState(0);
-  const [details, setDetails] = useState("");
+  const [comment, setComment] = useState("");
+
+  const createMutation = useCreateReviewProject();
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName.trim() || !email.trim() || !details.trim()) {
+    if (!firstName.trim() || !lastName.trim() || !email.trim() || !comment.trim()) {
       toast.error("Please fill in all required fields.");
       return;
     }
 
-    onReviewSubmitted?.({
-      name: fullName.trim(),
-      email: email.trim(),
-      rating,
-      details: details.trim(),
-    });
+    try {
+      await createMutation.mutateAsync({
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: email.trim(),
+        phone: phone.trim() || "+2000000000",
+        comment: comment.trim(),
+        rate: rating || 5,
+      });
 
-    toast.success("Thank you! Your review has been submitted for approval.");
-    setFullName("");
-    setEmail("");
-    setDetails("");
-    setRating(0);
-    onClose();
+      toast.success("Thank you! Your review has been submitted successfully.");
+      setFirstName("");
+      setLastName("");
+      setEmail("");
+      setPhone("");
+      setComment("");
+      setRating(5);
+      onReviewSubmitted?.();
+      onClose();
+    } catch {
+      toast.error("Failed to submit review. Please try again.");
+    }
   };
 
   return (
@@ -56,7 +65,7 @@ export default function AddReviewModal({
       aria-modal="true"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4"
     >
-      <div className="bg-white rounded-[32px] sm:rounded-[36px] p-7 sm:p-9 max-w-lg w-full shadow-2xl relative border border-black/5">
+      <div className="bg-white rounded-[32px] sm:rounded-[36px] p-7 sm:p-9 max-w-lg w-full shadow-2xl relative border border-black/5 max-h-[90vh] overflow-y-auto">
         {/* Close Button */}
         <button
           type="button"
@@ -73,25 +82,40 @@ export default function AddReviewModal({
             Write a Review
           </h3>
           <p className="font-[family-name:var(--font-lato)] text-xs sm:text-sm text-gray-500 font-normal mt-1">
-            Share your inspection experience with future customers
+            Share your travel experience with future customers
           </p>
         </div>
 
         {/* Review Form */}
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-4.5">
-          {/* Full Name */}
-          <div>
-            <label className="block font-[family-name:var(--font-lato)] text-xs sm:text-sm font-bold text-[#013E51] mb-1.5">
-              Your Full Name *
-            </label>
-            <input
-              type="text"
-              required
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="e.g. Hassan El-Sayed"
-              className="w-full h-[52px] bg-[#F3F4F6] rounded-2xl px-4 font-[family-name:var(--font-lato)] text-sm text-[#013E51] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 border border-transparent"
-            />
+          {/* Name Fields */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block font-[family-name:var(--font-lato)] text-xs sm:text-sm font-bold text-[#013E51] mb-1.5">
+                First Name *
+              </label>
+              <input
+                type="text"
+                required
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="e.g. Hassan"
+                className="w-full h-[50px] bg-[#F3F4F6] rounded-2xl px-4 font-[family-name:var(--font-lato)] text-sm text-[#013E51] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 border border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block font-[family-name:var(--font-lato)] text-xs sm:text-sm font-bold text-[#013E51] mb-1.5">
+                Last Name *
+              </label>
+              <input
+                type="text"
+                required
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                placeholder="e.g. El-Sayed"
+                className="w-full h-[50px] bg-[#F3F4F6] rounded-2xl px-4 font-[family-name:var(--font-lato)] text-sm text-[#013E51] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 border border-transparent"
+              />
+            </div>
           </div>
 
           {/* Email */}
@@ -105,14 +129,28 @@ export default function AddReviewModal({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="info@example.com"
-              className="w-full h-[52px] bg-[#F3F4F6] rounded-2xl px-4 font-[family-name:var(--font-lato)] text-sm text-[#013E51] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 border border-transparent"
+              className="w-full h-[50px] bg-[#F3F4F6] rounded-2xl px-4 font-[family-name:var(--font-lato)] text-sm text-[#013E51] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 border border-transparent"
+            />
+          </div>
+
+          {/* Phone */}
+          <div>
+            <label className="block font-[family-name:var(--font-lato)] text-xs sm:text-sm font-bold text-[#013E51] mb-1.5">
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+20 100 000 0000"
+              className="w-full h-[50px] bg-[#F3F4F6] rounded-2xl px-4 font-[family-name:var(--font-lato)] text-sm text-[#013E51] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 border border-transparent"
             />
           </div>
 
           {/* Rating */}
           <div>
             <label className="block font-[family-name:var(--font-lato)] text-xs sm:text-sm font-bold text-[#013E51] mb-1.5">
-              Rating
+              Rating ({rating} Stars)
             </label>
             <div className="flex items-center gap-1.5 pt-0.5">
               {[1, 2, 3, 4, 5].map((star) => {
@@ -142,15 +180,15 @@ export default function AddReviewModal({
           {/* Review Details */}
           <div>
             <label className="block font-[family-name:var(--font-lato)] text-xs sm:text-sm font-bold text-[#013E51] mb-1.5">
-              Review Details
+              Review Details *
             </label>
             <textarea
               required
               rows={4}
-              value={details}
-              onChange={(e) => setDetails(e.target.value)}
-              placeholder="comment...."
-              className="w-full h-32 bg-[#F3F4F6] rounded-2xl p-4 font-[family-name:var(--font-lato)] text-sm text-[#013E51] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 border border-transparent resize-none"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Tell us about your experience..."
+              className="w-full h-28 bg-[#F3F4F6] rounded-2xl p-4 font-[family-name:var(--font-lato)] text-sm text-[#013E51] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 border border-transparent resize-none"
             />
           </div>
 
@@ -159,15 +197,20 @@ export default function AddReviewModal({
             <button
               type="button"
               onClick={onClose}
-              className="h-[52px] px-7 rounded-2xl border border-gray-300 font-[family-name:var(--font-lato)] text-sm sm:text-base font-bold text-[#013E51] hover:bg-gray-50 transition-colors cursor-pointer"
+              disabled={createMutation.isPending}
+              className="h-[50px] px-6 rounded-2xl border border-gray-300 font-[family-name:var(--font-lato)] text-sm font-bold text-[#013E51] hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="h-[52px] flex-1 rounded-2xl bg-[#013E51] text-white font-[family-name:var(--font-lato)] text-sm sm:text-base font-bold hover:bg-[#024f68] transition-colors shadow-md cursor-pointer"
+              disabled={createMutation.isPending}
+              className="h-[50px] flex-1 rounded-2xl bg-[#013E51] text-white font-[family-name:var(--font-lato)] text-sm font-bold hover:bg-[#024f68] transition-colors shadow-md cursor-pointer disabled:opacity-50 inline-flex items-center justify-center gap-2"
             >
-              Submit Review
+              {createMutation.isPending && (
+                <FiLoader className="w-4 h-4 animate-spin text-[#E8B34A]" />
+              )}
+              <span>Submit Review</span>
             </button>
           </div>
         </form>
