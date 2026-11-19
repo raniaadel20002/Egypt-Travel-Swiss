@@ -1,0 +1,15 @@
+{
+  "common": {
+    "appName": "Egypt Dreams",
+    "home": "Startseite",
+    "destinations": "Reiseziele",
+    "trips": "Ausflüge",
+    "categories": "Kategorien",
+    "about": "Über uns",
+    "contact": "Kontakt",
+    "search": "Suche",
+    "bookNow": "Jetzt buchen",
+    "learnMore": "Mehr erfahren",
+    "viewAll": "Alle anzeigen"
+  }
+}

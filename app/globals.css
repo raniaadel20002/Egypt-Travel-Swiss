@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme {
+  --font-heading: var(--font-cormorant), serif;
+  --font-sans: var(--font-lato), sans-serif;
+  --color-egypt-primary: #013E51;
+  --color-egypt-gold: #E8B34A;
+  --color-egypt-cream: #F7EDE1;
+  --color-egypt-gray: #888888;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-lato), sans-serif;
+    color: #013E51;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-cormorant), serif;
+  }
+
+  img {
+    -webkit-user-drag: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  button,
+  [role="button"],
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"],
+  select {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [role="button"][aria-disabled="true"],
+  input:disabled,
+  select:disabled {
+    cursor: not-allowed;
+  }
+}

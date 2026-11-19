@@ -1,0 +1,15 @@
+{
+  "common": {
+    "appName": "Egypt Dreams",
+    "home": "Home",
+    "destinations": "Destinations",
+    "trips": "Trips",
+    "categories": "Categories",
+    "about": "About",
+    "contact": "Contact",
+    "search": "Search",
+    "bookNow": "Book Now",
+    "learnMore": "Learn More",
+    "viewAll": "View All"
+  }
+}
