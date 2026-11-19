@@ -1,15 +1,27 @@
 "use client";
 
 import { useState } from "react";
-import { FiBookOpen, FiPlus, FiSearch } from "react-icons/fi";
+import { FiBookOpen, FiPlus, FiSearch, FiCheck } from "react-icons/fi";
 import { toast } from "sonner";
 import AdminShell from "@/components/adminComp/Common/AdminShell";
+import AdminDrawer from "@/components/adminComp/Common/AdminDrawer";
 
 export default function AdminBlogsPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [title, setTitle] = useState("");
+  const [summary, setSummary] = useState("");
 
-  const handleCreate = () => {
-    toast.info("Article creation interface will open here.");
+  const handleCloseDrawer = () => {
+    setIsDrawerOpen(false);
+    setTitle("");
+    setSummary("");
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast.info("Articles & Blogs API integration is pending.");
+    handleCloseDrawer();
   };
 
   return (
@@ -20,7 +32,7 @@ export default function AdminBlogsPage() {
       action={
         <button
           type="button"
-          onClick={handleCreate}
+          onClick={() => setIsDrawerOpen(true)}
           className="inline-flex items-center gap-2 bg-[#013E51] hover:bg-[#025670] text-white px-5 py-2.5 rounded-xl font-[family-name:var(--font-lato)] text-xs font-bold uppercase tracking-wider transition shadow-sm cursor-pointer"
         >
           <FiPlus className="w-4 h-4 text-[#E8B34A]" />
@@ -56,13 +68,69 @@ export default function AdminBlogsPage() {
           </p>
           <button
             type="button"
-            onClick={handleCreate}
+            onClick={() => setIsDrawerOpen(true)}
             className="inline-flex items-center gap-2 bg-[#FAF7F2] hover:bg-[#013E51] text-[#013E51] hover:text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition cursor-pointer border border-[#013E51]/10"
           >
             <FiPlus className="w-4 h-4" />
             <span>Draft Your First Article</span>
           </button>
         </div>
+
+        <AdminDrawer
+          isOpen={isDrawerOpen}
+          onClose={handleCloseDrawer}
+          eyebrow="Content Management"
+          title="New Article"
+          subtitle="Draft a travel guide or editorial insight for visitors."
+          footer={
+            <div className="flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={handleCloseDrawer}
+                className="px-5 py-2.5 rounded-xl border border-gray-200 bg-white text-xs font-bold uppercase tracking-wider text-[#013E51] hover:bg-[#FAF7F2] transition cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                form="blog-drawer-form"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#013E51] hover:bg-[#025670] text-white text-xs font-bold uppercase tracking-wider transition shadow-sm cursor-pointer"
+              >
+                <FiCheck className="w-4 h-4 text-[#E8B34A]" />
+                <span>Publish Article</span>
+              </button>
+            </div>
+          }
+        >
+          <form id="blog-drawer-form" onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#013E51]">
+                Article Headline *
+              </label>
+              <input
+                type="text"
+                required
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="e.g. Best Time to Visit Egypt"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-[#FAF7F2]/50 text-xs sm:text-sm text-[#013E51] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#013E51]">
+                Article Excerpt
+              </label>
+              <textarea
+                rows={5}
+                value={summary}
+                onChange={(e) => setSummary(e.target.value)}
+                placeholder="Write a concise summary of the travel story..."
+                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-[#FAF7F2]/50 text-xs sm:text-sm text-[#013E51] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
+              />
+            </div>
+          </form>
+        </AdminDrawer>
       </div>
     </AdminShell>
   );

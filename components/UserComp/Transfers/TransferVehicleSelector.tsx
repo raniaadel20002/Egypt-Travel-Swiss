@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { FiCheck, FiCheckCircle } from "react-icons/fi";
-import { VehicleTypeTransferItem } from "@/models/transferApi";
+import { VehicleTypeTransferItem } from "@/models/transfer";
 
 interface TransferVehicleSelectorProps {
   vehicles: VehicleTypeTransferItem[];

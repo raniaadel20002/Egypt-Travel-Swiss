@@ -12,7 +12,7 @@ import {
 import {
   TransferPreviewRequest,
   CreateTransferBookingRequest,
-} from "@/models/transferApi";
+} from "@/models/transfer";
 
 export const TRANSFER_QUERY_KEYS = {
   fromLocations: ["transfers", "fromLocations"] as const,

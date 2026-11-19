@@ -9,7 +9,7 @@ import {
   TransferPreviewResponse,
   CreateTransferBookingRequest,
   TransferBookingResult,
-} from "@/models/transferApi";
+} from "@/models/transfer";
 
 const DEFAULT_FROM_LOCATIONS: TransferLocationItem[] = [
   { id: "hrg-apt", name: "Hurghada International Airport (HRG)", city: "Hurghada", code: "HRG", isAirport: true },

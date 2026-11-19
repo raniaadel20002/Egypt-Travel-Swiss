@@ -33,6 +33,8 @@ const VALID_ADMIN_SUBPATHS = new Set([
   "faq",
   "promo-codes",
   "admins",
+  "team-members",
+  "services",
 ]);
 
 export function proxy(request: NextRequest) {

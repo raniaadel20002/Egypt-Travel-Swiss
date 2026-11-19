@@ -12,7 +12,8 @@ export function extractApiError(error: unknown): string {
       }
 
       if (typeof responseData === "object") {
-        const errors = (responseData as { errors?: unknown }).errors;
+        const rawObj = responseData as Record<string, unknown>;
+        const errors = rawObj.errors || rawObj.Errors;
 
         if (Array.isArray(errors) && errors.length > 0) {
           return errors.join(" | ");
@@ -31,12 +32,17 @@ export function extractApiError(error: unknown): string {
           return errors;
         }
 
-        const message = (responseData as { message?: unknown }).message;
+        const message = rawObj.message || rawObj.Message;
         if (typeof message === "string" && message.trim().length > 0) {
           return message;
         }
 
-        const title = (responseData as { title?: unknown }).title;
+        const detail = rawObj.detail || rawObj.Detail;
+        if (typeof detail === "string" && detail.trim().length > 0) {
+          return detail;
+        }
+
+        const title = rawObj.title || rawObj.Title;
         if (typeof title === "string" && title.trim().length > 0) {
           return title;
         }
@@ -48,7 +54,11 @@ export function extractApiError(error: unknown): string {
     }
 
     if (status === 401) {
-      return "Unauthorized (401). Please sign in again.";
+      return "Unauthorized (401). Your session has expired. Please sign in again.";
+    }
+
+    if (error.message === "Network Error") {
+      return "Network connection issue. Please check your internet connection or server availability.";
     }
 
     if (error.message) {

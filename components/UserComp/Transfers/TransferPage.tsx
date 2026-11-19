@@ -17,7 +17,7 @@ import TransferCustomerForm from "./TransferCustomerForm";
 import TransferNotesForm from "./TransferNotesForm";
 import TransferBookingSummary from "./TransferBookingSummary";
 import TransferHelpContact from "./TransferHelpContact";
-import { TransferBookingResult } from "@/models/transferApi";
+import { TransferBookingResult } from "@/models/transfer";
 
 export default function TransferPage() {
   const { data: fromLocations = [] } = useTransferFromLocations();

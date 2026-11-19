@@ -4,13 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FiEye, FiEyeOff, FiLogIn, FiArrowLeft, FiMail } from "react-icons/fi";
 import { toast } from "sonner";
-import { useAdminAuthStore } from "@/features/admin/useAdminAuthStore";
-import { loginAdmin, forgotPasswordAdmin } from "@/clientApi/adminApi";
+import { useAuthStore } from "@/features/auth/useAuthStore";
+import { loginAdmin, forgotPasswordAdmin } from "@/clientApi/authApi";
 import AdminBrandingPanel from "./AdminBrandingPanel";
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const setAuth = useAdminAuthStore((state) => state.setAuth);
+  const setAuth = useAuthStore((state) => state.setAuth);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,10 +38,12 @@ export default function AdminLoginPage() {
           password,
         });
 
-        if (response?.data?.accessToken) {
+        if (response?.data?.accessToken || response?.data?.refreshToken) {
+          const effectiveToken =
+            response.data.refreshToken || response.data.accessToken || "";
           setAuth({
-            accessToken: response.data.accessToken,
-            refreshToken: response.data.refreshToken || "",
+            accessToken: effectiveToken,
+            refreshToken: effectiveToken,
             email: response.data.email || trimmedEmail,
             fullName: response.data.fullName || trimmedEmail.split("@")[0],
             role: response.data.role || "SuperAdmin",

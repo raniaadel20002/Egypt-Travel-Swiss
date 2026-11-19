@@ -1,7 +1,7 @@
 "use client";
 
 import { FiRepeat, FiRotateCcw, FiUsers } from "react-icons/fi";
-import { TransferLocationItem } from "@/models/transferApi";
+import { TransferLocationItem } from "@/models/transfer";
 
 interface TransferBookingFormProps {
   fromLocations: TransferLocationItem[];

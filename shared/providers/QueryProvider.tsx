@@ -7,6 +7,7 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query";
 import { useState } from "react";
+import "@/features/auth/useAuthStore";
 import { showApiErrorToast } from "@/shared/utils/errorHandler";
 
 export default function QueryProvider({

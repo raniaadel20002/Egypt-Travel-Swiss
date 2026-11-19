@@ -62,7 +62,7 @@ export default function AdminShell({
           ref={scrollContainerRef}
           className="flex-1 min-h-0 overflow-y-auto overscroll-contain"
         >
-          <main className="p-5 sm:p-8 lg:p-10 max-w-[1440px] w-full mx-auto space-y-6 sm:space-y-8 min-h-full">
+          <main className="p-5 sm:p-8 lg:p-10 w-full space-y-6 sm:space-y-8 min-h-full">
             {/* Header Area */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2">
               <div>

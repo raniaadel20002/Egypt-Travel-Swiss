@@ -1,13 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { FiImage, FiUploadCloud, FiSearch, FiStar } from "react-icons/fi";
+import { FiImage, FiUploadCloud, FiSearch, FiStar, FiCheck } from "react-icons/fi";
 import { toast } from "sonner";
 import AdminShell from "@/components/adminComp/Common/AdminShell";
+import AdminDrawer from "@/components/adminComp/Common/AdminDrawer";
 
 export default function AdminGalleryPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [featuredFilter, setFeaturedFilter] = useState("all");
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [caption, setCaption] = useState("");
+  const [isFeatured, setIsFeatured] = useState(false);
 
   const filterTabs = [
     { id: "all", label: "All Photos" },
@@ -15,8 +19,16 @@ export default function AdminGalleryPage() {
     { id: "standard", label: "Standard Photos" },
   ];
 
-  const handleUpload = () => {
-    toast.info("Media upload modal will open here.");
+  const handleCloseDrawer = () => {
+    setIsDrawerOpen(false);
+    setCaption("");
+    setIsFeatured(false);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast.info("Media Gallery API integration is pending.");
+    handleCloseDrawer();
   };
 
   return (
@@ -27,7 +39,7 @@ export default function AdminGalleryPage() {
       action={
         <button
           type="button"
-          onClick={handleUpload}
+          onClick={() => setIsDrawerOpen(true)}
           className="inline-flex items-center gap-2 bg-[#013E51] hover:bg-[#025670] text-white px-5 py-2.5 rounded-xl font-[family-name:var(--font-lato)] text-xs font-bold uppercase tracking-wider transition shadow-sm cursor-pointer"
         >
           <FiUploadCloud className="w-4 h-4 text-[#E8B34A]" />
@@ -81,7 +93,7 @@ export default function AdminGalleryPage() {
           <div className="flex flex-wrap items-center justify-center gap-3">
             <button
               type="button"
-              onClick={handleUpload}
+              onClick={() => setIsDrawerOpen(true)}
               className="inline-flex items-center gap-2 bg-[#FAF7F2] hover:bg-[#013E51] text-[#013E51] hover:text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition cursor-pointer border border-[#013E51]/10"
             >
               <FiUploadCloud className="w-4 h-4" />
@@ -93,6 +105,73 @@ export default function AdminGalleryPage() {
             </span>
           </div>
         </div>
+
+        <AdminDrawer
+          isOpen={isDrawerOpen}
+          onClose={handleCloseDrawer}
+          eyebrow="Media Assets"
+          title="Upload Image"
+          subtitle="Add a high-resolution photograph to the media gallery."
+          footer={
+            <div className="flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={handleCloseDrawer}
+                className="px-5 py-2.5 rounded-xl border border-gray-200 bg-white text-xs font-bold uppercase tracking-wider text-[#013E51] hover:bg-[#FAF7F2] transition cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                form="gallery-drawer-form"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#013E51] hover:bg-[#025670] text-white text-xs font-bold uppercase tracking-wider transition shadow-sm cursor-pointer"
+              >
+                <FiCheck className="w-4 h-4 text-[#E8B34A]" />
+                <span>Upload Photo</span>
+              </button>
+            </div>
+          }
+        >
+          <form id="gallery-drawer-form" onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#013E51]">
+                Image File *
+              </label>
+              <label className="flex flex-col items-center justify-center gap-2 p-6 rounded-2xl border-2 border-dashed border-[#013E51]/20 bg-[#FAF7F2]/50 hover:border-[#E8B34A] transition cursor-pointer">
+                <FiUploadCloud className="w-8 h-8 text-[#013E51]/60" />
+                <span className="text-xs font-semibold text-[#013E51]">
+                  Click to choose image file
+                </span>
+                <input type="file" accept="image/*" className="hidden" />
+              </label>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#013E51]">
+                Caption / Title
+              </label>
+              <input
+                type="text"
+                value={caption}
+                onChange={(e) => setCaption(e.target.value)}
+                placeholder="e.g. Red Sea Coral Reef"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-[#FAF7F2]/50 text-xs sm:text-sm text-[#013E51] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
+              />
+            </div>
+
+            <label className="flex items-center gap-2.5 cursor-pointer pt-1">
+              <input
+                type="checkbox"
+                checked={isFeatured}
+                onChange={(e) => setIsFeatured(e.target.checked)}
+                className="w-4 h-4 rounded border-gray-300 text-[#013E51]"
+              />
+              <span className="text-xs font-semibold text-[#013E51]">
+                Mark as Featured Gallery Photo
+              </span>
+            </label>
+          </form>
+        </AdminDrawer>
       </div>
     </AdminShell>
   );

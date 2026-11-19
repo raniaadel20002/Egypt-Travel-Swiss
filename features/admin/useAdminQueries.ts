@@ -10,7 +10,6 @@ export function useAdminReportQuery(period: ReportPeriod) {
   return useQuery({
     queryKey: ADMIN_QUERY_KEYS.report(period),
     queryFn: () => getAdminReport(period),
-    staleTime: 1000 * 60 * 3,
     retry: 1,
   });
 }

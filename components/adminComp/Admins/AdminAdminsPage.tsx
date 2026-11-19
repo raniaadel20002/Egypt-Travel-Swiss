@@ -1,15 +1,30 @@
 "use client";
 
-import { FiShield, FiUserPlus, FiUser, FiCheckCircle } from "react-icons/fi";
+import { useState } from "react";
+import { FiShield, FiUserPlus, FiUser, FiCheckCircle, FiCheck } from "react-icons/fi";
 import { toast } from "sonner";
-import { useAdminAuthStore } from "@/features/admin/useAdminAuthStore";
+import { useAuthStore } from "@/features/auth/useAuthStore";
 import AdminShell from "@/components/adminComp/Common/AdminShell";
+import AdminDrawer from "@/components/adminComp/Common/AdminDrawer";
 
 export default function AdminAdminsPage() {
-  const { user } = useAdminAuthStore();
+  const { user } = useAuthStore();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState("Admin");
 
-  const handleInvite = () => {
-    toast.info("Invite administrator dialog will open here.");
+  const handleCloseDrawer = () => {
+    setIsDrawerOpen(false);
+    setFullName("");
+    setEmail("");
+    setRole("Admin");
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast.info("Administrator invitation API integration is pending.");
+    handleCloseDrawer();
   };
 
   return (
@@ -20,7 +35,7 @@ export default function AdminAdminsPage() {
       action={
         <button
           type="button"
-          onClick={handleInvite}
+          onClick={() => setIsDrawerOpen(true)}
           className="inline-flex items-center gap-2 bg-[#013E51] hover:bg-[#025670] text-white px-5 py-2.5 rounded-xl font-[family-name:var(--font-lato)] text-xs font-bold uppercase tracking-wider transition shadow-sm cursor-pointer"
         >
           <FiUserPlus className="w-4 h-4 text-[#E8B34A]" />
@@ -88,13 +103,84 @@ export default function AdminAdminsPage() {
           </p>
           <button
             type="button"
-            onClick={handleInvite}
+            onClick={() => setIsDrawerOpen(true)}
             className="inline-flex items-center gap-2 bg-[#FAF7F2] hover:bg-[#013E51] text-[#013E51] hover:text-white px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition cursor-pointer border border-[#013E51]/10"
           >
             <FiUserPlus className="w-4 h-4" />
             <span>Invite Team Member</span>
           </button>
         </div>
+
+        <AdminDrawer
+          isOpen={isDrawerOpen}
+          onClose={handleCloseDrawer}
+          eyebrow="Access & Security"
+          title="New Administrator"
+          subtitle="Invite a staff operator and assign portal access permissions."
+          footer={
+            <div className="flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={handleCloseDrawer}
+                className="px-5 py-2.5 rounded-xl border border-gray-200 bg-white text-xs font-bold uppercase tracking-wider text-[#013E51] hover:bg-[#FAF7F2] transition cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                form="admin-drawer-form"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#013E51] hover:bg-[#025670] text-white text-xs font-bold uppercase tracking-wider transition shadow-sm cursor-pointer"
+              >
+                <FiCheck className="w-4 h-4 text-[#E8B34A]" />
+                <span>Send Invitation</span>
+              </button>
+            </div>
+          }
+        >
+          <form id="admin-drawer-form" onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#013E51]">
+                Full Name *
+              </label>
+              <input
+                type="text"
+                required
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="e.g. Nadia Hassan"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-[#FAF7F2]/50 text-xs sm:text-sm text-[#013E51] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#013E51]">
+                Email Address *
+              </label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="staff@egyptdreams.com"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-[#FAF7F2]/50 text-xs sm:text-sm text-[#013E51] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#013E51]">
+                Portal Role
+              </label>
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-[#FAF7F2]/50 text-xs sm:text-sm text-[#013E51] focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
+              >
+                <option value="Admin">Admin</option>
+                <option value="SuperAdmin">SuperAdmin</option>
+              </select>
+            </div>
+          </form>
+        </AdminDrawer>
       </div>
     </AdminShell>
   );

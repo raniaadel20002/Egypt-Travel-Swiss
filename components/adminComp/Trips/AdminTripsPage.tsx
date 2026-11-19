@@ -1,33 +1,213 @@
 "use client";
 
-import { useState } from "react";
-import { FiPlus, FiSearch, FiCompass } from "react-icons/fi";
+import { useMemo, useState } from "react";
+import { FiPlus } from "react-icons/fi";
 import { toast } from "sonner";
+import { TripApiItem } from "@/models/trip";
+import {
+  useDeactivateTripMutation,
+  useReactivateTripMutation,
+  useTripsQuery,
+} from "@/features/trips/useTrips";
+import { useDestinationsQuery } from "@/features/destinations/useDestinations";
+import { useTripTypesQuery } from "@/features/tripTypes/useTripTypes";
 import AdminShell from "@/components/adminComp/Common/AdminShell";
+import TripsFiltersBar from "./TripsFiltersBar";
+import TripsTable from "./TripsTable";
+import TripFormDrawer from "./TripFormDrawer";
+import TripImagesDrawer from "./TripImagesDrawer";
+import TripServicesDrawer from "./TripServicesDrawer";
+import TripStatusModal from "./TripStatusModal";
+import { extractErrorMessage } from "@/shared/utils/errorHandler";
 
 export default function AdminTripsPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "deactivated">("all");
+  const [destinationId, setDestinationId] = useState<number | "all">("all");
+  const [typeId, setTypeId] = useState<number | "all">("all");
+  const [category, setCategory] = useState<number | "all">("all");
 
-  const filterTabs = [
-    { id: "all", label: "All Excursions" },
-    { id: "active", label: "Active" },
-    { id: "deactivated", label: "Deactivated" },
-  ];
+  const [formDrawer, setFormDrawer] = useState<{
+    isOpen: boolean;
+    mode: "create" | "edit";
+    item: TripApiItem | null;
+  }>({
+    isOpen: false,
+    mode: "create",
+    item: null,
+  });
 
-  const handleNewTrip = () => {
-    toast.info("Create excursion dialog will open here.");
+  const [imagesDrawer, setImagesDrawer] = useState<{
+    isOpen: boolean;
+    trip: TripApiItem | null;
+  }>({
+    isOpen: false,
+    trip: null,
+  });
+
+  const [servicesDrawer, setServicesDrawer] = useState<{
+    isOpen: boolean;
+    trip: TripApiItem | null;
+  }>({
+    isOpen: false,
+    trip: null,
+  });
+
+  const [statusModal, setStatusModal] = useState<{
+    isOpen: boolean;
+    item: TripApiItem | null;
+  }>({
+    isOpen: false,
+    item: null,
+  });
+
+  const tripsQuery = useTripsQuery({
+    includeInactive: true,
+    language: "EN",
+  });
+  const destinationsQuery = useDestinationsQuery({ language: "EN" });
+  const tripTypesQuery = useTripTypesQuery({ language: "EN" });
+
+  const deactivateMutation = useDeactivateTripMutation();
+  const reactivateMutation = useReactivateTripMutation();
+
+  const trips = tripsQuery.data || [];
+  const destinations = destinationsQuery.data || [];
+  const tripTypes = tripTypesQuery.data || [];
+
+  const counts = useMemo(() => {
+    const active = trips.filter((t) => t.isActive).length;
+    return {
+      all: trips.length,
+      active,
+      deactivated: trips.length - active,
+    };
+  }, [trips]);
+
+  const hasActiveFilters =
+    searchQuery.trim().length > 0 ||
+    statusFilter !== "all" ||
+    destinationId !== "all" ||
+    typeId !== "all" ||
+    category !== "all";
+
+  const handleResetFilters = () => {
+    setSearchQuery("");
+    setStatusFilter("all");
+    setDestinationId("all");
+    setTypeId("all");
+    setCategory("all");
+  };
+
+  const filteredItems = useMemo(() => {
+    return trips.filter((item) => {
+      if (statusFilter === "active" && !item.isActive) return false;
+      if (statusFilter === "deactivated" && item.isActive) return false;
+
+      if (destinationId !== "all") {
+        if (item.destinationInfo?.id !== destinationId) return false;
+      }
+
+      if (typeId !== "all") {
+        const matchedType = tripTypes.find((t) => t.id === typeId);
+        if (
+          matchedType &&
+          item.tripTypeName?.toLowerCase() !== matchedType.name.toLowerCase()
+        ) {
+          return false;
+        }
+      }
+
+      if (category !== "all") {
+        const isPrivate = item.categoryName?.toLowerCase() === "private";
+        if (category === 1 && !isPrivate) return false;
+        if (category === 0 && isPrivate) return false;
+      }
+
+      const q = searchQuery.trim().toLowerCase();
+      if (q) {
+        const matchName = item.name?.toLowerCase().includes(q);
+        const matchMarker = item.markerID?.toLowerCase().includes(q);
+        const matchDest = item.destinationInfo?.name?.toLowerCase().includes(q);
+        const matchId = String(item.id).includes(q);
+        if (!matchName && !matchMarker && !matchDest && !matchId) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [trips, statusFilter, destinationId, typeId, category, searchQuery, tripTypes]);
+
+  const handleCreate = () => {
+    setFormDrawer({
+      isOpen: true,
+      mode: "create",
+      item: null,
+    });
+  };
+
+  const handleEdit = (item: TripApiItem) => {
+    setFormDrawer({
+      isOpen: true,
+      mode: "edit",
+      item,
+    });
+  };
+
+  const handleManageImages = (item: TripApiItem) => {
+    setImagesDrawer({
+      isOpen: true,
+      trip: item,
+    });
+  };
+
+  const handleManageServices = (item: TripApiItem) => {
+    setServicesDrawer({
+      isOpen: true,
+      trip: item,
+    });
+  };
+
+  const handleToggleStatusPrompt = (item: TripApiItem) => {
+    setStatusModal({
+      isOpen: true,
+      item,
+    });
+  };
+
+  const handleToggleStatusConfirm = async () => {
+    if (!statusModal.item) return;
+
+    const item = statusModal.item;
+    try {
+      if (item.isActive) {
+        await deactivateMutation.mutateAsync(item.id);
+        toast.success(`"${item.name}" deactivated.`);
+      } else {
+        await reactivateMutation.mutateAsync(item.id);
+        toast.success(`"${item.name}" reactivated.`);
+      }
+      setStatusModal({ isOpen: false, item: null });
+    } catch (err) {
+      toast.error(
+        extractErrorMessage(
+          err,
+          `Failed to ${item.isActive ? "deactivate" : "reactivate"} excursion.`
+        )
+      );
+    }
   };
 
   return (
     <AdminShell
       eyebrow="Tours & Content"
       title="Trips & Excursions"
-      subtitle="Publish, edit, and maintain itineraries, pricing tiers, and activity programs."
+      subtitle="Publish, edit, and maintain itineraries, pricing tiers, and activity programs across Egypt."
       action={
         <button
           type="button"
-          onClick={handleNewTrip}
+          onClick={handleCreate}
           className="inline-flex items-center gap-2 bg-[#013E51] hover:bg-[#025670] text-white px-5 py-2.5 rounded-xl font-[family-name:var(--font-lato)] text-xs font-bold uppercase tracking-wider transition shadow-sm cursor-pointer"
         >
           <FiPlus className="w-4 h-4 text-[#E8B34A]" />
@@ -36,57 +216,78 @@ export default function AdminTripsPage() {
       }
     >
       <div className="space-y-6">
-        {/* Search & Filter Bar */}
-        <div className="bg-white rounded-[20px] p-4 sm:p-5 shadow-[0px_4px_20px_0px_rgba(0,0,0,0.04)] border border-[#013E51]/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="relative w-full sm:w-80">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search excursions by title or destination..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 bg-[#FAF7F2]/50 text-xs sm:text-sm text-[#013E51] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
-            />
-            <FiSearch className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-          </div>
+        <TripsFiltersBar
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          statusFilter={statusFilter}
+          onStatusChange={setStatusFilter}
+          destinationId={destinationId}
+          onDestinationChange={setDestinationId}
+          typeId={typeId}
+          onTypeChange={setTypeId}
+          category={category}
+          onCategoryChange={setCategory}
+          destinations={destinations}
+          tripTypes={tripTypes}
+          counts={counts}
+          onReset={handleResetFilters}
+          hasActiveFilters={hasActiveFilters}
+        />
 
-          <div className="flex flex-wrap items-center gap-1.5 w-full sm:w-auto">
-            {filterTabs.map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setStatusFilter(tab.id)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
-                  statusFilter === tab.id
-                    ? "bg-[#013E51] text-white"
-                    : "text-[#013E51]/70 hover:bg-[#FAF7F2]"
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
+        {tripsQuery.isError && (
+          <div className="p-4 rounded-xl border border-red-200 bg-red-50 text-xs font-semibold text-red-700">
+            {extractErrorMessage(
+              tripsQuery.error,
+              "Failed to load excursions from Touristy server."
+            )}
           </div>
-        </div>
+        )}
 
-        {/* Empty State Card */}
-        <div className="bg-white rounded-[24px] sm:rounded-[28px] p-10 sm:p-16 shadow-[0px_4px_24px_0px_rgba(0,0,0,0.04)] border border-[#013E51]/10 text-center flex flex-col items-center justify-center">
-          <div className="w-16 h-16 rounded-2xl bg-[#013E51]/5 text-[#013E51] flex items-center justify-center mb-4">
-            <FiCompass className="w-8 h-8 text-[#013E51]" />
-          </div>
-          <h2 className="font-[family-name:var(--font-cormorant)] text-2xl sm:text-3xl font-bold text-[#013E51]">
-            No Excursions Configured
-          </h2>
-          <p className="font-[family-name:var(--font-lato)] text-xs sm:text-sm text-[#888888] max-w-md mt-2 mb-6 leading-relaxed">
-            There are currently no active itineraries in the catalog. Create your first excursion with adult/child pricing, duration, and highlights.
-          </p>
-          <button
-            type="button"
-            onClick={handleNewTrip}
-            className="inline-flex items-center gap-2 bg-[#FAF7F2] hover:bg-[#013E51] text-[#013E51] hover:text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition cursor-pointer border border-[#013E51]/10"
-          >
-            <FiPlus className="w-4 h-4" />
-            <span>Create First Excursion</span>
-          </button>
-        </div>
+        <TripsTable
+          items={filteredItems}
+          isLoading={tripsQuery.isLoading}
+          onEdit={handleEdit}
+          onManageImages={handleManageImages}
+          onManageServices={handleManageServices}
+          onToggleStatus={handleToggleStatusPrompt}
+        />
+
+        <TripFormDrawer
+          isOpen={formDrawer.isOpen}
+          mode={formDrawer.mode}
+          item={formDrawer.item}
+          destinations={destinations}
+          tripTypes={tripTypes}
+          onClose={() => setFormDrawer((prev) => ({ ...prev, isOpen: false }))}
+        />
+
+        <TripImagesDrawer
+          isOpen={imagesDrawer.isOpen}
+          trip={
+            trips.find((t) => t.id === imagesDrawer.trip?.id) ||
+            imagesDrawer.trip
+          }
+          onClose={() => setImagesDrawer({ isOpen: false, trip: null })}
+        />
+
+        <TripServicesDrawer
+          isOpen={servicesDrawer.isOpen}
+          trip={
+            trips.find((t) => t.id === servicesDrawer.trip?.id) ||
+            servicesDrawer.trip
+          }
+          onClose={() => setServicesDrawer({ isOpen: false, trip: null })}
+        />
+
+        <TripStatusModal
+          isOpen={statusModal.isOpen}
+          item={statusModal.item}
+          isLoading={
+            deactivateMutation.isPending || reactivateMutation.isPending
+          }
+          onClose={() => setStatusModal({ isOpen: false, item: null })}
+          onConfirm={handleToggleStatusConfirm}
+        />
       </div>
     </AdminShell>
   );

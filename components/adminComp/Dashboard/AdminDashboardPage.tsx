@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { FiRefreshCw } from "react-icons/fi";
 import { useAdminReportQuery } from "@/features/admin/useAdminQueries";
 import { ReportPeriod } from "@/models/report";
 import AdminShell from "@/components/adminComp/Common/AdminShell";
@@ -27,40 +26,24 @@ export default function AdminDashboardPage() {
       title="Dashboard"
       subtitle="Track booking activity, revenue, customers, and the trips that are getting the most attention."
       action={
-        <div className="flex items-center gap-2.5">
-          <div className="inline-flex rounded-xl p-1 bg-white border border-[#013E51]/10 shadow-xs">
-            {reportPeriods.map((period) => {
-              const isActive = activePeriod === period.value;
-              return (
-                <button
-                  key={period.value}
-                  type="button"
-                  onClick={() => setActivePeriod(period.value)}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    isActive
-                      ? "bg-[#013E51] text-white shadow-xs"
-                      : "text-[#013E51]/70 hover:bg-[#FAF7F2] hover:text-[#013E51]"
-                  }`}
-                >
-                  {period.label}
-                </button>
-              );
-            })}
-          </div>
-
-          <button
-            type="button"
-            onClick={() => reportQuery.refetch()}
-            disabled={reportQuery.isFetching}
-            aria-label="Refresh report"
-            className="w-10 h-10 rounded-xl bg-white border border-[#013E51]/10 flex items-center justify-center text-[#013E51] hover:bg-[#FAF7F2] shadow-xs transition-colors cursor-pointer disabled:opacity-50"
-          >
-            <FiRefreshCw
-              className={`w-4 h-4 ${
-                reportQuery.isFetching ? "animate-spin text-[#E8B34A]" : ""
-              }`}
-            />
-          </button>
+        <div className="inline-flex rounded-xl p-1 bg-white border border-[#013E51]/10 shadow-xs">
+          {reportPeriods.map((period) => {
+            const isActive = activePeriod === period.value;
+            return (
+              <button
+                key={period.value}
+                type="button"
+                onClick={() => setActivePeriod(period.value)}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  isActive
+                    ? "bg-[#013E51] text-white shadow-xs"
+                    : "text-[#013E51]/70 hover:bg-[#FAF7F2] hover:text-[#013E51]"
+                }`}
+              >
+                {period.label}
+              </button>
+            );
+          })}
         </div>
       }
     >

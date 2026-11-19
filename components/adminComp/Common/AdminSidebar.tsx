@@ -1,9 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { FiLogOut, FiX, FiUser } from "react-icons/fi";
-import { useAdminAuthStore } from "@/features/admin/useAdminAuthStore";
+import { useAuthStore } from "@/features/auth/useAuthStore";
 import { getAdminNavGroups } from "./adminNavConfig";
 
 interface AdminSidebarProps {
@@ -14,7 +15,12 @@ interface AdminSidebarProps {
 export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, clearAuth } = useAdminAuthStore();
+  const { user, clearAuth } = useAuthStore();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleSignOut = () => {
     clearAuth();
@@ -80,7 +86,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                 ADMIN PANEL
               </p>
               <p className="text-xs font-bold text-[#013E51] mt-0.5">
-                {user?.role || "SuperAdmin"}
+                {mounted ? user?.role || "SuperAdmin" : "SuperAdmin"}
               </p>
             </div>
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -130,10 +136,12 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-xs font-bold text-[#013E51] truncate">
-                {user?.fullName || "System Admin"}
+                {mounted ? user?.fullName || "System Admin" : "System Admin"}
               </p>
               <p className="text-[11px] text-[#888888] truncate">
-                {user?.email || "admin@egyptdreams.com"}
+                {mounted
+                  ? user?.email || "admin@egyptdreams.com"
+                  : "admin@egyptdreams.com"}
               </p>
             </div>
           </div>

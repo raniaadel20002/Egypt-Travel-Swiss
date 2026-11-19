@@ -1,15 +1,27 @@
 "use client";
 
 import { useState } from "react";
-import { FiHelpCircle, FiPlus, FiSearch } from "react-icons/fi";
+import { FiHelpCircle, FiPlus, FiSearch, FiCheck } from "react-icons/fi";
 import { toast } from "sonner";
 import AdminShell from "@/components/adminComp/Common/AdminShell";
+import AdminDrawer from "@/components/adminComp/Common/AdminDrawer";
 
 export default function AdminFaqPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState("");
 
-  const handleAddQuestion = () => {
-    toast.info("Add new FAQ question modal will open here.");
+  const handleCloseDrawer = () => {
+    setIsDrawerOpen(false);
+    setQuestion("");
+    setAnswer("");
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast.info("FAQ API integration is pending.");
+    handleCloseDrawer();
   };
 
   return (
@@ -20,7 +32,7 @@ export default function AdminFaqPage() {
       action={
         <button
           type="button"
-          onClick={handleAddQuestion}
+          onClick={() => setIsDrawerOpen(true)}
           className="inline-flex items-center gap-2 bg-[#013E51] hover:bg-[#025670] text-white px-5 py-2.5 rounded-xl font-[family-name:var(--font-lato)] text-xs font-bold uppercase tracking-wider transition shadow-sm cursor-pointer"
         >
           <FiPlus className="w-4 h-4 text-[#E8B34A]" />
@@ -56,13 +68,70 @@ export default function AdminFaqPage() {
           </p>
           <button
             type="button"
-            onClick={handleAddQuestion}
+            onClick={() => setIsDrawerOpen(true)}
             className="inline-flex items-center gap-2 bg-[#FAF7F2] hover:bg-[#013E51] text-[#013E51] hover:text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition cursor-pointer border border-[#013E51]/10"
           >
             <FiPlus className="w-4 h-4" />
             <span>Create First Question</span>
           </button>
         </div>
+
+        <AdminDrawer
+          isOpen={isDrawerOpen}
+          onClose={handleCloseDrawer}
+          eyebrow="Help & Support"
+          title="Add Question"
+          subtitle="Create a frequently asked question and traveler guidance answer."
+          footer={
+            <div className="flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={handleCloseDrawer}
+                className="px-5 py-2.5 rounded-xl border border-gray-200 bg-white text-xs font-bold uppercase tracking-wider text-[#013E51] hover:bg-[#FAF7F2] transition cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                form="faq-drawer-form"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#013E51] hover:bg-[#025670] text-white text-xs font-bold uppercase tracking-wider transition shadow-sm cursor-pointer"
+              >
+                <FiCheck className="w-4 h-4 text-[#E8B34A]" />
+                <span>Save Question</span>
+              </button>
+            </div>
+          }
+        >
+          <form id="faq-drawer-form" onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#013E51]">
+                Question *
+              </label>
+              <input
+                type="text"
+                required
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                placeholder="e.g. What is your free cancellation policy?"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-[#FAF7F2]/50 text-xs sm:text-sm text-[#013E51] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#013E51]">
+                Answer *
+              </label>
+              <textarea
+                rows={5}
+                required
+                value={answer}
+                onChange={(e) => setAnswer(e.target.value)}
+                placeholder="Provide a clear and helpful answer for travelers..."
+                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-[#FAF7F2]/50 text-xs sm:text-sm text-[#013E51] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
+              />
+            </div>
+          </form>
+        </AdminDrawer>
       </div>
     </AdminShell>
   );

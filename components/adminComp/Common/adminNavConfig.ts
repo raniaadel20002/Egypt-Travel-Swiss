@@ -14,6 +14,8 @@ import {
   FiHelpCircle,
   FiPercent,
   FiShield,
+  FiUsers,
+  FiLayers,
 } from "react-icons/fi";
 
 export interface NavItemConfig {
@@ -79,6 +81,12 @@ export function getAdminNavGroups(pathname: string): NavGroupConfig[] {
           active: pathname.startsWith("/admin/trips"),
         },
         {
+          label: "Private Services",
+          href: "/admin/services",
+          icon: FiLayers,
+          active: pathname.startsWith("/admin/services"),
+        },
+        {
           label: "Trip Types",
           href: "/admin/trip-types",
           icon: FiTag,
@@ -101,6 +109,12 @@ export function getAdminNavGroups(pathname: string): NavGroupConfig[] {
           href: "/admin/gallery",
           icon: FiImage,
           active: pathname.startsWith("/admin/gallery"),
+        },
+        {
+          label: "Team Members",
+          href: "/admin/team-members",
+          icon: FiUsers,
+          active: pathname.startsWith("/admin/team-members"),
         },
       ],
     },
