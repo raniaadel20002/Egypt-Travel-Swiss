@@ -2,15 +2,34 @@ import enDict from "@/translations/en.json";
 import deDict from "@/translations/de.json";
 import arDict from "@/translations/ar.json";
 
-export type SupportedLocale = "en" | "de" | "ar";
+export type SupportedLocale =
+  | "en"
+  | "fr"
+  | "ru"
+  | "ro"
+  | "it"
+  | "de"
+  | "ar";
 
 export const DEFAULT_LOCALE: SupportedLocale = "en";
-export const SUPPORTED_LOCALES: SupportedLocale[] = ["en", "de", "ar"];
+export const SUPPORTED_LOCALES: SupportedLocale[] = [
+  "en",
+  "fr",
+  "ru",
+  "ro",
+  "it",
+  "de",
+  "ar",
+];
 
 export type Dictionary = typeof enDict;
 
 const DICTIONARIES: Record<SupportedLocale, Dictionary> = {
   en: enDict,
+  fr: enDict,
+  ru: enDict,
+  ro: enDict,
+  it: enDict,
   de: deDict,
   ar: arDict,
 };

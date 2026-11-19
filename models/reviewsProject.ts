@@ -1,0 +1,24 @@
+export interface ReviewProjectItem {
+  id: number;
+  comment: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  rate: number;
+  createdAt: string;
+}
+
+export interface CreateReviewProjectDto {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  comment: string;
+  rate: number;
+}
+
+export interface ReviewsProjectQueryParams {
+  pageNumber?: number;
+  pageSize?: number;
+}

@@ -20,11 +20,12 @@ export default function Navbar() {
     { label: "Accommodation", href: `/${locale}/accommodation` },
     { label: "Transfers", href: `/${locale}/transfers` },
     { label: "Blog", href: `/${locale}/blog` },
+    { label: "FAQ", href: `/${locale}/faq` },
   ];
 
   const aboutDropdownItems = [
     { label: "About Us", href: `/${locale}#why-choose-us` },
-    { label: "FAQ", href: `/${locale}#faq` },
+    { label: "FAQ", href: `/${locale}/faq` },
   ];
 
   const isHomeActive = pathname === `/${locale}` || pathname === `/${locale}/`;

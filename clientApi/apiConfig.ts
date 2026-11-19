@@ -56,7 +56,7 @@ apiClient.interceptors.response.use(
 
     const isAuthEndpoint =
       originalRequest?.url?.includes("/api/Auth/login") ||
-      originalRequest?.url?.includes("/api/Auth/refresh-token") ||
+      originalRequest?.url?.includes("/api/Auth/refresh") ||
       originalRequest?.url?.includes("/api/Auth/logout");
 
     if (
@@ -87,7 +87,7 @@ apiClient.interceptors.response.use(
 
       try {
         const res = await axios.post<ApiResponse<AuthTokenData>>(
-          `${API_BASE_URL}/api/Auth/refresh-token`,
+          `${API_BASE_URL}/api/Auth/refresh`,
           { refreshToken },
           {
             headers: {

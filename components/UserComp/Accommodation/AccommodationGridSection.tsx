@@ -28,13 +28,13 @@ export default function AccommodationGridSection() {
             </p>
           </div>
 
-          <button
+          {/* <button
             type="button"
             onClick={handleInquiryService}
             className="self-start sm:self-auto border border-[#013E51] text-[#013E51] hover:bg-[#013E51] hover:text-[#F7EDE1] rounded-full px-7 py-3 text-sm font-medium transition-colors whitespace-nowrap cursor-pointer"
           >
             Inquiry Service
-          </button>
+          </button> */}
         </div>
 
         {/* Accommodation Cards Grid: 3 cols desktop, 2 cols tablet, 1 col mobile */}
