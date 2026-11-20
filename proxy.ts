@@ -36,6 +36,11 @@ const VALID_ADMIN_SUBPATHS = new Set([
   "admins",
   "team-members",
   "services",
+  "hotels",
+  "transfer-locations",
+  "transfer-service",
+  "flight-locations",
+  "diving-courses",
 ]);
 
 export function proxy(request: NextRequest) {

@@ -1,4 +1,5 @@
 import { IconType } from "react-icons";
+import { FaHotel, FaLifeRing } from "react-icons/fa";
 import {
   FiGrid,
   FiCalendar,
@@ -16,6 +17,8 @@ import {
   FiShield,
   FiUsers,
   FiLayers,
+  FiNavigation,
+  FiGlobe,
 } from "react-icons/fi";
 
 export interface NavItemConfig {
@@ -109,6 +112,32 @@ export function getAdminNavGroups(pathname: string): NavGroupConfig[] {
           href: "/admin/gallery",
           icon: FiImage,
           active: pathname.startsWith("/admin/gallery"),
+        },
+        {
+          label: "Hotels & Resorts",
+          href: "/admin/hotels",
+          icon: FaHotel,
+          active: pathname.startsWith("/admin/hotels"),
+        },
+        {
+          label: "Diving Courses",
+          href: "/admin/diving-courses",
+          icon: FaLifeRing,
+          active: pathname.startsWith("/admin/diving-courses"),
+        },
+        {
+          label: "Transfer Service",
+          href: "/admin/transfer-service",
+          icon: FiNavigation,
+          active:
+            pathname.startsWith("/admin/transfer-service") ||
+            pathname.startsWith("/admin/transfer-locations"),
+        },
+        {
+          label: "Flight Locations",
+          href: "/admin/flight-locations",
+          icon: FiGlobe,
+          active: pathname.startsWith("/admin/flight-locations"),
         },
         {
           label: "Team Members",

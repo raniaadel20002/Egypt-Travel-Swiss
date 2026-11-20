@@ -8,7 +8,6 @@ export interface TripReportItem {
 export interface ReportData {
   totalBookings: number;
   totalRevenue: number;
-  newCustomers?: number;
   topTrips?: TripReportItem[];
 }
 
