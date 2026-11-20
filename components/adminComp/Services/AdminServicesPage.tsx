@@ -106,8 +106,8 @@ export default function AdminServicesPage() {
   return (
     <AdminShell
       eyebrow="Tours & Content"
-      title="Private Services"
-      subtitle="Manage premium add-ons and bespoke service packages available for private excursions."
+      title="Trip Services"
+      subtitle="Manage add-ons, extras, and bespoke service packages available for group and private excursions."
       action={
         <button
           type="button"

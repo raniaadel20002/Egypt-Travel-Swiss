@@ -1,42 +1,57 @@
 "use client";
 
-import { useState } from "react";
-import { FiTag, FiPlus, FiSearch, FiCheck } from "react-icons/fi";
-import { toast } from "sonner";
+import { useMemo, useState } from "react";
+import { FiCompass, FiPlus, FiSearch, FiTag, FiUsers } from "react-icons/fi";
 import AdminShell from "@/components/adminComp/Common/AdminShell";
-import AdminDrawer from "@/components/adminComp/Common/AdminDrawer";
+import {
+  PromoCodeFilterType,
+  usePromoCodesQuery,
+} from "@/features/promoCodes/usePromoCodes";
+import { extractErrorMessage } from "@/shared/utils/errorHandler";
+import PromoCodeFormDrawer from "./PromoCodeFormDrawer";
+import PromoCodesTable from "./PromoCodesTable";
+import PromoCodeSuccessModal from "./PromoCodeSuccessModal";
 
 export default function AdminPromoCodesPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTab, setActiveTab] = useState<PromoCodeFilterType>("all");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [code, setCode] = useState("");
-  const [discountPercent, setDiscountPercent] = useState("");
+  const [createdCode, setCreatedCode] = useState<number | null>(null);
 
-  const tabs = [
+  const promoCodesQuery = usePromoCodesQuery(activeTab);
+
+  const tabs: { id: PromoCodeFilterType; label: string }[] = [
     { id: "all", label: "All Codes" },
-    { id: "active", label: "Active" },
     { id: "general", label: "General Vouchers" },
     { id: "trip-specific", label: "Trip-Specific" },
   ];
 
-  const handleCloseDrawer = () => {
-    setIsDrawerOpen(false);
-    setCode("");
-    setDiscountPercent("");
-  };
+  const items = promoCodesQuery.data || [];
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast.info("Promo Codes API integration is pending.");
-    handleCloseDrawer();
-  };
+  const filteredItems = useMemo(() => {
+    if (!searchQuery.trim()) return items;
+    const q = searchQuery.toLowerCase().trim();
+    return items.filter((item) => {
+      const matchCode = String(item.code).includes(q);
+      const matchTrip = item.tripName?.toLowerCase().includes(q);
+      const matchCreator = item.createdBy?.toLowerCase().includes(q);
+      return matchCode || matchTrip || matchCreator;
+    });
+  }, [items, searchQuery]);
+
+  // Statistics
+  const stats = useMemo(() => {
+    const total = items.length;
+    const generalCount = items.filter((i) => !i.tripId || i.tripId === 0).length;
+    const tripSpecificCount = items.filter((i) => Number(i.tripId || 0) > 0).length;
+    return { total, generalCount, tripSpecificCount };
+  }, [items]);
 
   return (
     <AdminShell
       eyebrow="Marketing & Discounts"
       title="Promo Codes & Vouchers"
-      subtitle="Configure seasonal coupons, percentage discounts, and trip-specific campaign codes."
+      subtitle="Generate seasonal coupons, percentage discounts, and trip-specific campaign codes."
       action={
         <button
           type="button"
@@ -49,6 +64,51 @@ export default function AdminPromoCodesPage() {
       }
     >
       <div className="space-y-6">
+        {/* Metric Badges */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="bg-white rounded-[20px] p-4 border border-[#013E51]/10 shadow-[0px_4px_20px_0px_rgba(0,0,0,0.03)] flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#013E51]/5 text-[#013E51] flex items-center justify-center shrink-0">
+              <FiTag className="w-5 h-5 text-[#E8B34A]" />
+            </div>
+            <div>
+              <span className="block text-[11px] font-bold uppercase tracking-wider text-gray-500">
+                Filtered Total
+              </span>
+              <span className="text-xl font-extrabold text-[#013E51]">
+                {stats.total}
+              </span>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-[20px] p-4 border border-[#013E51]/10 shadow-[0px_4px_20px_0px_rgba(0,0,0,0.03)] flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#013E51]/5 text-[#013E51] flex items-center justify-center shrink-0">
+              <FiUsers className="w-5 h-5 text-[#013E51]" />
+            </div>
+            <div>
+              <span className="block text-[11px] font-bold uppercase tracking-wider text-gray-500">
+                General Vouchers
+              </span>
+              <span className="text-xl font-extrabold text-[#013E51]">
+                {stats.generalCount}
+              </span>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-[20px] p-4 border border-[#013E51]/10 shadow-[0px_4px_20px_0px_rgba(0,0,0,0.03)] flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#013E51]/5 text-[#013E51] flex items-center justify-center shrink-0">
+              <FiCompass className="w-5 h-5 text-[#013E51]" />
+            </div>
+            <div>
+              <span className="block text-[11px] font-bold uppercase tracking-wider text-gray-500">
+                Trip-Specific Codes
+              </span>
+              <span className="text-xl font-extrabold text-[#013E51]">
+                {stats.tripSpecificCount}
+              </span>
+            </div>
+          </div>
+        </div>
+
         {/* Search & Tabs */}
         <div className="bg-white rounded-[20px] p-4 sm:p-5 shadow-[0px_4px_20px_0px_rgba(0,0,0,0.04)] border border-[#013E51]/10 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="relative w-full sm:w-80">
@@ -56,7 +116,7 @@ export default function AdminPromoCodesPage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search code (e.g. SUMMER26)..."
+              placeholder="Search code, trip title, or creator..."
               className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 bg-[#FAF7F2]/50 text-xs sm:text-sm text-[#013E51] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
             />
             <FiSearch className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -80,85 +140,35 @@ export default function AdminPromoCodesPage() {
           </div>
         </div>
 
-        {/* Empty State Card */}
-        <div className="bg-white rounded-[24px] sm:rounded-[28px] p-10 sm:p-16 shadow-[0px_4px_24px_0px_rgba(0,0,0,0.04)] border border-[#013E51]/10 text-center flex flex-col items-center justify-center">
-          <div className="w-16 h-16 rounded-2xl bg-[#013E51]/5 text-[#013E51] flex items-center justify-center mb-4">
-            <FiTag className="w-8 h-8 text-[#013E51]" />
+        {/* Error Banner */}
+        {promoCodesQuery.isError && (
+          <div className="p-4 rounded-xl border border-red-200 bg-red-50 text-xs font-semibold text-red-700">
+            {extractErrorMessage(
+              promoCodesQuery.error,
+              "Failed to load promo codes from server."
+            )}
           </div>
-          <h2 className="font-[family-name:var(--font-cormorant)] text-2xl sm:text-3xl font-bold text-[#013E51]">
-            No Promo Codes Available
-          </h2>
-          <p className="font-[family-name:var(--font-lato)] text-xs sm:text-sm text-[#888888] max-w-md mt-2 mb-6">
-            There are no discount vouchers active for this filter. Launch a new promotion to boost bookings across your excursions.
-          </p>
-          <button
-            type="button"
-            onClick={() => setIsDrawerOpen(true)}
-            className="inline-flex items-center gap-2 bg-[#FAF7F2] hover:bg-[#013E51] text-[#013E51] hover:text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition cursor-pointer border border-[#013E51]/10"
-          >
-            <FiPlus className="w-4 h-4" />
-            <span>Create Promo Code</span>
-          </button>
-        </div>
+        )}
 
-        <AdminDrawer
+        {/* Table */}
+        <PromoCodesTable
+          items={filteredItems}
+          isLoading={promoCodesQuery.isLoading}
+        />
+
+        {/* Create Drawer */}
+        <PromoCodeFormDrawer
           isOpen={isDrawerOpen}
-          onClose={handleCloseDrawer}
-          eyebrow="Marketing & Discounts"
-          title="New Promo Code"
-          subtitle="Configure a voucher code and percentage discount."
-          footer={
-            <div className="flex items-center justify-end gap-3">
-              <button
-                type="button"
-                onClick={handleCloseDrawer}
-                className="px-5 py-2.5 rounded-xl border border-gray-200 bg-white text-xs font-bold uppercase tracking-wider text-[#013E51] hover:bg-[#FAF7F2] transition cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                form="promo-drawer-form"
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#013E51] hover:bg-[#025670] text-white text-xs font-bold uppercase tracking-wider transition shadow-sm cursor-pointer"
-              >
-                <FiCheck className="w-4 h-4 text-[#E8B34A]" />
-                <span>Create Code</span>
-              </button>
-            </div>
-          }
-        >
-          <form id="promo-drawer-form" onSubmit={handleSubmit} className="space-y-5">
-            <div className="space-y-1.5">
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#013E51]">
-                Voucher Code *
-              </label>
-              <input
-                type="text"
-                required
-                value={code}
-                onChange={(e) => setCode(e.target.value.toUpperCase())}
-                placeholder="e.g. SUMMER26"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-[#FAF7F2]/50 text-xs sm:text-sm text-[#013E51] font-semibold uppercase placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
-              />
-            </div>
+          onClose={() => setIsDrawerOpen(false)}
+          onCreated={(code) => setCreatedCode(code)}
+        />
 
-            <div className="space-y-1.5">
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#013E51]">
-                Discount Percentage (%) *
-              </label>
-              <input
-                type="number"
-                required
-                min="1"
-                max="100"
-                value={discountPercent}
-                onChange={(e) => setDiscountPercent(e.target.value)}
-                placeholder="e.g. 15"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-[#FAF7F2]/50 text-xs sm:text-sm text-[#013E51] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
-              />
-            </div>
-          </form>
-        </AdminDrawer>
+        {/* Success Modal */}
+        <PromoCodeSuccessModal
+          isOpen={Boolean(createdCode)}
+          code={createdCode}
+          onClose={() => setCreatedCode(null)}
+        />
       </div>
     </AdminShell>
   );

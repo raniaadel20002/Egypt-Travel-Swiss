@@ -17,6 +17,7 @@ import TripsTable from "./TripsTable";
 import TripFormDrawer from "./TripFormDrawer";
 import TripImagesDrawer from "./TripImagesDrawer";
 import TripServicesDrawer from "./TripServicesDrawer";
+import TripPrivateTransfersDrawer from "./TripPrivateTransfersDrawer";
 import TripStatusModal from "./TripStatusModal";
 import { extractErrorMessage } from "@/shared/utils/errorHandler";
 
@@ -31,35 +32,23 @@ export default function AdminTripsPage() {
     isOpen: boolean;
     mode: "create" | "edit";
     item: TripApiItem | null;
-  }>({
-    isOpen: false,
-    mode: "create",
-    item: null,
-  });
-
+  }>({ isOpen: false, mode: "create", item: null });
   const [imagesDrawer, setImagesDrawer] = useState<{
     isOpen: boolean;
     trip: TripApiItem | null;
-  }>({
-    isOpen: false,
-    trip: null,
-  });
-
+  }>({ isOpen: false, trip: null });
   const [servicesDrawer, setServicesDrawer] = useState<{
     isOpen: boolean;
     trip: TripApiItem | null;
-  }>({
-    isOpen: false,
-    trip: null,
-  });
-
+  }>({ isOpen: false, trip: null });
+  const [privateTransfersDrawer, setPrivateTransfersDrawer] = useState<{
+    isOpen: boolean;
+    trip: TripApiItem | null;
+  }>({ isOpen: false, trip: null });
   const [statusModal, setStatusModal] = useState<{
     isOpen: boolean;
     item: TripApiItem | null;
-  }>({
-    isOpen: false,
-    item: null,
-  });
+  }>({ isOpen: false, item: null });
 
   const tripsQuery = useTripsQuery({
     includeInactive: true,
@@ -139,42 +128,13 @@ export default function AdminTripsPage() {
     });
   }, [trips, statusFilter, destinationId, typeId, category, searchQuery, tripTypes]);
 
-  const handleCreate = () => {
-    setFormDrawer({
-      isOpen: true,
-      mode: "create",
-      item: null,
-    });
-  };
-
-  const handleEdit = (item: TripApiItem) => {
-    setFormDrawer({
-      isOpen: true,
-      mode: "edit",
-      item,
-    });
-  };
-
-  const handleManageImages = (item: TripApiItem) => {
-    setImagesDrawer({
-      isOpen: true,
-      trip: item,
-    });
-  };
-
-  const handleManageServices = (item: TripApiItem) => {
-    setServicesDrawer({
-      isOpen: true,
-      trip: item,
-    });
-  };
-
-  const handleToggleStatusPrompt = (item: TripApiItem) => {
-    setStatusModal({
-      isOpen: true,
-      item,
-    });
-  };
+  const handleCreate = () => setFormDrawer({ isOpen: true, mode: "create", item: null });
+  const handleEdit = (item: TripApiItem) => setFormDrawer({ isOpen: true, mode: "edit", item });
+  const handleManageImages = (item: TripApiItem) => setImagesDrawer({ isOpen: true, trip: item });
+  const handleManageServices = (item: TripApiItem) => setServicesDrawer({ isOpen: true, trip: item });
+  const handleManagePrivateTransfers = (item: TripApiItem) =>
+    setPrivateTransfersDrawer({ isOpen: true, trip: item });
+  const handleToggleStatusPrompt = (item: TripApiItem) => setStatusModal({ isOpen: true, item });
 
   const handleToggleStatusConfirm = async () => {
     if (!statusModal.item) return;
@@ -249,6 +209,7 @@ export default function AdminTripsPage() {
           onEdit={handleEdit}
           onManageImages={handleManageImages}
           onManageServices={handleManageServices}
+          onManagePrivateTransfers={handleManagePrivateTransfers}
           onToggleStatus={handleToggleStatusPrompt}
         />
 
@@ -277,6 +238,17 @@ export default function AdminTripsPage() {
             servicesDrawer.trip
           }
           onClose={() => setServicesDrawer({ isOpen: false, trip: null })}
+        />
+
+        <TripPrivateTransfersDrawer
+          isOpen={privateTransfersDrawer.isOpen}
+          trip={
+            trips.find((t) => t.id === privateTransfersDrawer.trip?.id) ||
+            privateTransfersDrawer.trip
+          }
+          onClose={() =>
+            setPrivateTransfersDrawer({ isOpen: false, trip: null })
+          }
         />
 
         <TripStatusModal

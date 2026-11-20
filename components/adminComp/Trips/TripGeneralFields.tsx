@@ -2,6 +2,7 @@
 
 import { DestinationApiItem } from "@/models/destination";
 import { TripTypeItem } from "@/models/tripType";
+import { FaCar } from "react-icons/fa";
 import {
   DurationTypeEnum,
   DURATION_TYPE_OPTIONS,
@@ -184,50 +185,62 @@ export default function TripGeneralFields({
       </div>
 
       {/* Pricing (Adult, Child, Infant) */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="space-y-1.5">
-          <label className="block text-[11px] font-bold uppercase tracking-wider text-[#013E51]">
-            Adult (€) *
-          </label>
-          <input
-            type="number"
-            min="0"
-            step="0.01"
-            required
-            value={adultPrice}
-            onChange={(e) => onAdultPriceChange(Number(e.target.value))}
-            className="w-full px-3 py-2 rounded-xl border border-gray-200 bg-[#FAF7F2]/50 text-xs sm:text-sm text-[#013E51] font-bold focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
-          />
+      {category === TripCategoryEnum.Private ? (
+        <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80 text-xs text-[#013E51] space-y-1">
+          <div className="flex items-center gap-2 font-bold text-amber-900">
+            <FaCar className="w-4 h-4 text-[#E8B34A]" />
+            <span>Private Excursion Base Pricing (€0)</span>
+          </div>
+          <p className="text-[11px] text-amber-800/80 leading-relaxed">
+            Base adult, child, and infant prices are automatically set to €0. The total booking price for private excursions is calculated from attached Services plus Private Vehicle Transfer pricing based on passenger count.
+          </p>
         </div>
+      ) : (
+        <div className="grid grid-cols-3 gap-3">
+          <div className="space-y-1.5">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-[#013E51]">
+              Adult (€) *
+            </label>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              required
+              value={adultPrice}
+              onChange={(e) => onAdultPriceChange(Number(e.target.value))}
+              className="w-full px-3 py-2 rounded-xl border border-gray-200 bg-[#FAF7F2]/50 text-xs sm:text-sm text-[#013E51] font-bold focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
+            />
+          </div>
 
-        <div className="space-y-1.5">
-          <label className="block text-[11px] font-bold uppercase tracking-wider text-[#013E51]">
-            Child (€)
-          </label>
-          <input
-            type="number"
-            min="0"
-            step="0.01"
-            value={childPrice}
-            onChange={(e) => onChildPriceChange(Number(e.target.value))}
-            className="w-full px-3 py-2 rounded-xl border border-gray-200 bg-[#FAF7F2]/50 text-xs sm:text-sm text-[#013E51] font-medium focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
-          />
-        </div>
+          <div className="space-y-1.5">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-[#013E51]">
+              Child (€)
+            </label>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={childPrice}
+              onChange={(e) => onChildPriceChange(Number(e.target.value))}
+              className="w-full px-3 py-2 rounded-xl border border-gray-200 bg-[#FAF7F2]/50 text-xs sm:text-sm text-[#013E51] font-medium focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
+            />
+          </div>
 
-        <div className="space-y-1.5">
-          <label className="block text-[11px] font-bold uppercase tracking-wider text-[#013E51]">
-            Infant (€)
-          </label>
-          <input
-            type="number"
-            min="0"
-            step="0.01"
-            value={infPrice}
-            onChange={(e) => onInfPriceChange(Number(e.target.value))}
-            className="w-full px-3 py-2 rounded-xl border border-gray-200 bg-[#FAF7F2]/50 text-xs sm:text-sm text-[#013E51] font-medium focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
-          />
+          <div className="space-y-1.5">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-[#013E51]">
+              Infant (€)
+            </label>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={infPrice}
+              onChange={(e) => onInfPriceChange(Number(e.target.value))}
+              className="w-full px-3 py-2 rounded-xl border border-gray-200 bg-[#FAF7F2]/50 text-xs sm:text-sm text-[#013E51] font-medium focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Available Days */}
       <div className="space-y-2 pt-2">

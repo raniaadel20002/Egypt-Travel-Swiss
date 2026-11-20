@@ -11,6 +11,7 @@ import {
   FiClock,
   FiLayers,
 } from "react-icons/fi";
+import { FaCar } from "react-icons/fa";
 import { TripApiItem } from "@/models/trip";
 import { resolveApiImageUrl } from "@/shared/utils/imageUrl";
 
@@ -20,6 +21,7 @@ interface TripsTableProps {
   onEdit: (item: TripApiItem) => void;
   onManageImages: (item: TripApiItem) => void;
   onManageServices: (item: TripApiItem) => void;
+  onManagePrivateTransfers?: (item: TripApiItem) => void;
   onToggleStatus: (item: TripApiItem) => void;
 }
 
@@ -29,6 +31,7 @@ export default function TripsTable({
   onEdit,
   onManageImages,
   onManageServices,
+  onManagePrivateTransfers,
   onToggleStatus,
 }: TripsTableProps) {
   if (isLoading) {
@@ -174,14 +177,25 @@ export default function TripsTable({
 
                   {/* Pricing */}
                   <td className="py-4 px-5">
-                    <div className="text-xs space-y-0.5">
-                      <div className="font-bold text-[#013E51]">
-                        Adult: €{item.adultPrice}
+                    {item.categoryName?.toLowerCase() === "private" ? (
+                      <div className="space-y-0.5">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#E8B34A]/15 text-[#976D17] border border-[#E8B34A]/30">
+                          Services + Transfer
+                        </span>
+                        <span className="block text-[11px] text-gray-400">
+                          Base: €0
+                        </span>
                       </div>
-                      <div className="text-gray-500 text-[11px]">
-                        Child: €{item.childPrice} | Inf: €{item.infPrice}
+                    ) : (
+                      <div className="text-xs space-y-0.5">
+                        <div className="font-bold text-[#013E51]">
+                          Adult: €{item.adultPrice}
+                        </div>
+                        <div className="text-gray-500 text-[11px]">
+                          Child: €{item.childPrice} | Inf: €{item.infPrice}
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </td>
 
                   {/* Status */}
@@ -202,14 +216,23 @@ export default function TripsTable({
                   {/* Actions */}
                   <td className="py-4 px-5 text-right">
                     <div className="flex items-center justify-end gap-1">
-                      {item.categoryName?.toLowerCase() === "private" && (
+                      <button
+                        type="button"
+                        onClick={() => onManageServices(item)}
+                        title="Manage Excursion Services"
+                        className="p-2 rounded-xl text-[#013E51] bg-[#FAF7F2] hover:bg-[#E8B34A]/25 transition cursor-pointer"
+                      >
+                        <FiLayers className="w-4 h-4 text-[#013E51]" />
+                      </button>
+
+                      {item.categoryName?.toLowerCase() === "private" && onManagePrivateTransfers && (
                         <button
                           type="button"
-                          onClick={() => onManageServices(item)}
-                          title="Manage Private Services"
-                          className="p-2 rounded-xl text-[#013E51] bg-[#FAF7F2] hover:bg-[#E8B34A]/25 transition cursor-pointer"
+                          onClick={() => onManagePrivateTransfers(item)}
+                          title="Manage Private Vehicle Transfer Pricing"
+                          className="p-2 rounded-xl text-[#013E51] bg-[#FAF7F2] hover:bg-[#013E51] hover:text-[#E8B34A] transition cursor-pointer"
                         >
-                          <FiLayers className="w-4 h-4 text-[#013E51]" />
+                          <FaCar className="w-4 h-4" />
                         </button>
                       )}
 

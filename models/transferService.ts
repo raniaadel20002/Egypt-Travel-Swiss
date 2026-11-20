@@ -6,7 +6,7 @@ import {
 export { TRANSFER_LOCATION_LANGUAGES };
 export type { TransferLocationLocalizedName };
 
-export type TransferServiceTab = "from" | "to" | "vehicles" | "prices";
+export type TransferServiceTab = "countries" | "from" | "to" | "vehicles" | "prices";
 
 export interface VehicleTypeTransferApiItem {
   id: string;

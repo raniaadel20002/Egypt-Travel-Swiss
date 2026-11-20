@@ -1,5 +1,5 @@
 import { IconType } from "react-icons";
-import { FaHotel, FaLifeRing } from "react-icons/fa";
+import { FaCar, FaHotel, FaLifeRing } from "react-icons/fa";
 import {
   FiGrid,
   FiCalendar,
@@ -84,10 +84,16 @@ export function getAdminNavGroups(pathname: string): NavGroupConfig[] {
           active: pathname.startsWith("/admin/trips"),
         },
         {
-          label: "Private Services",
+          label: "Trip Services",
           href: "/admin/services",
           icon: FiLayers,
           active: pathname.startsWith("/admin/services"),
+        },
+        {
+          label: "Private Trip Pricing",
+          href: "/admin/private-vehicles",
+          icon: FaCar,
+          active: pathname.startsWith("/admin/private-vehicles"),
         },
         {
           label: "Trip Types",

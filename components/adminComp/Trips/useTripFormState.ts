@@ -130,33 +130,45 @@ export function useTripFormState({
     }
   }, [isOpen, isEdit, detailsData, item, destinations, tripTypes]);
 
+  const handleCategoryChange = (newCategory: TripCategoryEnum) => {
+    setCategory(newCategory);
+    if (newCategory === TripCategoryEnum.Private) {
+      setAdultPrice(0);
+      setChildPrice(0);
+      setInfPrice(0);
+    }
+  };
+
   const handleDayToggle = (dayNo: number) => {
     setAvailabilityDayNo((prev) =>
       prev.includes(dayNo) ? prev.filter((d) => d !== dayNo) : [...prev, dayNo]
     );
   };
 
-  const buildPayload = (): CreateTripPayload => ({
-    destinationId,
-    tripTypeId,
-    category,
-    timeFrom,
-    durationValue: Number(durationValue) || 1,
-    durationType,
-    adultPrice: Number(adultPrice) || 0,
-    childPrice: Number(childPrice) || 0,
-    infPrice: Number(infPrice) || 0,
-    availabilityDayNo:
-      availabilityDayNo.length > 0 ? availabilityDayNo : [0, 1, 2, 3, 4, 5, 6],
-    name: normalizeTranslation(name),
-    description: normalizeTranslation(description),
-    highlights: highlights.filter((h) => h.en.trim()).map(normalizeTranslation),
-    includes: includes.filter((i) => i.en.trim()).map(normalizeTranslation),
-    excludes: excludes.filter((e) => e.en.trim()).map(normalizeTranslation),
-    whatToBring: whatToBring
-      .filter((w) => w.en.trim())
-      .map(normalizeTranslation),
-  });
+  const buildPayload = (): CreateTripPayload => {
+    const isPrivate = category === TripCategoryEnum.Private;
+    return {
+      destinationId,
+      tripTypeId,
+      category,
+      timeFrom,
+      durationValue: Number(durationValue) || 1,
+      durationType,
+      adultPrice: isPrivate ? 0 : Number(adultPrice) || 0,
+      childPrice: isPrivate ? 0 : Number(childPrice) || 0,
+      infPrice: isPrivate ? 0 : Number(infPrice) || 0,
+      availabilityDayNo:
+        availabilityDayNo.length > 0 ? availabilityDayNo : [0, 1, 2, 3, 4, 5, 6],
+      name: normalizeTranslation(name),
+      description: normalizeTranslation(description),
+      highlights: highlights.filter((h) => h.en.trim()).map(normalizeTranslation),
+      includes: includes.filter((i) => i.en.trim()).map(normalizeTranslation),
+      excludes: excludes.filter((e) => e.en.trim()).map(normalizeTranslation),
+      whatToBring: whatToBring
+        .filter((w) => w.en.trim())
+        .map(normalizeTranslation),
+    };
+  };
 
   return {
     destinationId,
@@ -164,7 +176,7 @@ export function useTripFormState({
     tripTypeId,
     setTripTypeId,
     category,
-    setCategory,
+    setCategory: handleCategoryChange,
     timeFrom,
     setTimeFrom,
     durationValue,

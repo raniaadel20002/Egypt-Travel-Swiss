@@ -1,74 +1,265 @@
 "use client";
 
-import { useState } from "react";
-import { FiCalendar, FiSearch, FiCheckCircle } from "react-icons/fi";
+import { useMemo, useState } from "react";
+import { FiAlertCircle, FiPlus } from "react-icons/fi";
+import { toast } from "sonner";
 import AdminShell from "@/components/adminComp/Common/AdminShell";
+import ConfirmDeleteDialog from "@/components/adminComp/Common/ConfirmDeleteDialog";
+import {
+  BookingApiItem,
+  BookingsQueryParams,
+  BookingStatusFilter,
+} from "@/models/booking";
+import {
+  useBookingsQuery,
+  useConfirmBookingMutation,
+  useDeleteBookingMutation,
+  useFinishBookingMutation,
+} from "@/features/bookings/useBookings";
+import { useTripsQuery } from "@/features/trips/useTrips";
+import { extractErrorMessage } from "@/shared/utils/errorHandler";
+import BookingMetricsGrid from "./BookingMetricsGrid";
+import BookingsFiltersBar from "./BookingsFiltersBar";
+import BookingsTable from "./BookingsTable";
+import BookingPaginationBar from "./BookingPaginationBar";
+import BookingDetailsDrawer from "./BookingDetailsDrawer";
+import BookingCreateDrawer from "./BookingCreateDrawer";
+
+const PAGE_SIZE = 50;
 
 export default function AdminBookingsPage() {
+  const [pageNumber, setPageNumber] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState<BookingStatusFilter>("all");
+  const [tripIdFilter, setTripIdFilter] = useState<number | "all">("all");
+  const [dateFilter, setDateFilter] = useState("");
+  const [nationalityFilter, setNationalityFilter] = useState("");
+  const [phoneFilter, setPhoneFilter] = useState("");
 
-  const filterTabs = [
-    { id: "all", label: "All Bookings" },
-    { id: "pending", label: "Pending" },
-    { id: "confirmed", label: "Confirmed" },
-    { id: "finished", label: "Finished" },
-  ];
+  const [activeBookingId, setActiveBookingId] = useState<number | null>(null);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [deletingBooking, setDeletingBooking] = useState<BookingApiItem | null>(null);
+
+  const queryParams: BookingsQueryParams = useMemo(() => {
+    const p: BookingsQueryParams = {
+      PageNumber: pageNumber,
+      PageSize: PAGE_SIZE,
+    };
+    if (searchQuery.trim()) p.SearchItem = searchQuery.trim();
+    if (tripIdFilter !== "all") p.TripId = tripIdFilter;
+    if (dateFilter.trim()) p.Date = dateFilter.trim();
+    if (nationalityFilter.trim()) p.Nationality = nationalityFilter.trim();
+    if (phoneFilter.trim()) p.Phone = phoneFilter.trim();
+    return p;
+  }, [
+    pageNumber,
+    searchQuery,
+    tripIdFilter,
+    dateFilter,
+    nationalityFilter,
+    phoneFilter,
+  ]);
+
+  const bookingsQuery = useBookingsQuery(queryParams);
+  const tripsQuery = useTripsQuery({ language: "EN" });
+
+  const confirmMutation = useConfirmBookingMutation();
+  const finishMutation = useFinishBookingMutation();
+  const deleteMutation = useDeleteBookingMutation();
+
+  const isActionPending =
+    confirmMutation.isPending || finishMutation.isPending || deleteMutation.isPending;
+
+  const bookings = bookingsQuery.data || [];
+  const trips = tripsQuery.data || [];
+
+  const stats = useMemo(() => {
+    let pending = 0;
+    let confirmed = 0;
+    let finished = 0;
+    let revenue = 0;
+
+    bookings.forEach((b) => {
+      const s = b.status?.toLowerCase().trim();
+      if (s === "pending") pending += 1;
+      else if (s === "confirmed") confirmed += 1;
+      else if (s === "finished") finished += 1;
+      revenue += b.totalPrice || 0;
+    });
+
+    return { total: bookings.length, pending, confirmed, finished, revenue };
+  }, [bookings]);
+
+  const filteredBookings = useMemo(() => {
+    if (statusFilter === "all") return bookings;
+    return bookings.filter(
+      (b) => b.status?.toLowerCase().trim() === statusFilter
+    );
+  }, [bookings, statusFilter]);
+
+  const handleResetFilters = () => {
+    setSearchQuery("");
+    setStatusFilter("all");
+    setTripIdFilter("all");
+    setDateFilter("");
+    setNationalityFilter("");
+    setPhoneFilter("");
+    setPageNumber(1);
+  };
+
+  const handleConfirm = async (bookingOrId: BookingApiItem | number) => {
+    const id = typeof bookingOrId === "number" ? bookingOrId : bookingOrId.id;
+    try {
+      await confirmMutation.mutateAsync(id);
+      toast.success(`Booking #${id} confirmed.`);
+    } catch (err) {
+      toast.error(extractErrorMessage(err, "Failed to confirm booking."));
+    }
+  };
+
+  const handleFinish = async (bookingOrId: BookingApiItem | number) => {
+    const id = typeof bookingOrId === "number" ? bookingOrId : bookingOrId.id;
+    try {
+      await finishMutation.mutateAsync(id);
+      toast.success(`Booking #${id} marked as finished.`);
+    } catch (err) {
+      toast.error(extractErrorMessage(err, "Failed to finish booking."));
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deletingBooking) return;
+    try {
+      await deleteMutation.mutateAsync(deletingBooking.id);
+      toast.success(`Booking #${deletingBooking.id} deleted.`);
+      if (activeBookingId === deletingBooking.id) {
+        setActiveBookingId(null);
+      }
+      setDeletingBooking(null);
+    } catch (err) {
+      toast.error(extractErrorMessage(err, "Failed to delete booking."));
+    }
+  };
 
   return (
     <AdminShell
       eyebrow="Reservations"
       title="Tour Bookings & Excursions"
-      subtitle="Review, confirm, or modify traveler bookings across Egyptian tours and marine safaris."
+      subtitle="Review, confirm, or modify traveler bookings across Egyptian tours and marine safaris in EUR (&euro;)."
+      action={
+        <button
+          type="button"
+          onClick={() => setIsCreateOpen(true)}
+          className="inline-flex items-center gap-2 bg-[#013E51] hover:bg-[#025670] text-white px-5 py-2.5 rounded-xl font-[family-name:var(--font-lato)] text-xs font-bold uppercase tracking-wider transition shadow-sm cursor-pointer"
+        >
+          <FiPlus className="w-4 h-4 text-[#E8B34A]" />
+          <span>New Booking</span>
+        </button>
+      }
     >
       <div className="space-y-6">
-        {/* Search & Filter Bar */}
-        <div className="bg-white rounded-[20px] p-4 sm:p-5 shadow-[0px_4px_20px_0px_rgba(0,0,0,0.04)] border border-[#013E51]/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="relative w-full sm:w-80">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by customer name or tour..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 bg-[#FAF7F2]/50 text-xs sm:text-sm text-[#013E51] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
-            />
-            <FiSearch className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-          </div>
+        {/* Metric Badges */}
+        <BookingMetricsGrid stats={stats} />
 
-          <div className="flex flex-wrap items-center gap-1.5 w-full sm:w-auto">
-            {filterTabs.map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setStatusFilter(tab.id)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
-                  statusFilter === tab.id
-                    ? "bg-[#013E51] text-white"
-                    : "text-[#013E51]/70 hover:bg-[#FAF7F2]"
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </div>
+        {/* Filters Bar */}
+        <BookingsFiltersBar
+          searchQuery={searchQuery}
+          onSearchChange={(val) => {
+            setSearchQuery(val);
+            setPageNumber(1);
+          }}
+          statusFilter={statusFilter}
+          onStatusChange={(val) => {
+            setStatusFilter(val);
+            setPageNumber(1);
+          }}
+          tripIdFilter={tripIdFilter}
+          onTripIdChange={(val) => {
+            setTripIdFilter(val);
+            setPageNumber(1);
+          }}
+          dateFilter={dateFilter}
+          onDateChange={(val) => {
+            setDateFilter(val);
+            setPageNumber(1);
+          }}
+          nationalityFilter={nationalityFilter}
+          onNationalityChange={(val) => {
+            setNationalityFilter(val);
+            setPageNumber(1);
+          }}
+          phoneFilter={phoneFilter}
+          onPhoneChange={(val) => {
+            setPhoneFilter(val);
+            setPageNumber(1);
+          }}
+          trips={trips}
+          onReset={handleResetFilters}
+        />
 
-        {/* Empty State Card */}
-        <div className="bg-white rounded-[24px] sm:rounded-[28px] p-10 sm:p-16 shadow-[0px_4px_24px_0px_rgba(0,0,0,0.04)] border border-[#013E51]/10 text-center flex flex-col items-center justify-center">
-          <div className="w-16 h-16 rounded-2xl bg-[#013E51]/5 text-[#013E51] flex items-center justify-center mb-4">
-            <FiCalendar className="w-8 h-8 text-[#013E51]" />
+        {/* Error Banner */}
+        {bookingsQuery.isError && (
+          <div className="p-4 rounded-xl border border-red-200 bg-red-50 text-xs font-semibold text-red-700 flex items-center gap-2">
+            <FiAlertCircle className="w-4 h-4 shrink-0 text-red-500" />
+            <span>{extractErrorMessage(bookingsQuery.error, "Failed to load tour bookings.")}</span>
           </div>
-          <h2 className="font-[family-name:var(--font-cormorant)] text-2xl sm:text-3xl font-bold text-[#013E51]">
-            No Tour Bookings Recorded
-          </h2>
-          <p className="font-[family-name:var(--font-lato)] text-xs sm:text-sm text-[#888888] max-w-md mt-2 mb-4 leading-relaxed">
-            There are currently no tour reservations matching this filter. Excursion bookings submitted through trip checkout flows will appear here.
-          </p>
-          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#888888] bg-[#FAF7F2] px-3.5 py-1.5 rounded-full border border-[#013E51]/10">
-            <FiCheckCircle className="w-3.5 h-3.5 text-[#E8B34A]" />
-            <span>Connected to Touristy Bookings API</span>
-          </span>
-        </div>
+        )}
+
+        {/* Bookings Table */}
+        <BookingsTable
+          items={filteredBookings}
+          isLoading={bookingsQuery.isLoading}
+          onViewDetails={(b) => setActiveBookingId(b.id)}
+          onConfirm={handleConfirm}
+          onFinish={handleFinish}
+          onDelete={(b) => setDeletingBooking(b)}
+        />
+
+        {/* Pagination Bar */}
+        <BookingPaginationBar
+          pageNumber={pageNumber}
+          count={filteredBookings.length}
+          pageSize={PAGE_SIZE}
+          onPrev={() => setPageNumber((p) => Math.max(1, p - 1))}
+          onNext={() => setPageNumber((p) => p + 1)}
+        />
+
+        {/* Details Drawer */}
+        <BookingDetailsDrawer
+          isOpen={Boolean(activeBookingId)}
+          bookingId={activeBookingId}
+          onClose={() => setActiveBookingId(null)}
+          onConfirm={handleConfirm}
+          onFinish={handleFinish}
+          onDelete={(id) => {
+            const found = bookings.find((b) => b.id === id);
+            if (found) setDeletingBooking(found);
+          }}
+          isActionPending={isActionPending}
+        />
+
+        {/* Create Manual Booking Drawer */}
+        <BookingCreateDrawer
+          isOpen={isCreateOpen}
+          onClose={() => setIsCreateOpen(false)}
+          trips={trips}
+          onCreated={() => bookingsQuery.refetch()}
+        />
+
+        {/* Delete Confirmation Modal */}
+        <ConfirmDeleteDialog
+          isOpen={Boolean(deletingBooking)}
+          title={`Delete Booking #${deletingBooking?.id || ""}`}
+          description={`Are you sure you want to delete the reservation for ${
+            deletingBooking?.firstName || ""
+          } ${
+            deletingBooking?.lastName || ""
+          }? This action will permanently remove this record.`}
+          confirmLabel="Delete Booking"
+          isPending={deleteMutation.isPending}
+          onConfirm={handleDeleteConfirm}
+          onClose={() => setDeletingBooking(null)}
+        />
       </div>
     </AdminShell>
   );

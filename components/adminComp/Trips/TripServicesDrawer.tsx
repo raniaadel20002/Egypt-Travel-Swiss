@@ -123,12 +123,12 @@ export default function TripServicesDrawer({
       isOpen={isOpen}
       onClose={onClose}
       disableClose={isSaving}
-      eyebrow={trip ? `ID #${trip.id} • Private Excursion` : "Private Excursion"}
-      title="Private Services"
+      eyebrow={trip ? `ID #${trip.id} • ${trip.categoryName || "Excursion"}` : "Excursion"}
+      title="Trip Services"
       subtitle={
         trip
           ? `Select add-on services bundled with "${trip.name}".`
-          : "Manage private excursion services."
+          : "Manage excursion add-on services."
       }
       widthClassName="max-w-2xl sm:max-w-3xl"
       footer={
