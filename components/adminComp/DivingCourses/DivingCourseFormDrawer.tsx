@@ -9,6 +9,7 @@ import {
   UpdateDivingCourseFacilityInput,
   UpdateDivingCoursePayload,
 } from "@/models/divingCourse";
+import { useModalDismiss } from "@/shared/utils/useModalDismiss";
 import {
   useCreateDivingCourseMutation,
   useDivingCourseMultiLangQuery,
@@ -48,6 +49,8 @@ export default function DivingCourseFormDrawer({
   const createMutation = useCreateDivingCourseMutation();
   const updateMutation = useUpdateDivingCourseMutation();
   const isSubmitting = createMutation.isPending || updateMutation.isPending;
+
+  useModalDismiss({ isOpen, onClose, disabled: isSubmitting });
 
   useEffect(() => {
     if (isEdit && multiLangData) {
@@ -107,9 +110,6 @@ export default function DivingCourseFormDrawer({
       role="dialog"
       aria-modal="true"
       className="fixed inset-0 z-50 flex justify-end bg-[#013E51]/40 backdrop-blur-xs transition-opacity"
-      onClick={(e) => {
-        if (e.target === e.currentTarget && !isSubmitting) onClose();
-      }}
     >
       <div className="relative w-full max-w-3xl bg-white h-full shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-200">
         <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-white shrink-0">

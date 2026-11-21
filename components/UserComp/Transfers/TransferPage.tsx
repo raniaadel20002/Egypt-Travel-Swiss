@@ -133,7 +133,7 @@ export default function TransferPage() {
         nationality,
         email,
         preferredContactMethod,
-        phone,
+        phone: phone.replace(/\s+/g, "").trim(),
         luggagePieces,
         notes,
       });

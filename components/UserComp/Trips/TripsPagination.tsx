@@ -13,7 +13,41 @@ export default function TripsPagination({
   totalPages,
   onPageChange,
 }: TripsPaginationProps) {
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+  if (totalPages <= 1) return null;
+
+  const getPageNumbers = (): (number | string)[] => {
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    if (currentPage <= 4) {
+      return [1, 2, 3, 4, 5, "...", totalPages];
+    }
+
+    if (currentPage >= totalPages - 3) {
+      return [
+        1,
+        "...",
+        totalPages - 4,
+        totalPages - 3,
+        totalPages - 2,
+        totalPages - 1,
+        totalPages,
+      ];
+    }
+
+    return [
+      1,
+      "...",
+      currentPage - 1,
+      currentPage,
+      currentPage + 1,
+      "...",
+      totalPages,
+    ];
+  };
+
+  const pages = getPageNumbers();
 
   return (
     <div className="flex items-center justify-center gap-2 sm:gap-3 pt-6 sm:pt-8 font-[family-name:var(--font-lato)]">
@@ -29,7 +63,18 @@ export default function TripsPagination({
       </button>
 
       {/* Page Numbers */}
-      {pages.map((page) => {
+      {pages.map((page, idx) => {
+        if (typeof page === "string") {
+          return (
+            <span
+              key={`ellipsis-${idx}`}
+              className="w-8 h-10 flex items-center justify-center text-gray-400 font-bold select-none"
+            >
+              ...
+            </span>
+          );
+        }
+
         const isActive = page === currentPage;
 
         return (

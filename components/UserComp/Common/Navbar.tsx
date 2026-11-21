@@ -5,12 +5,20 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FiShoppingCart, FiChevronDown, FiMenu, FiX } from "react-icons/fi";
 import { useLocale } from "@/shared/providers/LocaleProvider";
+import { useCartStore } from "@/features/cart/useCartStore";
+import { useModalDismiss } from "@/shared/utils/useModalDismiss";
 
 export default function Navbar() {
   const pathname = usePathname();
   const { locale } = useLocale();
+  const { items: cartItems, hasHydrated } = useCartStore();
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useModalDismiss({
+    isOpen: isMobileMenuOpen,
+    onClose: () => setIsMobileMenuOpen(false),
+  });
 
   const navLinks = [
     { label: "Home", href: `/${locale}` },
@@ -32,18 +40,18 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-[#888888]/20 shadow-[0px_2px_12px_0px_rgba(0,0,0,0.05)]">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 h-24 flex items-center justify-between">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 h-20 sm:h-24 flex items-center justify-between">
         {/* Brand Logo */}
-        <Link href={`/${locale}`} className="flex items-center gap-3.5 group">
+        <Link href={`/${locale}`} className="flex items-center gap-2.5 sm:gap-3.5 group">
           {/* Golden Triangle / Pyramid Mark */}
           <div className="shrink-0 flex items-center justify-center">
             <svg
-              width="36"
-              height="32"
+              width="32"
+              height="28"
               viewBox="0 0 36 32"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
-              className="drop-shadow-xs"
+              className="sm:w-9 sm:h-8 drop-shadow-xs"
             >
               <polygon points="18,0 36,32 0,32" fill="#E8B34A" />
             </svg>
@@ -51,10 +59,10 @@ export default function Navbar() {
 
           {/* Brand Typography */}
           <div className="flex flex-col leading-tight">
-            <span className="font-[family-name:var(--font-cormorant)] text-2xl font-bold tracking-[0.14em] text-[#013E51] uppercase transition-colors group-hover:text-[#024f67]">
+            <span className="font-[family-name:var(--font-cormorant)] text-xl sm:text-2xl font-bold tracking-[0.14em] text-[#013E51] uppercase transition-colors group-hover:text-[#024f67]">
               Egypt Dreams
             </span>
-            <span className="font-[family-name:var(--font-lato)] text-[10px] font-semibold tracking-[0.32em] text-[#E8B34A] uppercase -mt-0.5">
+            <span className="font-[family-name:var(--font-lato)] text-[9px] sm:text-[10px] font-semibold tracking-[0.32em] text-[#E8B34A] uppercase -mt-0.5">
               Travel
             </span>
           </div>
@@ -125,29 +133,42 @@ export default function Navbar() {
         <div className="flex items-center gap-3 sm:gap-4">
           {/* Cart Icon Button */}
           <Link
-            href={`/${locale}/trips`}
-            aria-label="View trips"
-            className="w-12 h-12 rounded-full bg-[#F7EDE1] flex items-center justify-center text-[#013E51] hover:bg-[#ebd9c7] transition-colors shadow-xs"
+            href={`/${locale}/cart`}
+            aria-label="View shopping cart"
+            className="relative w-12 h-12 rounded-full bg-[#F7EDE1] flex items-center justify-center text-[#013E51] hover:bg-[#ebd9c7] transition-colors shadow-xs"
           >
             <FiShoppingCart className="w-5 h-5" />
+            {hasHydrated && cartItems.length > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 rounded-full bg-[#013E51] text-white text-[10px] font-bold flex items-center justify-center border-2 border-white shadow-xs">
+                {cartItems.length > 99 ? "99+" : cartItems.length}
+              </span>
+            )}
           </Link>
 
           {/* Book Now Button */}
           <Link
             href={`/${locale}/trips`}
-            className="hidden sm:inline-flex items-center justify-center px-7 py-3 rounded-full bg-[#013E51] text-white font-[family-name:var(--font-lato)] text-[15px] font-semibold hover:bg-[#024f67] transition-colors shadow-xs whitespace-nowrap"
+            className="hidden md:inline-flex items-center justify-center px-6 sm:px-7 py-2.5 sm:py-3 rounded-full bg-[#013E51] text-white font-[family-name:var(--font-lato)] text-[14px] sm:text-[15px] font-semibold hover:bg-[#024f67] transition-colors shadow-xs whitespace-nowrap"
           >
             Book Now
           </Link>
 
-          {/* Mobile Menu Toggle */}
+          {/* Mobile Menu Toggle (Icon Button) */}
           <button
             type="button"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label="Toggle navigation menu"
-            className="xl:hidden flex items-center gap-1.5 px-3 py-1.5 text-[#E8B34A] font-[family-name:var(--font-lato)] font-bold text-sm sm:text-base hover:text-[#d8a33a] transition-colors cursor-pointer"
+            aria-label={
+              isMobileMenuOpen
+                ? "Close navigation menu"
+                : "Open navigation menu"
+            }
+            className="xl:hidden w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#F7EDE1] flex items-center justify-center text-[#013E51] hover:bg-[#ebd9c7] transition-colors shadow-xs cursor-pointer"
           >
-            <span>{isMobileMenuOpen ? "Close" : "Menu"}</span>
+            {isMobileMenuOpen ? (
+              <FiX className="w-5 h-5" />
+            ) : (
+              <FiMenu className="w-5 h-5" />
+            )}
           </button>
         </div>
       </div>

@@ -153,22 +153,21 @@ export default function Footer() {
         <div className="border-t border-white/15" />
 
         {/* Bottom Bar */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 font-[family-name:var(--font-lato)] text-xs sm:text-sm text-white/70">
-          <p>© 2026 Egypt Travel Swiss. All rights reserved.</p>
-          <div className="flex items-center gap-3">
-            <Link
-              href={`/${locale}/about`}
-              className="hover:text-white transition-colors"
+        <div className="pt-8 flex flex-row items-center justify-between gap-4 font-[family-name:var(--font-lato)] text-xs sm:text-sm text-white/70 w-full">
+          <p className="text-left">
+            &copy; 2026 Egypt Travel Swiss. All rights reserved.
+          </p>
+
+          <div className="flex items-center gap-1.5 text-right shrink-0">
+            <span>Powered by</span>
+            <a
+              href="https://tech-gear.net/en"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white hover:text-[#E8B34A] font-semibold transition-colors underline-offset-4 hover:underline"
             >
-              Terms & Conditions
-            </Link>
-            <span>•</span>
-            <Link
-              href={`/${locale}/about`}
-              className="hover:text-white transition-colors"
-            >
-              Privacy Policy
-            </Link>
+              Tech Gear Solutions
+            </a>
           </div>
         </div>
       </div>

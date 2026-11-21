@@ -1,6 +1,7 @@
 "use client";
 
 import { FiAlertTriangle, FiX } from "react-icons/fi";
+import { useModalDismiss } from "@/shared/utils/useModalDismiss";
 import { HotelApiItem } from "@/models/hotel";
 
 interface HotelDeleteModalProps {
@@ -18,6 +19,8 @@ export default function HotelDeleteModal({
   onClose,
   onConfirm,
 }: HotelDeleteModalProps) {
+  useModalDismiss({ isOpen, onClose, disabled: isLoading });
+
   if (!isOpen || !item) return null;
 
   return (

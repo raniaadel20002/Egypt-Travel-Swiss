@@ -1,6 +1,7 @@
 "use client";
 
 import { FiAlertTriangle, FiLoader, FiX } from "react-icons/fi";
+import { useModalDismiss } from "@/shared/utils/useModalDismiss";
 
 interface ConfirmDeleteDialogProps {
   isOpen: boolean;
@@ -23,6 +24,8 @@ export default function ConfirmDeleteDialog({
   onConfirm,
   onClose,
 }: ConfirmDeleteDialogProps) {
+  useModalDismiss({ isOpen, onClose, disabled: isPending });
+
   if (!isOpen) return null;
 
   return (
@@ -30,11 +33,6 @@ export default function ConfirmDeleteDialog({
       role="dialog"
       aria-modal="true"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#013E51]/40 backdrop-blur-xs transition-opacity"
-      onClick={(e) => {
-        if (e.target === e.currentTarget && !isPending) {
-          onClose();
-        }
-      }}
     >
       <div className="relative bg-white rounded-[24px] sm:rounded-[28px] shadow-2xl w-full max-w-md p-6 sm:p-7 border border-[#013E51]/10 text-center flex flex-col items-center">
         {/* Close Button */}

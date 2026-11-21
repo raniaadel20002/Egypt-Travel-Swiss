@@ -52,7 +52,7 @@ export default function CountryTransfersTable({
             <tr className="border-b border-[#013E51]/10 bg-[#FAF7F2]/60 text-[11px] font-bold uppercase tracking-wider text-[#013E51]/60 font-[family-name:var(--font-lato)]">
               <th className="py-4 px-5 sm:px-6 w-20">ID</th>
               <th className="py-4 px-5 sm:px-6">Country / Region</th>
-              <th className="py-4 px-5 sm:px-6">ISO Code</th>
+              <th className="py-4 px-5 sm:px-6">Dial Code</th>
               <th className="py-4 px-5 sm:px-6">Created Date</th>
               <th className="py-4 px-5 sm:px-6 text-right">Actions</th>
             </tr>
@@ -76,8 +76,8 @@ export default function CountryTransfersTable({
                 </td>
 
                 <td className="py-4 px-5 sm:px-6">
-                  <span className="inline-flex items-center font-mono font-bold text-xs uppercase px-2.5 py-0.5 rounded-full bg-[#013E51]/5 text-[#013E51] border border-[#013E51]/10">
-                    {item.code}
+                  <span className="inline-flex items-center font-mono font-bold text-xs px-2.5 py-0.5 rounded-full bg-[#013E51]/5 text-[#013E51] border border-[#013E51]/10">
+                    {item.code ? (item.code.startsWith("+") ? item.code : `+${item.code}`) : "-"}
                   </span>
                 </td>
 

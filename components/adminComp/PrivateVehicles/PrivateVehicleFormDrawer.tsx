@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { FiCheck, FiCopy, FiLoader, FiX } from "react-icons/fi";
 import { FaCar } from "react-icons/fa";
 import { toast } from "sonner";
+import { useModalDismiss } from "@/shared/utils/useModalDismiss";
 import {
   TRANSFER_LOCATION_LANGUAGES,
 } from "@/models/transferLocation";
@@ -50,6 +51,8 @@ export default function PrivateVehicleFormDrawer({
   const createMutation = useCreatePrivateVehicleMutation();
   const updateMutation = useUpdatePrivateVehicleMutation();
   const isSubmitting = createMutation.isPending || updateMutation.isPending;
+
+  useModalDismiss({ isOpen, onClose, disabled: isSubmitting });
 
   useEffect(() => {
     if (isEdit && multiLangQuery.data) {
@@ -113,9 +116,6 @@ export default function PrivateVehicleFormDrawer({
       role="dialog"
       aria-modal="true"
       className="fixed inset-0 z-50 flex justify-end bg-[#013E51]/40 backdrop-blur-xs transition-opacity"
-      onClick={(e) => {
-        if (e.target === e.currentTarget && !isSubmitting) onClose();
-      }}
     >
       <div className="relative w-full max-w-lg bg-white h-full shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-200">
         <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-white shrink-0">

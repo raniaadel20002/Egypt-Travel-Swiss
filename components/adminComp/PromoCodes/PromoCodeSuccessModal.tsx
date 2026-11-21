@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FiCheck, FiCopy, FiTag, FiX } from "react-icons/fi";
+import { useModalDismiss } from "@/shared/utils/useModalDismiss";
 
 interface PromoCodeSuccessModalProps {
   isOpen: boolean;
@@ -14,6 +15,8 @@ export default function PromoCodeSuccessModal({
   code,
   onClose,
 }: PromoCodeSuccessModalProps) {
+  useModalDismiss({ isOpen, onClose });
+
   const [copied, setCopied] = useState(false);
 
   if (!isOpen || !code) return null;
@@ -29,9 +32,6 @@ export default function PromoCodeSuccessModal({
       role="dialog"
       aria-modal="true"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#013E51]/50 backdrop-blur-xs animate-in fade-in duration-150"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
     >
       <div className="relative w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-[#013E51]/10 text-center animate-in zoom-in-95 duration-150">
         <button

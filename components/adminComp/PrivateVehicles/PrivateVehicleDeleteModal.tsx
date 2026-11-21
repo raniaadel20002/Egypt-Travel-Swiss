@@ -1,6 +1,7 @@
 "use client";
 
 import { FiAlertTriangle, FiLoader, FiTrash2, FiX } from "react-icons/fi";
+import { useModalDismiss } from "@/shared/utils/useModalDismiss";
 import { PrivateVehicleApiItem } from "@/models/privateVehicle";
 
 interface PrivateVehicleDeleteModalProps {
@@ -18,6 +19,8 @@ export default function PrivateVehicleDeleteModal({
   onClose,
   onConfirm,
 }: PrivateVehicleDeleteModalProps) {
+  useModalDismiss({ isOpen, onClose, disabled: isLoading });
+
   if (!isOpen || !item) return null;
 
   return (
@@ -25,9 +28,6 @@ export default function PrivateVehicleDeleteModal({
       role="dialog"
       aria-modal="true"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#013E51]/50 backdrop-blur-xs animate-in fade-in duration-150"
-      onClick={(e) => {
-        if (e.target === e.currentTarget && !isLoading) onClose();
-      }}
     >
       <div className="relative w-full max-w-md bg-white rounded-3xl p-6 sm:p-7 shadow-2xl border border-red-100 text-center animate-in zoom-in-95 duration-150">
         <button

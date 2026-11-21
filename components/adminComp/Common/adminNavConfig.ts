@@ -72,6 +72,12 @@ export function getAdminNavGroups(pathname: string): NavGroupConfig[] {
           icon: FiSend,
           active: pathname.startsWith("/admin/flight-bookings"),
         },
+        {
+          label: "Transfer Bookings",
+          href: "/admin/transfer-bookings",
+          icon: FiNavigation,
+          active: pathname.startsWith("/admin/transfer-bookings"),
+        },
       ],
     },
     {

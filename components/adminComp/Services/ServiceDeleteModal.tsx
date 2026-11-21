@@ -1,6 +1,7 @@
 "use client";
 
 import { FiAlertTriangle, FiX } from "react-icons/fi";
+import { useModalDismiss } from "@/shared/utils/useModalDismiss";
 import { ServiceApiItem } from "@/models/service";
 
 interface ServiceDeleteModalProps {
@@ -18,6 +19,8 @@ export default function ServiceDeleteModal({
   onClose,
   onConfirm,
 }: ServiceDeleteModalProps) {
+  useModalDismiss({ isOpen, onClose, disabled: isLoading });
+
   if (!isOpen || !item) return null;
 
   return (

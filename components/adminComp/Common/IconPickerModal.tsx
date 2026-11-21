@@ -92,13 +92,9 @@ export default function IconPickerModal({
       aria-modal="true"
       aria-label={title}
       className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-5 bg-[#01232e]/60 backdrop-blur-xs animate-in fade-in duration-200"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
     >
       <div
         className="w-full max-w-3xl max-h-[90vh] bg-white rounded-[28px] shadow-2xl border border-[#013E51]/10 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200"
-        onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="p-5 sm:p-6 border-b border-[#013E51]/10 bg-white shrink-0 flex items-center justify-between gap-4">

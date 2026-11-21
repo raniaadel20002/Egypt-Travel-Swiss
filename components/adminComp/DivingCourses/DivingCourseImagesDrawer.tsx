@@ -15,6 +15,7 @@ import {
   useReorderDivingCourseImagesMutation,
   useUploadDivingCourseImageMutation,
 } from "@/features/divingCourses/useDivingCourseImages";
+import { useModalDismiss } from "@/shared/utils/useModalDismiss";
 import DivingCourseImageCard from "./DivingCourseImageCard";
 
 interface DivingCourseImagesDrawerProps {
@@ -48,6 +49,8 @@ export default function DivingCourseImagesDrawer({
       setLocalImages(sorted);
     }
   }, [images]);
+
+  useModalDismiss({ isOpen, onClose, disabled: isUploading });
 
   if (!isOpen || !course) return null;
 
@@ -108,9 +111,6 @@ export default function DivingCourseImagesDrawer({
       role="dialog"
       aria-modal="true"
       className="fixed inset-0 z-50 flex justify-end bg-[#013E51]/40 backdrop-blur-xs transition-opacity"
-      onClick={(e) => {
-        if (e.target === e.currentTarget && !isUploading) onClose();
-      }}
     >
       <div className="relative w-full max-w-2xl bg-white h-full shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-200">
         <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-white shrink-0">

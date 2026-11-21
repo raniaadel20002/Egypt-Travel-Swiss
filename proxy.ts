@@ -15,6 +15,7 @@ const VALID_PUBLIC_SUBPATHS = new Set([
   "transfers",
   "blog",
   "faq",
+  "cart",
 ]);
 
 const VALID_ADMIN_SUBPATHS = new Set([
@@ -24,6 +25,7 @@ const VALID_ADMIN_SUBPATHS = new Set([
   "bookings",
   "hotel-bookings",
   "flight-bookings",
+  "transfer-bookings",
   "trips",
   "trip-types",
   "destinations",

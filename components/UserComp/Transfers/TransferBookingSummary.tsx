@@ -35,7 +35,7 @@ export default function TransferBookingSummary({
   isLoading,
   onSubmit,
 }: TransferBookingSummaryProps) {
-  const displayPrice = totalPrice.toFixed(2);
+  const displayPrice = (totalPrice ?? 0).toFixed(2);
   const totalPassengers = adults + childrenCount;
 
   return (
@@ -87,7 +87,7 @@ export default function TransferBookingSummary({
             </span>
             <div className="text-right">
               <span className="font-[family-name:var(--font-cormorant)] text-3xl sm:text-4xl font-bold text-[#E8B34A]">
-                ${displayPrice}
+                &euro;{displayPrice}
               </span>
               <span className="text-xs text-white/60 block">{currency} &bull; All taxes &amp; fees included</span>
             </div>

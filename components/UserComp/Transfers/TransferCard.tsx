@@ -33,7 +33,7 @@ export default function TransferCard({
         {/* Vehicle Icon / Illustration Container */}
         <div className="relative w-full h-48 sm:h-52 rounded-[22px] sm:rounded-[26px] overflow-hidden mb-5 bg-[#F7EDE1]/40 border border-[#888888]/15 flex items-center justify-center p-6 group-hover:bg-[#F7EDE1]/70 transition-colors duration-300">
           <Image
-            src={vehicle.icon}
+            src={vehicle.icon || "/Transfers/car.svg"}
             alt={vehicle.name}
             width={120}
             height={80}
@@ -59,7 +59,7 @@ export default function TransferCard({
 
         {/* Key Features */}
         <ul className="space-y-1.5 mb-6 text-xs text-[#013E51]/80 font-medium">
-          {vehicle.features.map((feature, idx) => (
+          {(vehicle.features || []).map((feature, idx) => (
             <li key={idx} className="flex items-center gap-2">
               <FiCheck className="w-3.5 h-3.5 text-[#E8B34A] shrink-0" />
               <span>{feature}</span>

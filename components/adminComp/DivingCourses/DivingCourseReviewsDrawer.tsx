@@ -9,6 +9,7 @@ import {
   useDivingCourseReviewsQuery,
   useUpdateDivingCourseReviewStatusMutation,
 } from "@/features/divingCourses/useDivingCourseReviews";
+import { useModalDismiss } from "@/shared/utils/useModalDismiss";
 import DivingCourseReviewCard from "./DivingCourseReviewCard";
 
 interface DivingCourseReviewsDrawerProps {
@@ -52,6 +53,8 @@ export default function DivingCourseReviewsDrawer({
     course?.id
   );
 
+  useModalDismiss({ isOpen, onClose, disabled: Boolean(updatingId) });
+
   if (!isOpen || !course) return null;
 
   const reviews = reviewsData?.data || [];
@@ -73,9 +76,6 @@ export default function DivingCourseReviewsDrawer({
       role="dialog"
       aria-modal="true"
       className="fixed inset-0 z-50 flex justify-end bg-[#013E51]/40 backdrop-blur-xs transition-opacity"
-      onClick={(e) => {
-        if (e.target === e.currentTarget && !updatingId) onClose();
-      }}
     >
       <div className="relative w-full max-w-2xl bg-white h-full shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-200">
         <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-white shrink-0">

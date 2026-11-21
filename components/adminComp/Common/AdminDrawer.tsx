@@ -41,12 +41,6 @@ export default function AdminDrawer({
 
   if (!isOpen) return null;
 
-  const handleBackdropClick = () => {
-    if (!disableClose) {
-      onClose();
-    }
-  };
-
   return (
     <div
       role="dialog"
@@ -56,7 +50,6 @@ export default function AdminDrawer({
     >
       {/* Backdrop */}
       <div
-        onClick={handleBackdropClick}
         aria-hidden="true"
         className="fixed inset-0 z-40 bg-[#01232e]/45 backdrop-blur-xs transition-opacity"
       />

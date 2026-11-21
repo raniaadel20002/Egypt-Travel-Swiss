@@ -17,12 +17,22 @@ export default function TransferVehicleSelector({
   isRoundTrip,
   onSelectVehicle,
 }: TransferVehicleSelectorProps) {
+  const safeVehicles = Array.isArray(vehicles) ? vehicles : [];
+
   return (
     <div className="space-y-4">
-      {vehicles.map((v) => {
+      {safeVehicles.map((v) => {
         const isSelected = String(v.id) === String(selectedVehicleId);
-        const price = isRoundTrip ? v.roundTripPrice : v.oneWayPrice;
+        const rawPrice = isRoundTrip ? v.roundTripPrice : v.oneWayPrice;
+        const price = typeof rawPrice === "number" ? rawPrice : 0;
         const tripLabel = isRoundTrip ? "Round Trip" : "One Way";
+        const features = Array.isArray(v.features) ? v.features : [];
+        const iconSrc = v.icon || "/Transfers/car.svg";
+        const capacityText =
+          v.capacityText ||
+          (v.maxPassengers
+            ? `Max ${v.maxPassengers} passengers`
+            : "Standard passenger capacity");
 
         return (
           <article
@@ -46,8 +56,8 @@ export default function TransferVehicleSelector({
                   }`}
                 >
                   <Image
-                    src={v.icon}
-                    alt={v.name}
+                    src={iconSrc}
+                    alt={v.name || "Transfer Vehicle"}
                     width={56}
                     height={40}
                     className="w-12 sm:w-14 h-auto object-contain brightness-95"
@@ -69,21 +79,23 @@ export default function TransferVehicleSelector({
                   </div>
 
                   <p className="font-[family-name:var(--font-lato)] text-xs sm:text-sm text-[#888888] font-medium">
-                    {v.capacityText}
+                    {capacityText}
                   </p>
 
                   {/* Feature Tags */}
-                  <div className="flex flex-wrap gap-2 pt-2">
-                    {v.features.map((feature, idx) => (
-                      <span
-                        key={idx}
-                        className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#013E51]/90 bg-white/80 border border-[#013E51]/10 px-2.5 py-0.5 rounded-full"
-                      >
-                        <FiCheck className="w-2.5 h-2.5 text-[#E8B34A]" />
-                        {feature}
-                      </span>
-                    ))}
-                  </div>
+                  {features.length > 0 && (
+                    <div className="flex flex-wrap gap-2 pt-2">
+                      {features.map((feature, idx) => (
+                        <span
+                          key={idx}
+                          className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#013E51]/90 bg-white/80 border border-[#013E51]/10 px-2.5 py-0.5 rounded-full"
+                        >
+                          <FiCheck className="w-2.5 h-2.5 text-[#E8B34A]" />
+                          {feature}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -93,7 +105,7 @@ export default function TransferVehicleSelector({
                   Price - {tripLabel}
                 </span>
                 <span className="font-[family-name:var(--font-cormorant)] text-2xl sm:text-3xl font-bold text-[#013E51]">
-                  ${price.toFixed(2)}
+                  &euro;{price.toFixed(2)}
                 </span>
                 <span className="text-[11px] font-medium text-[#888888]">
                   per vehicle (all-inclusive)

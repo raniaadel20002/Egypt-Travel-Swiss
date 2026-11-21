@@ -1,6 +1,7 @@
 "use client";
 
 import { FiAlertTriangle, FiX } from "react-icons/fi";
+import { useModalDismiss } from "@/shared/utils/useModalDismiss";
 import { TeamMemberApiItem } from "@/models/teamMember";
 
 interface TeamMemberDeleteModalProps {
@@ -18,6 +19,8 @@ export default function TeamMemberDeleteModal({
   onClose,
   onConfirm,
 }: TeamMemberDeleteModalProps) {
+  useModalDismiss({ isOpen, onClose, disabled: isLoading });
+
   if (!isOpen || !item) return null;
 
   return (

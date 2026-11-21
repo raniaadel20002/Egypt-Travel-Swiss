@@ -154,9 +154,9 @@ export default function TransferCustomerForm({
             <div className="relative">
               <input
                 type="tel"
-                placeholder="+20 100 000 0000"
+                placeholder="+201000000000"
                 value={phone}
-                onChange={(e) => onPhoneChange(e.target.value)}
+                onChange={(e) => onPhoneChange(e.target.value.replace(/\s+/g, ""))}
                 required
                 className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-[#FAF7F2] text-sm text-[#013E51] font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
               />

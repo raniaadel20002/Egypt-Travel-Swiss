@@ -10,81 +10,11 @@ import {
   CreateTransferBookingRequest,
   TransferBookingResult,
 } from "@/models/transfer";
-
-const DEFAULT_FROM_LOCATIONS: TransferLocationItem[] = [
-  { id: "hrg-apt", name: "Hurghada International Airport (HRG)", city: "Hurghada", code: "HRG", isAirport: true },
-  { id: "cai-apt", name: "Cairo International Airport (CAI)", city: "Cairo", code: "CAI", isAirport: true },
-  { id: "ssh-apt", name: "Sharm El Sheikh International Airport (SSH)", city: "Sharm El Sheikh", code: "SSH", isAirport: true },
-  { id: "lux-apt", name: "Luxor International Airport (LXR)", city: "Luxor", code: "LXR", isAirport: true },
-  { id: "rmy-apt", name: "Marsa Alam International Airport (RMF)", city: "Marsa Alam", code: "RMF", isAirport: true },
-];
-
-const DEFAULT_TO_LOCATIONS: TransferLocationItem[] = [
-  { id: "hrg-hotels", name: "Hurghada City / Hotels & Resorts", city: "Hurghada" },
-  { id: "el-gouna", name: "El Gouna Resorts", city: "El Gouna" },
-  { id: "makadi-bay", name: "Makadi Bay Resorts", city: "Makadi Bay" },
-  { id: "soma-bay", name: "Soma Bay Luxury Resorts", city: "Soma Bay" },
-  { id: "sahl-hasheesh", name: "Sahl Hasheesh Bay", city: "Sahl Hasheesh" },
-  { id: "cairo-downtown", name: "Cairo Downtown / Nile Corniche Hotels", city: "Cairo" },
-  { id: "giza-pyramids", name: "Giza Pyramids Area Hotels", city: "Giza" },
-];
-
-const DEFAULT_VEHICLE_TYPES: VehicleTypeTransferItem[] = [
-  {
-    id: "car",
-    name: "Car (Sedan)",
-    capacityText: "Max 3 passengers, 3 suitcases, 2 hand bags",
-    maxPassengers: 3,
-    maxLuggage: 3,
-    maxHandBags: 2,
-    features: [
-      "Air-conditioned",
-      "Free Cancellation up to 24h",
-      "Flight Delay Protection",
-      "Fixed Price - No Hidden Fees",
-    ],
-    icon: "/Transfers/car.svg",
-    oneWayPrice: 25,
-    roundTripPrice: 45,
-    currency: "USD",
-  },
-  {
-    id: "minibus",
-    name: "Minibus",
-    capacityText: "Max 7 passengers, 7 suitcases, 5 hand bags",
-    maxPassengers: 7,
-    maxLuggage: 7,
-    maxHandBags: 5,
-    features: [
-      "Climate Controlled",
-      "Generous Luggage Compartment",
-      "Free Cancellation up to 24h",
-      "Direct Door-to-Door Service",
-    ],
-    icon: "/Transfers/minibus.svg",
-    oneWayPrice: 45,
-    roundTripPrice: 80,
-    currency: "USD",
-  },
-  {
-    id: "bus",
-    name: "Tourist Coach (Bus)",
-    capacityText: "Max 18 passengers, 20 suitcases, 10 hand bags",
-    maxPassengers: 18,
-    maxLuggage: 20,
-    maxHandBags: 10,
-    features: [
-      "Maximum Baggage Space",
-      "Reclining Executive Seats",
-      "Licensed Bilingual Driver",
-      "Flight Delay Monitoring",
-    ],
-    icon: "/Transfers/bus.svg",
-    oneWayPrice: 90,
-    roundTripPrice: 160,
-    currency: "USD",
-  },
-];
+import {
+  DEFAULT_FROM_LOCATIONS,
+  DEFAULT_TO_LOCATIONS,
+  DEFAULT_VEHICLE_TYPES,
+} from "./transferDefaults";
 
 export async function getTransferFromLocations(): Promise<TransferLocationItem[]> {
   try {
@@ -115,11 +45,60 @@ export async function getTransferToLocations(
 
 export async function getVehicleTypeTransfers(): Promise<VehicleTypeTransferItem[]> {
   try {
-    const res = await apiClient.get<{ data?: VehicleTypeTransferItem[] } | VehicleTypeTransferItem[]>(
-      "/api/VehicleTypeTransfer"
-    );
+    const res = await apiClient.get<any>("/api/VehicleTypeTransfer");
     const data = Array.isArray(res.data) ? res.data : res.data?.data;
-    return data && data.length > 0 ? data : DEFAULT_VEHICLE_TYPES;
+    if (data && data.length > 0) {
+      return data.map((item: any) => {
+        const toPerson = item.toPerson ?? item.maxPassengers ?? 4;
+        const isMinibus = toPerson > 4 && toPerson <= 8;
+        const isBus = toPerson > 8;
+
+        const defaultIcon = isBus
+          ? "/Transfers/bus.svg"
+          : isMinibus
+          ? "/Transfers/minibus.svg"
+          : "/Transfers/car.svg";
+
+        const defaultFeatures = [
+          "Air-conditioned",
+          "Flight Delay Protection",
+          "Free Cancellation up to 24h",
+          "Fixed Price - No Hidden Fees",
+        ];
+
+        const oneWay =
+          typeof item.oneWayPrice === "number"
+            ? item.oneWayPrice
+            : typeof item.additionalHoursUsd === "number"
+            ? item.additionalHoursUsd
+            : 25;
+
+        const roundTrip =
+          typeof item.roundTripPrice === "number"
+            ? item.roundTripPrice
+            : oneWay * 2 * 0.9;
+
+        return {
+          id: item.id,
+          name: item.name || "Transfer Vehicle",
+          capacityText:
+            item.capacityText ||
+            `Max ${toPerson} passengers, ${toPerson} suitcases`,
+          maxPassengers: toPerson,
+          maxLuggage: item.maxLuggage ?? toPerson,
+          maxHandBags: item.maxHandBags ?? Math.max(1, Math.floor(toPerson / 2)),
+          features:
+            Array.isArray(item.features) && item.features.length > 0
+              ? item.features
+              : defaultFeatures,
+          icon: item.icon || defaultIcon,
+          oneWayPrice: oneWay,
+          roundTripPrice: roundTrip,
+          currency: item.currency || "EUR",
+        };
+      });
+    }
+    return DEFAULT_VEHICLE_TYPES;
   } catch {
     return DEFAULT_VEHICLE_TYPES;
   }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { FiX, FiStar, FiLoader } from "react-icons/fi";
 import { toast } from "sonner";
+import { useModalDismiss } from "@/shared/utils/useModalDismiss";
 import { useCreateReviewProject } from "@/features/reviews/useReviewsProject";
 
 interface AddReviewModalProps {
@@ -25,6 +26,8 @@ export default function AddReviewModal({
   const [comment, setComment] = useState("");
 
   const createMutation = useCreateReviewProject();
+
+  useModalDismiss({ isOpen, onClose, disabled: createMutation.isPending });
 
   if (!isOpen) return null;
 

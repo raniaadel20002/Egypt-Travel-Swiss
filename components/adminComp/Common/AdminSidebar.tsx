@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { FiLogOut, FiX, FiUser } from "react-icons/fi";
 import { useAuthStore } from "@/features/auth/useAuthStore";
+import { useModalDismiss } from "@/shared/utils/useModalDismiss";
 import { getAdminNavGroups } from "./adminNavConfig";
 
 interface AdminSidebarProps {
@@ -29,12 +30,13 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
 
   const navGroups = getAdminNavGroups(pathname);
 
+  useModalDismiss({ isOpen, onClose });
+
   return (
     <>
       {/* Mobile Backdrop */}
       {isOpen && (
         <div
-          onClick={onClose}
           aria-hidden="true"
           className="fixed inset-0 z-40 bg-[#01232e]/50 backdrop-blur-xs lg:hidden transition-opacity"
         />

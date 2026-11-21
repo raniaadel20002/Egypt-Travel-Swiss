@@ -1,6 +1,7 @@
 "use client";
 
 import { FiAlertTriangle, FiX } from "react-icons/fi";
+import { useModalDismiss } from "@/shared/utils/useModalDismiss";
 import { TripTypeItem } from "@/models/tripType";
 
 interface TripTypeDeleteModalProps {
@@ -18,6 +19,8 @@ export default function TripTypeDeleteModal({
   onClose,
   onConfirm,
 }: TripTypeDeleteModalProps) {
+  useModalDismiss({ isOpen, onClose, disabled: isLoading });
+
   if (!isOpen || !item) return null;
 
   return (

@@ -13,6 +13,7 @@ import {
   DivingCourseApiItem,
   DivingCourseFacilityApiItem,
 } from "@/models/divingCourse";
+import { useModalDismiss } from "@/shared/utils/useModalDismiss";
 import { useReorderDivingCourseFacilitiesMutation } from "@/features/divingCourses/useDivingCourses";
 import DynamicIcon from "@/components/adminComp/Common/DynamicIcon";
 
@@ -37,6 +38,8 @@ export default function DivingCourseFacilitiesReorderDrawer({
   }, [course]);
 
   const reorderMutation = useReorderDivingCourseFacilitiesMutation(course?.id);
+
+  useModalDismiss({ isOpen, onClose, disabled: reorderMutation.isPending });
 
   if (!isOpen || !course) return null;
 
@@ -67,11 +70,6 @@ export default function DivingCourseFacilitiesReorderDrawer({
       role="dialog"
       aria-modal="true"
       className="fixed inset-0 z-50 flex justify-end bg-[#013E51]/40 backdrop-blur-xs transition-opacity"
-      onClick={(e) => {
-        if (e.target === e.currentTarget && !reorderMutation.isPending) {
-          onClose();
-        }
-      }}
     >
       <div className="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-200">
         <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-white shrink-0">

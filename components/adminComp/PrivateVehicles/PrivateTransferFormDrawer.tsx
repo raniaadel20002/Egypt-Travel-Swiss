@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { FiCheck, FiCompass, FiLoader, FiX } from "react-icons/fi";
 import { FaCar } from "react-icons/fa";
 import { toast } from "sonner";
+import { useModalDismiss } from "@/shared/utils/useModalDismiss";
 import { useTripsQuery } from "@/features/trips/useTrips";
 import { usePrivateVehiclesQuery } from "@/features/privateVehicles/usePrivateVehicles";
 import {
@@ -47,6 +48,8 @@ export default function PrivateTransferFormDrawer({
   const createMutation = useCreatePrivateVehicleTransferMutation();
   const updateMutation = useUpdatePrivateVehicleTransferMutation();
   const isSubmitting = createMutation.isPending || updateMutation.isPending;
+
+  useModalDismiss({ isOpen, onClose, disabled: isSubmitting });
 
   // Filter to private trips only
   const privateTrips = useMemo(() => {
@@ -126,9 +129,6 @@ export default function PrivateTransferFormDrawer({
       role="dialog"
       aria-modal="true"
       className="fixed inset-0 z-50 flex justify-end bg-[#013E51]/40 backdrop-blur-xs transition-opacity"
-      onClick={(e) => {
-        if (e.target === e.currentTarget && !isSubmitting) onClose();
-      }}
     >
       <div className="relative w-full max-w-lg bg-white h-full shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-200">
         <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-white shrink-0">

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { FiCheck, FiCopy, FiGlobe, FiLoader, FiX } from "react-icons/fi";
 import { toast } from "sonner";
+import { useModalDismiss } from "@/shared/utils/useModalDismiss";
 import { TRANSFER_LOCATION_LANGUAGES } from "@/models/transferLocation";
 import {
   CountryTransferItem,
@@ -36,7 +37,7 @@ export default function CountryTransferFormDrawer({
   onClose,
 }: CountryTransferFormDrawerProps) {
   const isEdit = Boolean(item);
-  const [code, setCode] = useState<string>("EG");
+  const [code, setCode] = useState<string>("+20");
   const [names, setNames] = useState<CountryTransferLocalizedName>(emptyNames());
 
   const multiLangQuery = useCountryTransferMultiLangQuery(
@@ -50,15 +51,25 @@ export default function CountryTransferFormDrawer({
 
   useEffect(() => {
     if (isEdit && multiLangQuery.data) {
-      setCode(multiLangQuery.data.code || "EG");
+      setCode(multiLangQuery.data.code || "+20");
       setNames(multiLangQuery.data.name || emptyNames());
     } else if (!isEdit && isOpen) {
-      setCode("EG");
+      setCode("+20");
       setNames(emptyNames());
     }
   }, [isEdit, multiLangQuery.data, isOpen]);
 
+  useModalDismiss({ isOpen, onClose, disabled: isSubmitting });
+
   if (!isOpen) return null;
+
+  const handleCodeChange = (raw: string) => {
+    let cleaned = raw.replace(/[^\d+]/g, "");
+    if (cleaned.includes("+")) {
+      cleaned = "+" + cleaned.replace(/\+/g, "");
+    }
+    setCode(cleaned);
+  };
 
   const handleCopyEnToAll = () => {
     const enVal = names.en.trim();
@@ -78,9 +89,10 @@ export default function CountryTransferFormDrawer({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const cleanCode = code.trim().toUpperCase();
-    if (!cleanCode) {
-      toast.error("Country ISO code is required (e.g. EG).");
+    const rawCode = code.trim();
+    const cleanCode = rawCode.startsWith("+") ? rawCode : `+${rawCode}`;
+    if (!/^\+\d{1,6}$/.test(cleanCode)) {
+      toast.error("Country dial code must start with '+' followed by numbers only (e.g. +20, +41).");
       return;
     }
 
@@ -120,9 +132,6 @@ export default function CountryTransferFormDrawer({
       role="dialog"
       aria-modal="true"
       className="fixed inset-0 z-50 flex justify-end bg-[#013E51]/40 backdrop-blur-xs transition-opacity"
-      onClick={(e) => {
-        if (e.target === e.currentTarget && !isSubmitting) onClose();
-      }}
     >
       <div className="relative w-full max-w-lg bg-white h-full shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-200">
         <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-white shrink-0">
@@ -160,19 +169,19 @@ export default function CountryTransferFormDrawer({
         ) : (
           <form onSubmit={handleSubmit} className="flex-1 flex flex-col overflow-hidden">
             <div className="flex-1 overflow-y-auto p-5 space-y-4">
-              {/* Country ISO Code Input */}
+              {/* Country Dial Code Input */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold uppercase tracking-wider text-[#013E51] block">
-                  Country ISO Code (2-3 Letters) *
+                  Country Dial Code (e.g. +20, +41, +1) *
                 </label>
                 <input
                   type="text"
                   required
-                  maxLength={4}
+                  maxLength={8}
                   value={code}
-                  onChange={(e) => setCode(e.target.value.toUpperCase())}
-                  placeholder="e.g. EG, CH, AE"
-                  className="w-full sm:w-48 px-3.5 py-2 text-xs font-mono font-bold uppercase rounded-xl border border-gray-200 bg-white text-[#013E51] focus:outline-hidden focus:border-[#013E51]"
+                  onChange={(e) => handleCodeChange(e.target.value)}
+                  placeholder="e.g. +20, +41, +1"
+                  className="w-full sm:w-48 px-3.5 py-2 text-xs font-mono font-bold rounded-xl border border-gray-200 bg-white text-[#013E51] focus:outline-hidden focus:border-[#013E51]"
                 />
               </div>
 

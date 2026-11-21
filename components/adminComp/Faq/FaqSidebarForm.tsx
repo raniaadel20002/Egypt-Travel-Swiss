@@ -186,7 +186,6 @@ export default function FaqSidebarForm({
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
       <div
-        onClick={onClose}
         className="fixed inset-0 bg-[#013E51]/30 backdrop-blur-xs transition-opacity duration-300"
         aria-hidden="true"
       />

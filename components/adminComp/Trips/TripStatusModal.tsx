@@ -1,6 +1,7 @@
 "use client";
 
 import { FiAlertTriangle, FiCheckCircle, FiX } from "react-icons/fi";
+import { useModalDismiss } from "@/shared/utils/useModalDismiss";
 import { TripApiItem } from "@/models/trip";
 
 interface TripStatusModalProps {
@@ -18,6 +19,8 @@ export default function TripStatusModal({
   onClose,
   onConfirm,
 }: TripStatusModalProps) {
+  useModalDismiss({ isOpen, onClose, disabled: isLoading });
+
   if (!isOpen || !item) return null;
 
   const isDeactivating = item.isActive;
