@@ -20,29 +20,36 @@ import {
 export async function getHotels(
   params?: HotelsQueryParams
 ): Promise<HotelApiItem[]> {
-  const queryParams: Record<string, unknown> = {};
+  try {
+    const queryParams: Record<string, unknown> = {};
 
-  if (params?.PageNumber) queryParams.PageNumber = params.PageNumber;
-  if (params?.PageSize) queryParams.PageSize = params.PageSize;
-  if (params?.Search) queryParams.Search = params.Search;
-  if (params?.Rate) queryParams.Rate = params.Rate;
-  if (params?.FacilityId) queryParams.FacilityId = params.FacilityId;
-  if (params?.Language) queryParams.Language = params.Language;
+    if (params?.PageNumber) queryParams.PageNumber = params.PageNumber;
+    if (params?.PageSize) queryParams.PageSize = params.PageSize;
+    if (params?.Search) queryParams.Search = params.Search;
+    if (params?.Rate) queryParams.Rate = params.Rate;
+    if (params?.FacilityId) queryParams.FacilityId = params.FacilityId;
+    if (params?.Language) queryParams.Language = params.Language;
 
-  const headers: Record<string, string> = {};
-  if (params?.Language) {
-    headers["Accept-Language"] = String(params.Language);
-  }
-
-  const response = await apiClient.get<ApiResponse<HotelApiItem[]>>(
-    "/api/Hotels",
-    {
-      params: Object.keys(queryParams).length > 0 ? queryParams : undefined,
-      headers: Object.keys(headers).length > 0 ? headers : undefined,
+    const headers: Record<string, string> = {};
+    if (params?.Language) {
+      headers["Accept-Language"] = String(params.Language);
     }
-  );
 
-  return response.data?.data || [];
+    const response = await apiClient.get<ApiResponse<HotelApiItem[]>>(
+      "/api/Hotels",
+      {
+        params: Object.keys(queryParams).length > 0 ? queryParams : undefined,
+        headers: Object.keys(headers).length > 0 ? headers : undefined,
+      }
+    );
+
+    const data =
+      response.data?.data ||
+      (response.data as unknown as { Data?: HotelApiItem[] })?.Data;
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
 }
 
 export async function getHotelById(
@@ -63,7 +70,10 @@ export async function getHotelById(
     }
   );
 
-  return response.data?.data;
+  const data =
+    response.data?.data ||
+    (response.data as unknown as { Data?: HotelApiItem })?.Data;
+  return data as HotelApiItem;
 }
 
 export async function getHotelAllLanguages(

@@ -63,6 +63,21 @@ export function buildBlogDetailsPath(
     : `/${cleanLocale}/blog/${blogId}`;
 }
 
+/**
+ * Builds SEO-friendly path for a single accommodation / hotel: /${locale}/accommodation/${id}-${slug}
+ */
+export function buildAccommodationDetailsPath(
+  locale: string,
+  hotelId: number | string,
+  hotelName: string
+): string {
+  const cleanLocale = locale?.trim() || "en";
+  const slug = slugify(hotelName);
+  return slug
+    ? `/${cleanLocale}/accommodation/${hotelId}-${slug}`
+    : `/${cleanLocale}/accommodation/${hotelId}`;
+}
+
 const UUID_REGEX =
   /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/;
 
