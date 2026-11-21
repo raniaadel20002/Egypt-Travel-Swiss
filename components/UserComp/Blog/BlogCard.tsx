@@ -1,9 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { FiArrowRight, FiCalendar } from "react-icons/fi";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { FiArrowRight } from "react-icons/fi";
 import { BlogApiItem } from "@/models/blog";
+import { useLocale } from "@/shared/providers/LocaleProvider";
 import { resolveApiImageUrl } from "@/shared/utils/imageUrl";
+import { buildBlogDetailsPath } from "@/shared/utils/slugify";
 
 interface BlogCardProps {
   post: BlogApiItem;
@@ -12,70 +16,120 @@ interface BlogCardProps {
 
 const DEFAULT_IMAGE = "/home/blog/dive-sites.jpg";
 
+function getBlogMeta(post: BlogApiItem): { tag: string; readTime: string } {
+  const text = `${post.title || ""} ${post.content || ""}`.toLowerCase();
+  let tag = "TRAVEL";
+  if (
+    text.includes("dive") ||
+    text.includes("scuba") ||
+    text.includes("reef") ||
+    text.includes("snorkeling")
+  ) {
+    tag = "DIVING";
+  } else if (
+    text.includes("cairo") ||
+    text.includes("pyramid") ||
+    text.includes("culture") ||
+    text.includes("museum") ||
+    text.includes("temple") ||
+    text.includes("luxor")
+  ) {
+    tag = "CULTURE";
+  } else if (
+    text.includes("time") ||
+    text.includes("when") ||
+    text.includes("season") ||
+    text.includes("tip") ||
+    text.includes("weather")
+  ) {
+    tag = "TIPS";
+  }
+
+  const wordCount = (post.content || "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean).length;
+  const minutes = Math.max(3, Math.min(10, Math.ceil(wordCount / 25) || 5));
+
+  return { tag, readTime: `${minutes} MIN READ` };
+}
+
 export default function BlogCard({ post, onRead }: BlogCardProps) {
+  const { locale } = useLocale();
+  const router = useRouter();
+
   const imageSrc = post.imageUrl
     ? resolveApiImageUrl(post.imageUrl)
     : DEFAULT_IMAGE;
 
+  const detailsPath = buildBlogDetailsPath(locale, post.id, post.title);
+  const { tag, readTime } = getBlogMeta(post);
+
   const handleClick = () => {
     if (onRead) {
       onRead(post);
+    } else {
+      router.push(detailsPath);
     }
   };
 
   return (
     <article
       onClick={handleClick}
-      className="bg-white rounded-[28px] sm:rounded-[34px] p-5 sm:p-6 shadow-[0px_4px_20px_0px_rgba(0,0,0,0.08)] hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group cursor-pointer border border-[#888888]/15"
+      className="group bg-white rounded-[24px] sm:rounded-[28px] overflow-hidden shadow-lg hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between cursor-pointer"
     >
       <div>
-        {/* Cover Image Container */}
-        <div className="relative w-full h-56 sm:h-64 rounded-[22px] sm:rounded-[26px] overflow-hidden mb-5 bg-slate-100">
+        {/* Flush Top Cover Image */}
+        <div className="relative w-full h-[220px] sm:h-[240px] lg:h-[250px] overflow-hidden bg-slate-100">
           <Image
             src={imageSrc}
             alt={post.title}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
           />
         </div>
 
-        {/* Metadata */}
-        <div className="flex items-center justify-between text-xs font-semibold text-[#888888] font-[family-name:var(--font-lato)] mb-2">
-          <div className="flex items-center gap-1.5 uppercase tracking-wider">
-            <span className="text-[#E8B34A]">Travel Blog</span>
+        {/* Content Body */}
+        <div className="p-6 sm:p-7">
+          {/* Eyebrow: TAG · X MIN READ */}
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-[#888888] tracking-wider uppercase mb-2.5 font-[family-name:var(--font-lato)]">
+            <span>{tag}</span>
+            <span className="text-[#888888]/60">·</span>
+            <span>{readTime}</span>
           </div>
 
-          <div className="flex items-center gap-1 text-[#888888]/80 text-[11px]">
-            <FiCalendar className="w-3 h-3 text-[#E8B34A]" />
-            <span>Guide</span>
-          </div>
+          {/* Title */}
+          <Link
+            href={detailsPath}
+            onClick={(e) => e.stopPropagation()}
+            className="block"
+          >
+            <h3 className="font-[family-name:var(--font-cormorant)] text-2xl sm:text-[26px] font-bold text-[#013E51] leading-[1.25] mb-3 group-hover:text-[#E8B34A] transition-colors line-clamp-2">
+              {post.title}
+            </h3>
+          </Link>
+
+          {/* Excerpt */}
+          <p className="font-[family-name:var(--font-lato)] text-xs sm:text-sm text-[#888888] leading-relaxed line-clamp-2">
+            {post.content}
+          </p>
         </div>
-
-        {/* Blog Title */}
-        <h3 className="font-[family-name:var(--font-cormorant)] text-2xl sm:text-[26px] font-bold text-[#013E51] group-hover:text-[#E8B34A] transition-colors leading-snug mt-1 mb-2 line-clamp-2">
-          {post.title}
-        </h3>
-
-        {/* Content */}
-        <p className="font-[family-name:var(--font-lato)] text-xs sm:text-sm text-[#888888] leading-relaxed mb-6 line-clamp-3">
-          {post.content}
-        </p>
       </div>
 
-      {/* Read More Row */}
-      <div className="pt-2">
-        <button
-          type="button"
+      {/* Read More Footer */}
+      <div className="px-6 sm:px-7 pb-6 sm:pb-7 pt-1">
+        <Link
+          href={detailsPath}
           onClick={(e) => {
             e.stopPropagation();
-            handleClick();
+            if (onRead) onRead(post);
           }}
-          className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#013E51] group-hover:text-[#E8B34A] transition-colors cursor-pointer"
+          className="font-[family-name:var(--font-lato)] text-xs sm:text-sm font-bold text-[#013E51] inline-flex items-center gap-1.5 group-hover:text-[#E8B34A] transition-colors cursor-pointer"
         >
           <span>Read more</span>
           <FiArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
-        </button>
+        </Link>
       </div>
     </article>
   );

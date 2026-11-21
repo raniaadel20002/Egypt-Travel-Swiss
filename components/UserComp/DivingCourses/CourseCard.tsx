@@ -7,6 +7,7 @@ import { FiStar, FiCheckCircle } from "react-icons/fi";
 import { DivingCourseApiItem } from "@/models/divingCourse";
 import { useLocale } from "@/shared/providers/LocaleProvider";
 import { resolveApiImageUrl } from "@/shared/utils/imageUrl";
+import { buildDivingCourseDetailsPath } from "@/shared/utils/slugify";
 
 interface CourseCardProps {
   course: DivingCourseApiItem;
@@ -27,7 +28,11 @@ export default function CourseCard({ course }: CourseCardProps) {
   const router = useRouter();
   const { locale } = useLocale();
 
-  const detailsPath = `/${locale}/diving-courses/${course.id}`;
+  const detailsPath = buildDivingCourseDetailsPath(
+    locale,
+    course.id,
+    course.name
+  );
   const bookingPath = `/${locale}/bookings?courseId=${course.id}`;
 
   const firstImage = course.images?.[0]?.imageUrl || course.images?.[0]?.url;

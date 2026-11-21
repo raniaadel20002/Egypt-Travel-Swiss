@@ -10,26 +10,33 @@ import {
 export async function getBlogs(
   params?: BlogsQueryParams
 ): Promise<BlogApiItem[]> {
-  const response = await apiClient.get<ApiResponse<BlogApiItem[]>>(
-    "/api/Blogs",
-    {
-      params: {
-        PageNumber: params?.PageNumber ?? 1,
-        PageSize: params?.PageSize ?? 20,
-      },
-    }
-  );
-  const data =
-    response.data?.data ||
-    (response.data as unknown as { Data?: BlogApiItem[] })?.Data;
-  return Array.isArray(data) ? data : [];
+  try {
+    const response = await apiClient.get<ApiResponse<BlogApiItem[]>>(
+      "/api/Blogs",
+      {
+        params: {
+          PageNumber: params?.PageNumber ?? 1,
+          PageSize: params?.PageSize ?? 20,
+        },
+      }
+    );
+    const data =
+      response.data?.data ||
+      (response.data as unknown as { Data?: BlogApiItem[] })?.Data;
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
 }
 
 export async function getBlogById(id: number): Promise<BlogApiItem> {
   const response = await apiClient.get<ApiResponse<BlogApiItem>>(
     `/api/Blogs/${id}`
   );
-  return response.data.data;
+  const data =
+    response.data?.data ||
+    (response.data as unknown as { Data?: BlogApiItem })?.Data;
+  return data as BlogApiItem;
 }
 
 export async function createBlog(

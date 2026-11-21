@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import {
   createBlog,
   deleteBlog,
@@ -23,6 +28,21 @@ export function useBlogsQuery(params?: BlogsQueryParams) {
   return useQuery<BlogApiItem[]>({
     queryKey: [...BLOGS_QUERY_KEY, "list", params],
     queryFn: () => getBlogs(params),
+  });
+}
+
+export function useInfiniteBlogsQuery(pageSize = 6) {
+  return useInfiniteQuery<BlogApiItem[]>({
+    queryKey: [...BLOGS_QUERY_KEY, "infinite", pageSize],
+    queryFn: ({ pageParam = 1 }) =>
+      getBlogs({ PageNumber: pageParam as number, PageSize: pageSize }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      if (!lastPage || lastPage.length < pageSize) {
+        return undefined;
+      }
+      return allPages.length + 1;
+    },
   });
 }
 

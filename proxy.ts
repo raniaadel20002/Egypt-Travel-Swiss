@@ -8,6 +8,7 @@ import {
 
 const PUBLIC_FILE = /\.(.*)$/;
 
+// Top-level public route sections (no detail sub-page)
 const VALID_PUBLIC_SUBPATHS = new Set([
   "",
   "trips",
@@ -19,6 +20,17 @@ const VALID_PUBLIC_SUBPATHS = new Set([
   "blog",
   "faq",
   "cart",
+]);
+
+// Sections that allow exactly one additional dynamic slug segment: /<section>/<slug>
+const PUBLIC_DETAIL_SUBPATHS = new Set([
+  "blog",
+  "trips",
+  "destinations",
+  "diving-courses",
+  "accommodation",
+  "categories",
+  "transfers",
 ]);
 
 const VALID_ADMIN_SUBPATHS = new Set([
@@ -99,17 +111,35 @@ export function proxy(request: NextRequest) {
 
   // 4. Handle paths starting with a supported locale
   if (SUPPORTED_LOCALES.includes(firstSegment as SupportedLocale)) {
-    const subpath = segments.slice(1).join("/");
-    if (VALID_PUBLIC_SUBPATHS.has(subpath)) {
+    const afterLocale = segments.slice(1); // e.g. ["blog", "2-cairo-itinerary"]
+    const topSection = afterLocale[0] ?? "";
+    const detailSlug = afterLocale[1];
+
+    // Exact match: /en, /en/blog, /en/trips, etc.
+    if (VALID_PUBLIC_SUBPATHS.has(afterLocale.join("/"))) {
       return NextResponse.next();
     }
+
+    // Detail page: /en/blog/<slug>, /en/trips/<slug>, etc. (exactly 2 segments after locale)
+    if (
+      afterLocale.length === 2 &&
+      detailSlug &&
+      PUBLIC_DETAIL_SUBPATHS.has(topSection)
+    ) {
+      return NextResponse.next();
+    }
+
     return NextResponse.rewrite(new URL("/_not-found", request.url), {
       status: 404,
     });
   }
 
   // 5. Handle valid public routes without locale prefix
-  if (VALID_PUBLIC_SUBPATHS.has(cleanPath)) {
+  const isDirectSubpath = VALID_PUBLIC_SUBPATHS.has(cleanPath);
+  const isDirectDetail =
+    segments.length === 2 && PUBLIC_DETAIL_SUBPATHS.has(segments[0]);
+
+  if (isDirectSubpath || isDirectDetail) {
     const redirectUrl = new URL(
       `/${preferredLocale}/${cleanPath}${search}`,
       request.url

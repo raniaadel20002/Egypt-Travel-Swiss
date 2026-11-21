@@ -1,13 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { FiArrowRight } from "react-icons/fi";
 import { useLocale } from "@/shared/providers/LocaleProvider";
 import { useBlogsQuery } from "@/features/blogs/useBlogs";
-import { resolveApiImageUrl } from "@/shared/utils/imageUrl";
-
-const DEFAULT_IMAGE = "/home/blog/dive-sites.jpg";
+import BlogCard from "@/components/UserComp/Blog/BlogCard";
 
 export default function BlogSection() {
   const { locale } = useLocale();
@@ -66,52 +63,9 @@ export default function BlogSection() {
         {/* Backend Blogs Grid */}
         {!isLoading && blogs.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 lg:gap-8">
-            {blogs.slice(0, 3).map((post) => {
-              const imageSrc = post.imageUrl
-                ? resolveApiImageUrl(post.imageUrl)
-                : DEFAULT_IMAGE;
-
-              return (
-                <Link
-                  key={post.id}
-                  href={`/${locale}/blog`}
-                  className="group bg-white rounded-[24px] sm:rounded-[28px] overflow-hidden shadow-lg hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between"
-                >
-                  {/* Card Image */}
-                  <div className="relative w-full h-[220px] sm:h-[240px] lg:h-[250px] overflow-hidden bg-slate-100">
-                    <Image
-                      src={imageSrc}
-                      alt={post.title}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
-
-                  {/* Card Body */}
-                  <div className="p-6 sm:p-7 flex flex-col flex-1 justify-between">
-                    <div>
-                      <span className="block font-[family-name:var(--font-lato)] text-xs font-bold tracking-wider uppercase text-[#013E51]/60 mb-2.5">
-                        TRAVEL GUIDE
-                      </span>
-                      <h3 className="font-[family-name:var(--font-cormorant)] text-2xl sm:text-[26px] font-bold text-[#013E51] leading-[1.25] mb-3 group-hover:text-[#E8B34A] transition-colors line-clamp-2">
-                        {post.title}
-                      </h3>
-                      <p className="font-[family-name:var(--font-lato)] text-xs sm:text-sm text-[#013E51]/75 font-normal leading-relaxed mb-6 line-clamp-3">
-                        {post.content}
-                      </p>
-                    </div>
-
-                    <div className="pt-2">
-                      <span className="font-[family-name:var(--font-lato)] text-xs sm:text-sm font-bold text-[#013E51] inline-flex items-center gap-1.5 group-hover:text-[#E8B34A] transition-colors">
-                        <span>Read more</span>
-                        <FiArrowRight className="text-sm group-hover:translate-x-1 transition-transform" />
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
+            {blogs.slice(0, 3).map((post) => (
+              <BlogCard key={post.id} post={post} />
+            ))}
           </div>
         )}
 
