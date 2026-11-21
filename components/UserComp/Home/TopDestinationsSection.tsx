@@ -1,51 +1,30 @@
 "use client";
 
+import { useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FiArrowUpRight, FiChevronRight } from "react-icons/fi";
 import { useLocale } from "@/shared/providers/LocaleProvider";
+import { useDestinationsQuery } from "@/features/destinations/useDestinations";
+import { localeToBackendLanguage } from "@/shared/utils/localeToBackendLanguage";
+import { resolveApiImageUrl } from "@/shared/utils/imageUrl";
 
-interface DestinationItem {
-  id: string;
-  name: string;
-  description: string;
-  image: string;
-  href: string;
-}
-
-const TOP_DESTINATIONS: DestinationItem[] = [
-  {
-    id: "hurghada",
-    name: "Hurghada",
-    description: "Beaches, reefs & water activities",
-    image: "/home/destnation/5b4d6afe2ce17f5d0136422bb6f1990407152f95.jpg",
-    href: "/destinations/hurghada",
-  },
-  {
-    id: "marsa-alam",
-    name: "Marsa Alam",
-    description: "Pristine reefs & rich marine life",
-    image: "/home/destnation/894daa180106aec0584a13248dcd2260e0933aab.jpg",
-    href: "/destinations/marsa-alam",
-  },
-  {
-    id: "cairo",
-    name: "Cairo",
-    description: "Pyramids & ancient wonders",
-    image: "/home/destnation/f0468466954c489b788296c5c7b3134e3d0789d5.png",
-    href: "/destinations/cairo",
-  },
-  {
-    id: "luxor",
-    name: "Luxor",
-    description: "Valley of the Kings & Temples",
-    image: "/home/destnation/9482ba6745d394de567f97f9e75e05a2dc86f377.jpg",
-    href: "/destinations/luxor",
-  },
-];
+const DEFAULT_IMAGE =
+  "/home/destnation/5b4d6afe2ce17f5d0136422bb6f1990407152f95.jpg";
 
 export default function TopDestinationsSection() {
   const { locale } = useLocale();
+  const backendLanguage = useMemo(
+    () => localeToBackendLanguage(locale),
+    [locale]
+  );
+
+  const { data: destinations = [], isLoading } = useDestinationsQuery({
+    PageSize: 100,
+    language: backendLanguage,
+  });
+
+  const displayDestinations = destinations.slice(0, 4);
 
   return (
     <section className="relative w-full py-16 sm:py-20 lg:py-14 bg-white overflow-hidden">
@@ -116,7 +95,7 @@ export default function TopDestinationsSection() {
 
         {/* Cards Wrapper with Anchored Watermarks */}
         <div className="relative">
-          {/* Camel Watermark (Center): Small delicate line art resting above the gap between Card 2 and Card 3 */}
+          {/* Camel Watermark (Center): Small delicate line art resting above the gap */}
           <div className="hidden sm:block absolute -top-8 sm:-top-9 md:-top-10 lg:-top-11 left-1/2 -translate-x-1/2 w-[64px] sm:w-[76px] md:w-[86px] lg:w-[96px] pointer-events-none z-0">
             <Image
               src="/home/destnation/camal.svg"
@@ -127,7 +106,7 @@ export default function TopDestinationsSection() {
             />
           </div>
 
-          {/* Palm Tree (Bottom-Left): Small silhouette accent framing Card 1 bottom corner */}
+          {/* Palm Tree (Bottom-Left): Small silhouette accent */}
           <div className="hidden md:block absolute -bottom-15 left-2 sm:-bottom-0 md:-bottom-7 lg:-bottom-15 -left-29 sm:-left-29 md:left-2 lg:-left-29 w-[80px] sm:w-[95px] md:w-[110px] lg:w-[125px] pointer-events-none z-0">
             <Image
               src="/home/destnation/Vector.svg"
@@ -138,7 +117,7 @@ export default function TopDestinationsSection() {
             />
           </div>
 
-          {/* Palm Tree (Bottom-Right): Small silhouette accent framing Card 4 bottom corner, mirrored */}
+          {/* Palm Tree (Bottom-Right): Small silhouette accent, mirrored */}
           <div className="hidden md:block absolute -bottom-15 sm:-bottom-12 md:-bottom-12 lg:-bottom-15 -right-29 sm:-right-3 md:-right-4 lg:-right-29 w-[80px] sm:w-[95px] md:w-[110px] lg:w-[125px] pointer-events-none z-0 scale-x-[-1]">
             <Image
               src="/home/destnation/Vector.svg"
@@ -149,46 +128,84 @@ export default function TopDestinationsSection() {
             />
           </div>
 
-          {/* 4 Destinations Grid: 2x2 on mobile, 4 columns on large screens */}
-          <div className="relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-6 lg:gap-7">
-            {TOP_DESTINATIONS.map((dest) => (
-              <Link
-                key={dest.id}
-                href={`/${locale}${dest.href}`}
-                className="group relative block aspect-[1/1.3] sm:aspect-[1/1.1] lg:aspect-[1/1.05] rounded-[20px] sm:rounded-[28px] overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 bg-[#013E51]"
-              >
-                <Image
-                  src={dest.image}
-                  alt={dest.name}
-                  fill
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 25vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-
-                {/* Bottom Gradient Overlay */}
+          {/* Loading Skeleton */}
+          {isLoading && (
+            <div className="relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-6 lg:gap-7">
+              {[1, 2, 3, 4].map((idx) => (
                 <div
-                  aria-hidden="true"
-                  className="absolute inset-0 bg-gradient-to-t from-[#013E51]/95 via-[#013E51]/25 to-transparent"
+                  key={idx}
+                  className="aspect-[1/1.3] sm:aspect-[1/1.1] lg:aspect-[1/1.05] rounded-[20px] sm:rounded-[28px] bg-[#013E51]/10 animate-pulse"
                 />
+              ))}
+            </div>
+          )}
 
-                {/* Card Bottom Content */}
-                <div className="absolute inset-x-0 bottom-0 p-3.5 sm:p-5 lg:p-6 flex items-end justify-between z-10">
-                  <div className="pr-1 sm:pr-3">
-                    <h3 className="font-[family-name:var(--font-cormorant)] text-xl sm:text-2xl lg:text-[28px] font-bold text-white tracking-wide leading-tight mb-1">
-                      {dest.name}
-                    </h3>
-                    <p className="font-[family-name:var(--font-lato)] text-[11px] sm:text-xs lg:text-sm text-white/85 font-normal leading-snug line-clamp-2">
-                      {dest.description}
-                    </p>
-                  </div>
+          {/* Empty State */}
+          {!isLoading && displayDestinations.length === 0 && (
+            <div className="relative z-10 text-center py-10">
+              <p className="font-[family-name:var(--font-lato)] text-sm sm:text-base text-[#013E51]/70">
+                No destinations available at the moment.
+              </p>
+            </div>
+          )}
 
-                  <div className="hidden sm:flex shrink-0 w-8 h-8 rounded-full items-center justify-center text-white transition-transform group-hover:translate-x-1">
-                    <FiChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+          {/* Actual Backend Destinations */}
+          {!isLoading && displayDestinations.length > 0 && (
+            <div
+              className={`relative z-10 grid gap-3.5 sm:gap-6 lg:gap-7 ${
+                displayDestinations.length === 1
+                  ? "grid-cols-1 max-w-sm mx-auto"
+                  : "grid-cols-2 lg:grid-cols-4"
+              }`}
+            >
+              {displayDestinations.map((dest) => {
+                const imageSrc = dest.imageUrl
+                  ? resolveApiImageUrl(dest.imageUrl)
+                  : DEFAULT_IMAGE;
+
+                return (
+                  <Link
+                    key={dest.id}
+                    href={`/${locale}/trips?dest=${dest.id}`}
+                    className="group relative block aspect-[1/1.3] sm:aspect-[1/1.1] lg:aspect-[1/1.05] rounded-[20px] sm:rounded-[28px] overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 bg-[#013E51]"
+                  >
+                    <Image
+                      src={imageSrc}
+                      alt={dest.name}
+                      fill
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 25vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+
+                    {/* Bottom Gradient Overlay */}
+                    <div
+                      aria-hidden="true"
+                      className="absolute inset-0 bg-gradient-to-t from-[#013E51]/95 via-[#013E51]/25 to-transparent"
+                    />
+
+                    {/* Card Bottom Content */}
+                    <div className="absolute inset-x-0 bottom-0 p-3.5 sm:p-5 lg:p-6 flex items-end justify-between z-10">
+                      <div className="pr-1 sm:pr-3">
+                        <h3 className="font-[family-name:var(--font-cormorant)] text-xl sm:text-2xl lg:text-[28px] font-bold text-white tracking-wide leading-tight mb-1">
+                          {dest.name}
+                        </h3>
+                        {dest.tripsCount !== undefined && (
+                          <p className="font-[family-name:var(--font-lato)] text-[11px] sm:text-xs lg:text-sm text-white/85 font-normal leading-snug line-clamp-2">
+                            {dest.tripsCount}{" "}
+                            {dest.tripsCount === 1 ? "Trip" : "Trips"}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="hidden sm:flex shrink-0 w-8 h-8 rounded-full items-center justify-center text-white transition-transform group-hover:translate-x-1">
+                        <FiChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     </section>

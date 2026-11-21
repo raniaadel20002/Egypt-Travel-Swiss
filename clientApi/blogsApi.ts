@@ -19,7 +19,10 @@ export async function getBlogs(
       },
     }
   );
-  return response.data?.data || [];
+  const data =
+    response.data?.data ||
+    (response.data as unknown as { Data?: BlogApiItem[] })?.Data;
+  return Array.isArray(data) ? data : [];
 }
 
 export async function getBlogById(id: number): Promise<BlogApiItem> {

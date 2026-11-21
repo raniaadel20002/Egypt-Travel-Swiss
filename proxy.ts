@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "@/features/i18n/i18nConfig";
+import {
+  DEFAULT_LOCALE,
+  SUPPORTED_LOCALES,
+  SupportedLocale,
+} from "@/features/i18n/i18nConfig";
 
 const PUBLIC_FILE = /\.(.*)$/;
 
-// Only pages that have explicit Figma designs in the design system
 const VALID_PUBLIC_SUBPATHS = new Set([
   "",
   "trips",
@@ -47,6 +50,14 @@ const VALID_ADMIN_SUBPATHS = new Set([
   "private-vehicles",
 ]);
 
+function getPreferredLocale(request: NextRequest): SupportedLocale {
+  const cookieLocale = request.cookies.get("NEXT_LOCALE")?.value?.toLowerCase();
+  if (cookieLocale && SUPPORTED_LOCALES.includes(cookieLocale as SupportedLocale)) {
+    return cookieLocale as SupportedLocale;
+  }
+  return DEFAULT_LOCALE;
+}
+
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
@@ -67,7 +78,6 @@ export function proxy(request: NextRequest) {
     if (VALID_ADMIN_SUBPATHS.has(topAdminSection)) {
       return NextResponse.next();
     }
-    // Unknown admin route -> render 404 directly without redirect
     return NextResponse.rewrite(new URL("/_not-found", request.url), {
       status: 404,
     });
@@ -77,36 +87,37 @@ export function proxy(request: NextRequest) {
   const cleanPath = pathname.replace(/^\/+|\/+$/g, "");
   const segments = cleanPath === "" ? [] : cleanPath.split("/");
 
-  // 3. Handle Root route: "/" -> "/${DEFAULT_LOCALE}"
+  const preferredLocale = getPreferredLocale(request);
+
+  // 3. Handle Root route: "/" -> "/${preferredLocale}"
   if (segments.length === 0) {
-    const redirectUrl = new URL(`/${DEFAULT_LOCALE}${search}`, request.url);
+    const redirectUrl = new URL(`/${preferredLocale}${search}`, request.url);
     return NextResponse.redirect(redirectUrl);
   }
 
-  const firstSegment = segments[0];
+  const firstSegment = segments[0].toLowerCase();
 
-  // 4. Handle paths starting with a supported locale (e.g., "/en", "/de", "/ar")
-  if (SUPPORTED_LOCALES.includes(firstSegment as typeof SUPPORTED_LOCALES[number])) {
+  // 4. Handle paths starting with a supported locale
+  if (SUPPORTED_LOCALES.includes(firstSegment as SupportedLocale)) {
     const subpath = segments.slice(1).join("/");
     if (VALID_PUBLIC_SUBPATHS.has(subpath)) {
       return NextResponse.next();
     }
-    // Subpath does not match any valid route under locale -> 404 without redirect
     return NextResponse.rewrite(new URL("/_not-found", request.url), {
       status: 404,
     });
   }
 
-  // 5. Handle valid public routes without locale prefix (e.g., "/trips" -> "/en/trips")
+  // 5. Handle valid public routes without locale prefix
   if (VALID_PUBLIC_SUBPATHS.has(cleanPath)) {
     const redirectUrl = new URL(
-      `/${DEFAULT_LOCALE}/${cleanPath}${search}`,
+      `/${preferredLocale}/${cleanPath}${search}`,
       request.url
     );
     return NextResponse.redirect(redirectUrl);
   }
 
-  // 6. Unknown or invalid URL: never redirect to unrelated page, render 404 directly
+  // 6. Unknown or invalid URL: 404
   return NextResponse.rewrite(new URL("/_not-found", request.url), {
     status: 404,
   });

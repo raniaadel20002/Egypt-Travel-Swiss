@@ -1,64 +1,33 @@
 "use client";
 
+import { useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FiArrowUpRight } from "react-icons/fi";
 import { useLocale } from "@/shared/providers/LocaleProvider";
+import { useTripTypesQuery } from "@/features/tripTypes/useTripTypes";
+import { localeToBackendLanguage } from "@/shared/utils/localeToBackendLanguage";
+import { resolveApiImageUrl } from "@/shared/utils/imageUrl";
 
-interface CategoryItem {
-  id: string;
-  title: string;
-  subtitle: string;
-  image: string;
-  href: string;
-}
-
-const CATEGORIES: CategoryItem[] = [
-  {
-    id: "snorkeling",
-    title: "Snorkeling",
-    subtitle: "Reefs & Courses",
-    image: "/home/Categories/5af697b0125109949149af917bc7716385d9cf04.png",
-    href: "/trips?category=snorkeling",
-  },
-  {
-    id: "safari",
-    title: "Safari",
-    subtitle: "Desert Adventures & Wildlife",
-    image: "/home/Categories/fa452a480e54c1859a0f6f83bd4c063a070fe249.jpg",
-    href: "/trips?category=safari",
-  },
-  {
-    id: "culture",
-    title: "Culture",
-    subtitle: "Heritage & Local Traditions",
-    image: "/home/Categories/36bf881bb9fc58e52b50ea73b83f231c3c116bd4.jpg",
-    href: "/trips?category=culture",
-  },
-  {
-    id: "diving",
-    title: "Diving",
-    subtitle: "Coral Reefs & Marine Life",
-    image: "/home/Categories/f9ac485c9b51592a41c4e5df356b680e572f38b4.jpg",
-    href: "/trips?category=diving",
-  },
-  {
-    id: "flighting",
-    title: "Flighting",
-    subtitle: "Scenic Flights & Sky Views",
-    image: "/home/Categories/aa09f6d53a1939da0b6f2f5880a2bdd1318dfa6a.jpg",
-    href: "/trips?category=flighting",
-  },
-];
+const DEFAULT_IMAGE =
+  "/home/Categories/5af697b0125109949149af917bc7716385d9cf04.png";
 
 export default function CategoriesSection() {
   const { locale } = useLocale();
+  const backendLanguage = useMemo(
+    () => localeToBackendLanguage(locale),
+    [locale]
+  );
+
+  const { data: tripTypes = [], isLoading } = useTripTypesQuery({
+    PageSize: 100,
+    language: backendLanguage,
+  });
 
   return (
     <section className="w-full py-16 sm:py-20 bg-[#F7EDE1]">
       <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
         {/* Section Title with Decorative Lines */}
-
         <div className="text-center mb-2">
           <div className="inline-flex flex-nowrap items-center justify-center gap-2 sm:gap-4 lg:gap-6">
             <span
@@ -66,7 +35,7 @@ export default function CategoriesSection() {
               className="block shrink-0 w-8 sm:w-24 md:w-28 h-[3px] rounded-l-full"
               style={{
                 background:
-                  "linear-gradient(to right, rgb(1, 62, 81) 0%, rgb(1, 62, 81) 35%, rgba(1, 62, 81, 0) 100%)",
+                  "linear-gradient(to right, rgb(1, 62, 81) 0%, rgb(1, 62, 81) 35%, rgba(1, 62, 81) 0%)",
               }}
             />
 
@@ -79,12 +48,11 @@ export default function CategoriesSection() {
               className="block shrink-0 w-8 sm:w-24 md:w-28 h-[3px] rounded-l-none rounded-r-full"
               style={{
                 background:
-                  "linear-gradient(to left, rgb(1, 62, 81) 0%, rgb(1, 62, 81) 35%, rgba(1, 62, 81, 0) 100%)",
+                  "linear-gradient(to left, rgb(1, 62, 81) 0%, rgb(1, 62, 81) 35%, rgba(1, 62, 81, 0%)",
               }}
             />
           </div>
         </div>
-
 
         {/* Subtitle & View All Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 sm:mb-12 text-center sm:text-left">
@@ -101,39 +69,71 @@ export default function CategoriesSection() {
           </Link>
         </div>
 
-        {/* 5 Arch Shaped Cards Grid (Horizontal scroll on mobile, grid on tablet/desktop) */}
-        <div className="flex sm:grid overflow-x-auto sm:overflow-visible pb-3 sm:pb-0 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-7 snap-x snap-mandatory">
-          {CATEGORIES.map((category) => (
-            <Link
-              key={category.id}
-              href={`/${locale}${category.href}`}
-              className="group flex flex-col items-center w-[200px] sm:w-auto shrink-0 sm:shrink snap-center"
-            >
-              {/* Arch / Pill Capsule Container with Golden Border */}
-              <div className="relative w-full aspect-[1/1.7] rounded-[200px] overflow-hidden border-[4px] sm:border-[5px] border-[#E8B34A] shadow-sm transition-all duration-300 group-hover:shadow-md">
-                <Image
-                  src={category.image}
-                  alt={category.title}
-                  fill
-                  sizes="(max-width: 640px) 200px, (max-width: 1024px) 33vw, 20vw"
-                  className="object-cover transition-transform duration-500 ease-out group-hover:scale-108"
-                />
+        {/* Loading Skeleton */}
+        {isLoading && (
+          <div className="flex sm:grid overflow-x-auto sm:overflow-visible pb-3 sm:pb-0 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-7">
+            {[1, 2, 3, 4, 5].map((idx) => (
+              <div
+                key={idx}
+                className="flex flex-col items-center w-[200px] sm:w-auto shrink-0 sm:shrink animate-pulse"
+              >
+                <div className="w-full aspect-[1/1.7] rounded-[200px] bg-[#013E51]/10 border-[4px] border-[#E8B34A]/30" />
+                <div className="h-4 bg-gray-300 rounded w-24 mt-4" />
               </div>
+            ))}
+          </div>
+        )}
 
-              {/* Title & Subtitle */}
-              <div className="text-center mt-3.5 sm:mt-5 space-y-1">
-                <h3 className="font-[family-name:var(--font-lato)] text-base sm:text-xl lg:text-[22px] font-bold text-[#013E51] group-hover:text-[#E8B34A] transition-colors">
-                  {category.title}
-                </h3>
-                <p className="font-[family-name:var(--font-lato)] text-[11px] sm:text-[13px] text-[#013E51]/80 font-bold">
-                  {category.subtitle}
-                </p>
-              </div>
-            </Link>
-          ))}
-        </div>
+        {/* Empty State */}
+        {!isLoading && tripTypes.length === 0 && (
+          <div className="text-center py-12">
+            <p className="font-[family-name:var(--font-lato)] text-base text-[#013E51]/70">
+              No categories available at the moment.
+            </p>
+          </div>
+        )}
 
-        {/* Mobile View All Button (Matches Figma responsive design) */}
+        {/* Backend Trip Types / Categories Grid */}
+        {!isLoading && tripTypes.length > 0 && (
+          <div className="flex sm:grid overflow-x-auto sm:overflow-visible pb-3 sm:pb-0 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-7 snap-x snap-mandatory">
+            {tripTypes.map((type) => {
+              const imageSrc = type.imageUrl
+                ? resolveApiImageUrl(type.imageUrl)
+                : DEFAULT_IMAGE;
+
+              return (
+                <Link
+                  key={type.id}
+                  href={`/${locale}/trips?type=${type.id}`}
+                  className="group flex flex-col items-center w-[200px] sm:w-auto shrink-0 sm:shrink snap-center"
+                >
+                  {/* Arch / Pill Capsule Container with Golden Border */}
+                  <div className="relative w-full aspect-[1/1.7] rounded-[200px] overflow-hidden border-[4px] sm:border-[5px] border-[#E8B34A] shadow-sm transition-all duration-300 group-hover:shadow-md bg-[#013E51]">
+                    <Image
+                      src={imageSrc}
+                      alt={type.name}
+                      fill
+                      sizes="(max-width: 640px) 200px, (max-width: 1024px) 33vw, 20vw"
+                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-108"
+                    />
+                  </div>
+
+                  {/* Title */}
+                  <div className="text-center mt-3.5 sm:mt-5 space-y-1">
+                    <h3 className="font-[family-name:var(--font-lato)] text-base sm:text-xl lg:text-[22px] font-bold text-[#013E51] group-hover:text-[#E8B34A] transition-colors">
+                      {type.name}
+                    </h3>
+                    <p className="font-[family-name:var(--font-lato)] text-[11px] sm:text-[13px] text-[#013E51]/80 font-bold">
+                      Explore Trips
+                    </p>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Mobile View All Button */}
         <div className="mt-8 sm:hidden flex justify-center w-full">
           <Link
             href={`/${locale}/categories`}

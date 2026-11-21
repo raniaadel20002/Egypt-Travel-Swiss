@@ -1,15 +1,6 @@
 import enDict from "@/translations/en.json";
-import deDict from "@/translations/de.json";
-import arDict from "@/translations/ar.json";
 
-export type SupportedLocale =
-  | "en"
-  | "fr"
-  | "ru"
-  | "ro"
-  | "it"
-  | "de"
-  | "ar";
+export type SupportedLocale = "en" | "fr" | "ru" | "ro" | "it";
 
 export const DEFAULT_LOCALE: SupportedLocale = "en";
 export const SUPPORTED_LOCALES: SupportedLocale[] = [
@@ -18,8 +9,6 @@ export const SUPPORTED_LOCALES: SupportedLocale[] = [
   "ru",
   "ro",
   "it",
-  "de",
-  "ar",
 ];
 
 export type Dictionary = typeof enDict;
@@ -30,8 +19,6 @@ const DICTIONARIES: Record<SupportedLocale, Dictionary> = {
   ru: enDict,
   ro: enDict,
   it: enDict,
-  de: deDict,
-  ar: arDict,
 };
 
 export function isValidLocale(locale: string): locale is SupportedLocale {
@@ -42,6 +29,6 @@ export function getDictionary(locale: SupportedLocale): Dictionary {
   return DICTIONARIES[locale] || DICTIONARIES[DEFAULT_LOCALE];
 }
 
-export function getLocaleDirection(locale: SupportedLocale): "ltr" | "rtl" {
-  return locale === "ar" ? "rtl" : "ltr";
+export function getLocaleDirection(_locale: SupportedLocale): "ltr" | "rtl" {
+  return "ltr";
 }

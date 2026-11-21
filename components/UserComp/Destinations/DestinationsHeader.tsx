@@ -35,14 +35,14 @@ export default function DestinationsHeader() {
         <div className="flex items-center justify-center gap-3 sm:gap-6 mb-3 sm:mb-4">
           <span
             aria-hidden="true"
-            className="block w-12 sm:w-24 md:w-36 h-[1.5px] bg-[#E8B34A] shrink-0"
+            className="block w-12 sm:w-24 md:w-76 h-[2.5px] bg-[#E8B34A] shrink-0"
           />
           <h1 className="whitespace-nowrap font-[family-name:var(--font-cormorant)] text-3xl sm:text-5xl lg:text-[56px] font-bold text-[#013E51] tracking-tight leading-tight">
             Explore Our Destinations
           </h1>
           <span
             aria-hidden="true"
-            className="block w-12 sm:w-24 md:w-36 h-[1.5px] bg-[#E8B34A] shrink-0"
+            className="block w-12 sm:w-24 md:w-76 h-[2.5px] bg-[#E8B34A] shrink-0"
           />
         </div>
 

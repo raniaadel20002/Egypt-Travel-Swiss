@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, ReactNode } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Dictionary,
   getDictionary,
@@ -8,6 +9,8 @@ import {
   SupportedLocale,
   DEFAULT_LOCALE,
 } from "@/features/i18n/i18nConfig";
+import { setActiveLanguageResolver } from "@/clientApi/apiConfig";
+import { localeToBackendLanguage } from "@/shared/utils/localeToBackendLanguage";
 
 interface LocaleContextValue {
   locale: SupportedLocale;
@@ -30,8 +33,25 @@ export default function LocaleProvider({
   locale,
   children,
 }: LocaleProviderProps) {
+  const queryClient = useQueryClient();
   const direction = getLocaleDirection(locale);
   const dictionary = getDictionary(locale);
+  const previousLocaleRef = useRef<SupportedLocale>(locale);
+
+  useEffect(() => {
+    setActiveLanguageResolver(() => localeToBackendLanguage(locale));
+
+    if (typeof document !== "undefined") {
+      document.cookie = `NEXT_LOCALE=${locale}; path=/; max-age=31536000; SameSite=Lax`;
+      document.documentElement.lang = locale;
+      document.documentElement.dir = direction;
+    }
+
+    if (previousLocaleRef.current !== locale) {
+      previousLocaleRef.current = locale;
+      queryClient.invalidateQueries();
+    }
+  }, [locale, direction, queryClient]);
 
   return (
     <LocaleContext.Provider value={{ locale, direction, dictionary }}>

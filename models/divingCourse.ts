@@ -67,8 +67,10 @@ export interface DivingCourseApiItem {
   description: string;
   price: number;
   currency: string;
-  rating: number;
-  reviewsCount: number;
+  rating?: number;
+  reviewsCount?: number;
+  averageRating?: number;
+  totalReviews?: number;
   images: DivingCourseImageApiItem[];
   facilities: DivingCourseFacilityApiItem[];
 }

@@ -1,10 +1,24 @@
 "use client";
 
+import { useMemo } from "react";
 import Image from "next/image";
-import { CATEGORY_CARDS } from "./categoriesData";
 import CategoryCard from "./CategoryCard";
+import { useTripTypesQuery } from "@/features/tripTypes/useTripTypes";
+import { useLocale } from "@/shared/providers/LocaleProvider";
+import { localeToBackendLanguage } from "@/shared/utils/localeToBackendLanguage";
 
 export default function CategoriesPage() {
+  const { locale } = useLocale();
+  const backendLanguage = useMemo(
+    () => localeToBackendLanguage(locale),
+    [locale]
+  );
+
+  const { data: tripTypes = [], isLoading } = useTripTypesQuery({
+    PageSize: 100,
+    language: backendLanguage,
+  });
+
   return (
     <div className="w-full bg-[#F7EDE1] py-12 sm:py-16 lg:py-20 min-h-screen">
       <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 space-y-8 sm:space-y-10 lg:space-y-12">
@@ -40,12 +54,35 @@ export default function CategoriesPage() {
           </div>
         </div>
 
-        {/* 6 Categories Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 lg:gap-8">
-          {CATEGORY_CARDS.map((cat) => (
-            <CategoryCard key={cat.id} category={cat} />
-          ))}
-        </div>
+        {/* Loading Skeletons */}
+        {isLoading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 lg:gap-8">
+            {[1, 2, 3].map((idx) => (
+              <div
+                key={idx}
+                className="w-full aspect-[1.05/1] sm:aspect-square rounded-[28px] sm:rounded-[34px] lg:rounded-[38px] bg-[#013E51]/10 border-2 border-[#E8B34A]/30 animate-pulse"
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!isLoading && tripTypes.length === 0 && (
+          <div className="text-center py-16">
+            <p className="font-[family-name:var(--font-lato)] text-lg text-[#013E51]/70">
+              No categories available at the moment.
+            </p>
+          </div>
+        )}
+
+        {/* Backend Trip Types / Categories Grid */}
+        {!isLoading && tripTypes.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 lg:gap-8">
+            {tripTypes.map((cat) => (
+              <CategoryCard key={cat.id} category={cat} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

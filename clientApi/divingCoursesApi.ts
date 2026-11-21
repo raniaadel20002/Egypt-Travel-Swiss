@@ -26,12 +26,17 @@ export async function getDivingCourses(
   if (params?.pageNumber) queryParams.pageNumber = params.pageNumber;
   if (params?.pageSize) queryParams.pageSize = params.pageSize;
 
-  const lang = params?.language || "en";
+  const requestHeaders: Record<string, string> = {};
+  if (params?.language) {
+    requestHeaders["Accept-Language"] = params.language;
+  }
+
   const response = await apiClient.get<ApiResponse<PaginatedDivingCoursesData>>(
     "/api/DivingCourses",
     {
       params: Object.keys(queryParams).length > 0 ? queryParams : undefined,
-      headers: { "Accept-Language": lang },
+      headers:
+        Object.keys(requestHeaders).length > 0 ? requestHeaders : undefined,
     }
   );
 

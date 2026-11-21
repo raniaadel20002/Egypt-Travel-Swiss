@@ -4,7 +4,7 @@ import Image from "next/image";
 
 export default function DivingHeroBanner() {
   return (
-    <section className="relative w-full min-h-[360px] sm:min-h-[420px] lg:min-h-[460px] flex items-center overflow-hidden shadow-[0px 16px 40px 0px #013E512E;">
+    <section className="relative w-full min-h-[360px] sm:min-h-[420px] lg:min-h-[460px] flex items-center overflow-hidden shadow-[0px_16px_40px_rgba(1,62,81,0.18)]">
 
       {/* Background Hero Image */}
       <Image

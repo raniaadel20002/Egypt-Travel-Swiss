@@ -7,6 +7,7 @@ import { FiShoppingCart, FiChevronDown, FiMenu, FiX } from "react-icons/fi";
 import { useLocale } from "@/shared/providers/LocaleProvider";
 import { useCartStore } from "@/features/cart/useCartStore";
 import { useModalDismiss } from "@/shared/utils/useModalDismiss";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -43,7 +44,6 @@ export default function Navbar() {
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 h-20 sm:h-24 flex items-center justify-between">
         {/* Brand Logo */}
         <Link href={`/${locale}`} className="flex items-center gap-2.5 sm:gap-3.5 group">
-          {/* Golden Triangle / Pyramid Mark */}
           <div className="shrink-0 flex items-center justify-center">
             <svg
               width="32"
@@ -57,7 +57,6 @@ export default function Navbar() {
             </svg>
           </div>
 
-          {/* Brand Typography */}
           <div className="flex flex-col leading-tight">
             <span className="font-[family-name:var(--font-cormorant)] text-xl sm:text-2xl font-bold tracking-[0.14em] text-[#013E51] uppercase transition-colors group-hover:text-[#024f67]">
               Egypt Dreams
@@ -130,12 +129,15 @@ export default function Navbar() {
         </nav>
 
         {/* Right CTA Actions */}
-        <div className="flex items-center gap-3 sm:gap-4">
+        <div className="flex items-center gap-2.5 sm:gap-3.5">
+          {/* Language Switcher */}
+          <LanguageSwitcher />
+
           {/* Cart Icon Button */}
           <Link
             href={`/${locale}/cart`}
             aria-label="View shopping cart"
-            className="relative w-12 h-12 rounded-full bg-[#F7EDE1] flex items-center justify-center text-[#013E51] hover:bg-[#ebd9c7] transition-colors shadow-xs"
+            className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#F7EDE1] flex items-center justify-center text-[#013E51] hover:bg-[#ebd9c7] transition-colors shadow-xs"
           >
             <FiShoppingCart className="w-5 h-5" />
             {hasHydrated && cartItems.length > 0 && (
@@ -153,7 +155,7 @@ export default function Navbar() {
             Book Now
           </Link>
 
-          {/* Mobile Menu Toggle (Icon Button) */}
+          {/* Mobile Menu Toggle */}
           <button
             type="button"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -213,6 +215,13 @@ export default function Navbar() {
                   {item.label}
                 </Link>
               ))}
+            </div>
+
+            <div className="pt-3 border-t border-[#888888]/15">
+              <LanguageSwitcher
+                variant="mobile"
+                onSelectLanguage={() => setIsMobileMenuOpen(false)}
+              />
             </div>
           </nav>
 
