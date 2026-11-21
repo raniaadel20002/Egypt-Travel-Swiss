@@ -2,10 +2,10 @@ import { FiEye, FiCheckCircle, FiArrowRight, FiUser, FiPhone, FiMail } from "rea
 import {
   TransferBookingApiItem,
   TransferBookingStatusEnum,
-  TransferCommunicationMethodEnum,
 } from "@/models/transferBooking";
 import TransferBookingStatusBadge from "./TransferBookingStatusBadge";
 import {
+  getCommunicationLabel,
   parseTransferStatus,
   isTransferBookingCompleted,
 } from "./transferBookingHelpers";
@@ -16,21 +16,6 @@ interface TransferBookingsTableProps {
   onViewDetails: (item: TransferBookingApiItem) => void;
   onStatusChange: (id: string, newStatus: TransferBookingStatusEnum) => void;
   onCompleteClick: (item: TransferBookingApiItem) => void;
-}
-
-function getCommunicationLabel(method: TransferCommunicationMethodEnum | number) {
-  switch (Number(method)) {
-    case TransferCommunicationMethodEnum.Email:
-      return { text: "Email", color: "bg-blue-50 text-blue-700 border-blue-200" };
-    case TransferCommunicationMethodEnum.WhatsApp:
-      return { text: "WhatsApp", color: "bg-emerald-50 text-emerald-700 border-emerald-200" };
-    case TransferCommunicationMethodEnum.Viber:
-      return { text: "Viber", color: "bg-purple-50 text-purple-700 border-purple-200" };
-    case TransferCommunicationMethodEnum.Phone:
-      return { text: "Phone", color: "bg-amber-50 text-amber-700 border-amber-200" };
-    default:
-      return { text: "Direct", color: "bg-gray-50 text-gray-700 border-gray-200" };
-  }
 }
 
 export default function TransferBookingsTable({
@@ -60,6 +45,15 @@ export default function TransferBookingsTable({
     );
   }
 
+  const handleStatusSelect = (booking: TransferBookingApiItem, valStr: string) => {
+    const nextStatus = Number(valStr) as TransferBookingStatusEnum;
+    if (nextStatus === TransferBookingStatusEnum.Completed) {
+      onCompleteClick(booking);
+      return;
+    }
+    onStatusChange(booking.id, nextStatus);
+  };
+
   return (
     <div className="bg-white rounded-2xl border border-[#013E51]/10 overflow-hidden shadow-[0px_4px_20px_0px_rgba(0,0,0,0.03)] font-[family-name:var(--font-lato)]">
       <div className="overflow-x-auto">
@@ -78,7 +72,7 @@ export default function TransferBookingsTable({
           </thead>
           <tbody className="divide-y divide-gray-100">
             {bookings.map((booking) => {
-              const comm = getCommunicationLabel(booking.communicationMethod);
+              const commLabel = getCommunicationLabel(booking.communicationMethod);
               const priceEur =
                 booking.pricing?.finalPriceConverted ??
                 booking.pricing?.finalPriceUsd ??
@@ -118,10 +112,8 @@ export default function TransferBookingsTable({
                           <FiPhone className="w-3 h-3 text-gray-400 shrink-0" />
                           <span>{booking.phoneNumber}</span>
                         </span>
-                        <span
-                          className={`inline-block px-1.5 py-0.2 rounded text-[10px] font-bold border ${comm.color}`}
-                        >
-                          {comm.text}
+                        <span className="inline-block px-1.5 py-0.2 rounded text-[10px] font-bold border bg-gray-50 text-gray-700 border-gray-200">
+                          {commLabel}
                         </span>
                       </div>
                     </div>
@@ -193,33 +185,29 @@ export default function TransferBookingsTable({
                         <FiEye className="w-4 h-4" />
                       </button>
 
-                      {/* Quick Status Selector */}
-                      <select
-                        value={parseTransferStatus(booking.status)}
-                        onChange={(e) =>
-                          onStatusChange(
-                            booking.id,
-                            Number(e.target.value) as TransferBookingStatusEnum
-                          )
-                        }
-                        className="py-1 px-1.5 rounded-lg border border-gray-200 text-xs font-semibold text-[#013E51] bg-white cursor-pointer focus:outline-hidden"
-                      >
-                        <option value={TransferBookingStatusEnum.Pending}>Pending</option>
-                        <option value={TransferBookingStatusEnum.Confirmed}>Confirmed</option>
-                        <option value={TransferBookingStatusEnum.Completed}>Completed</option>
-                        <option value={TransferBookingStatusEnum.Cancelled}>Cancelled</option>
-                      </select>
-
-                      {/* Complete Booking Button */}
+                      {/* Quick Status Selector & Complete for Non-Completed Bookings */}
                       {!isCompleted && (
-                        <button
-                          type="button"
-                          onClick={() => onCompleteClick(booking)}
-                          title="Complete Booking"
-                          className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-600 hover:text-white transition-colors cursor-pointer"
-                        >
-                          <FiCheckCircle className="w-4 h-4" />
-                        </button>
+                        <>
+                          <select
+                            value={parseTransferStatus(booking.status)}
+                            onChange={(e) => handleStatusSelect(booking, e.target.value)}
+                            className="py-1 px-1.5 rounded-lg border border-gray-200 text-xs font-semibold text-[#013E51] bg-white cursor-pointer focus:outline-hidden"
+                          >
+                            <option value={TransferBookingStatusEnum.Pending}>Pending</option>
+                            <option value={TransferBookingStatusEnum.Confirmed}>Confirmed</option>
+                            <option value={TransferBookingStatusEnum.Completed}>Completed</option>
+                            <option value={TransferBookingStatusEnum.Cancelled}>Cancelled</option>
+                          </select>
+
+                          <button
+                            type="button"
+                            onClick={() => onCompleteClick(booking)}
+                            title="Complete Booking"
+                            className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-600 hover:text-white transition-colors cursor-pointer"
+                          >
+                            <FiCheckCircle className="w-4 h-4" />
+                          </button>
+                        </>
                       )}
                     </div>
                   </td>

@@ -141,6 +141,12 @@ export default function TransferBookingCustomerFields({
             type="tel"
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value.replace(/\s+/g, ""))}
+            onBlur={(e) => setPhoneNumber(e.target.value.replace(/\s+/g, ""))}
+            onPaste={(e) => {
+              e.preventDefault();
+              const text = e.clipboardData.getData("text").replace(/\s+/g, "");
+              setPhoneNumber(text);
+            }}
             placeholder="+20123456789"
             required
             className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs text-[#013E51]"

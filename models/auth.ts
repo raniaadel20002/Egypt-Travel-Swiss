@@ -5,11 +5,25 @@ export interface LoginRequestDto {
   password: string;
 }
 
+export interface ForgotPasswordRequestDto {
+  email: string;
+}
+
+export interface ResetPasswordRequestDto {
+  token: string;
+  newPassword: string;
+}
+
+export interface UpdatePasswordRequestDto {
+  oldPassword: string;
+  newPassword: string;
+}
+
 export interface AuthTokenData {
   accessToken: string;
   refreshToken?: string;
-  email: string;
-  fullName: string;
+  email?: string;
+  fullName?: string;
   role?: AdminRole;
   roles?: AdminRole[];
 }
@@ -29,4 +43,6 @@ export interface CurrentAdminSession {
   fullName: string;
   role: AdminRole;
   roles?: AdminRole[];
+  phone?: string;
+  nationality?: string;
 }

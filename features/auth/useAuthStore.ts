@@ -11,6 +11,9 @@ interface JwtPayload {
   email?: string;
   unique_name?: string;
   role?: string | string[];
+  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"?: string;
+  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"?: string;
+  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone"?: string;
   "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"?: string | string[];
   exp?: number;
 }
@@ -43,12 +46,12 @@ export function isSuperAdminSession(
   if (accessToken) {
     const claims = parseJwtPayload(accessToken);
     const jwtRole =
-      claims?.role ||
-      claims?.["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+      claims?.["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] ||
+      claims?.role;
     if (Array.isArray(jwtRole) && jwtRole.includes("SuperAdmin")) {
       return true;
     }
-    if (typeof jwtRole === "string" && jwtRole === "SuperAdmin") {
+    if (typeof jwtRole === "string" && jwtRole.toLowerCase() === "superadmin") {
       return true;
     }
   }
@@ -64,7 +67,7 @@ export interface AuthState {
   setHasHydrated: (status: boolean) => void;
   setAuth: (data: Partial<AuthTokenData> & { accessToken: string }) => void;
   setAccessToken: (token: string) => void;
-  updateCurrentUser: (info: { userName: string; email: string }) => void;
+  updateCurrentUser: (info: Partial<CurrentAdminSession>) => void;
   clearAuth: () => void;
 }
 
@@ -79,12 +82,12 @@ export const useAuthStore = create<AuthState>()(
       setHasHydrated: (status) => set({ hasHydrated: status }),
 
       setAuth: (data) => {
-        // Use refreshToken as accessToken per backend requirements
-        const effectiveToken = data.refreshToken || data.accessToken;
-        const claims = parseJwtPayload(effectiveToken);
+        const primaryToken = data.accessToken || data.refreshToken || "";
+        const claims = parseJwtPayload(primaryToken);
         const jwtRole =
-          claims?.role ||
-          claims?.["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+          claims?.["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] ||
+          claims?.role;
+
         const resolvedRole: AdminRole =
           data.role ||
           (data.roles && data.roles[0]) ||
@@ -99,24 +102,39 @@ export const useAuthStore = create<AuthState>()(
               ? (jwtRole as AdminRole[])
               : [resolvedRole];
 
-        set((state) => {
-          const sessionUser: CurrentAdminSession = {
-            id: claims?.nameid || state.user?.id || "",
-            email: data.email || claims?.email || state.user?.email || "",
-            fullName:
-              data.fullName ||
-              claims?.unique_name ||
-              state.user?.fullName ||
-              "Admin",
-            role: resolvedRole,
-            roles: resolvedRoles,
-          };
+        const resolvedId =
+          claims?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] ||
+          claims?.nameid ||
+          "";
 
-          return {
-            accessToken: effectiveToken,
-            refreshToken: data.refreshToken || state.refreshToken || effectiveToken,
-            user: sessionUser,
-          };
+        const resolvedEmail =
+          data.email ||
+          claims?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"] ||
+          claims?.email ||
+          "";
+
+        const resolvedPhone =
+          claims?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone"] ||
+          "";
+
+        const resolvedFullName =
+          data.fullName ||
+          claims?.unique_name ||
+          (resolvedEmail ? resolvedEmail.split("@")[0] : "Admin");
+
+        const sessionUser: CurrentAdminSession = {
+          id: resolvedId,
+          email: resolvedEmail,
+          fullName: resolvedFullName,
+          role: resolvedRole,
+          roles: resolvedRoles,
+          phone: resolvedPhone,
+        };
+
+        set({
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken || null,
+          user: sessionUser,
         });
       },
 
@@ -124,32 +142,28 @@ export const useAuthStore = create<AuthState>()(
         const claims = parseJwtPayload(token);
         set((state) => {
           if (!state.user) {
-            return {
-              accessToken: token,
-              refreshToken: token,
-            };
+            return { accessToken: token };
           }
           return {
             accessToken: token,
-            refreshToken: state.refreshToken || token,
             user: {
               ...state.user,
-              id: claims?.nameid || state.user.id,
-              email: claims?.email || state.user.email,
+              id:
+                claims?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] ||
+                claims?.nameid ||
+                state.user.id,
+              email:
+                claims?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"] ||
+                claims?.email ||
+                state.user.email,
             },
           };
         });
       },
 
-      updateCurrentUser: ({ userName, email }) =>
+      updateCurrentUser: (info) =>
         set((state) => ({
-          user: state.user
-            ? {
-                ...state.user,
-                fullName: userName,
-                email,
-              }
-            : null,
+          user: state.user ? { ...state.user, ...info } : null,
         })),
 
       clearAuth: () =>
@@ -163,9 +177,6 @@ export const useAuthStore = create<AuthState>()(
       name: "egypt-dreams-admin-auth",
       onRehydrateStorage: () => (state) => {
         if (state) {
-          if (state.refreshToken && state.accessToken !== state.refreshToken) {
-            state.accessToken = state.refreshToken;
-          }
           state.setHasHydrated(true);
         }
       },
@@ -173,13 +184,13 @@ export const useAuthStore = create<AuthState>()(
   )
 );
 
-function getEffectiveStoredToken(): string | null {
+function getEffectiveStoredToken(key: "accessToken" | "refreshToken"): string | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = localStorage.getItem("egypt-dreams-admin-auth");
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    return parsed?.state?.refreshToken || parsed?.state?.accessToken || null;
+    return parsed?.state?.[key] || null;
   } catch {
     return null;
   }
@@ -187,13 +198,13 @@ function getEffectiveStoredToken(): string | null {
 
 attachAuthInterceptors(apiClient, {
   getAccessToken: () =>
-    useAuthStore.getState().refreshToken ||
     useAuthStore.getState().accessToken ||
-    getEffectiveStoredToken(),
+    getEffectiveStoredToken("accessToken") ||
+    useAuthStore.getState().refreshToken ||
+    getEffectiveStoredToken("refreshToken"),
   getRefreshToken: () =>
     useAuthStore.getState().refreshToken ||
-    useAuthStore.getState().accessToken ||
-    getEffectiveStoredToken(),
+    getEffectiveStoredToken("refreshToken"),
   onTokenRefreshed: (token) => useAuthStore.getState().setAccessToken(token),
   onAuthFailed: () => {
     useAuthStore.getState().clearAuth();

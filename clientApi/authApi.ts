@@ -3,8 +3,11 @@ import { apiClient, API_BASE_URL } from "./apiConfig";
 import { ApiResponse } from "@/models/api";
 import {
   AuthTokenData,
+  ForgotPasswordRequestDto,
   LoginRequestDto,
   RefreshTokenRequestDto,
+  ResetPasswordRequestDto,
+  UpdatePasswordRequestDto,
 } from "@/models/auth";
 
 export async function loginAdmin(
@@ -20,19 +23,41 @@ export async function loginAdmin(
 export async function forgotPasswordAdmin(
   email: string
 ): Promise<ApiResponse<null>> {
+  const payload: ForgotPasswordRequestDto = { email };
   const response = await apiClient.post<ApiResponse<null>>(
     "/api/Auth/forgot-password",
-    { email }
+    payload
+  );
+  return response.data;
+}
+
+export async function resetPasswordAdmin(
+  payload: ResetPasswordRequestDto
+): Promise<ApiResponse<null>> {
+  const response = await apiClient.post<ApiResponse<null>>(
+    "/api/Auth/reset-password",
+    payload
+  );
+  return response.data;
+}
+
+export async function updateAdminPassword(
+  adminId: number | string,
+  payload: UpdatePasswordRequestDto
+): Promise<ApiResponse<string>> {
+  const response = await apiClient.put<ApiResponse<string>>(
+    `/api/Auth/updatepassword/${adminId}`,
+    payload
   );
   return response.data;
 }
 
 export async function logoutAdmin(
   refreshToken: string
-): Promise<ApiResponse<null>> {
-  const response = await apiClient.post<ApiResponse<null>>(
+): Promise<{ message?: string }> {
+  const response = await apiClient.post<{ message?: string }>(
     "/api/Auth/logout",
-    JSON.stringify(refreshToken),
+    { refreshToken },
     {
       headers: {
         "Content-Type": "application/json",
@@ -118,7 +143,9 @@ export function attachAuthInterceptors(
       const isAuthEndpoint =
         requestUrl.includes("/api/Auth/login") ||
         requestUrl.includes("/api/Auth/refresh") ||
-        requestUrl.includes("/api/Auth/logout");
+        requestUrl.includes("/api/Auth/logout") ||
+        requestUrl.includes("/api/Auth/forgot-password") ||
+        requestUrl.includes("/api/Auth/reset-password");
 
       if (
         error.response?.status === 401 &&
@@ -133,16 +160,6 @@ export function attachAuthInterceptors(
         }
 
         originalRequest._retry = true;
-
-        // If the request was not yet sent with refreshToken, use refreshToken directly as access token
-        const currentAuth = String(originalRequest.headers?.Authorization || "");
-        if (refreshToken && !currentAuth.includes(refreshToken)) {
-          if (originalRequest.headers) {
-            originalRequest.headers.Authorization = `Bearer ${refreshToken}`;
-          }
-          options.onTokenRefreshed(refreshToken);
-          return instance(originalRequest);
-        }
 
         if (isRefreshing) {
           return new Promise<string>((resolve, reject) => {
@@ -177,7 +194,6 @@ export function attachAuthInterceptors(
             return Promise.reject(error);
           }
         } catch {
-          // Both accessToken and refreshToken attempts failed
           options.onAuthFailed();
           processQueue(error, null);
           return Promise.reject(error);

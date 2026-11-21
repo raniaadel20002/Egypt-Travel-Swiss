@@ -4,7 +4,9 @@ import {
   TransferBookingApiItem,
   TransferBookingStatusEnum,
 } from "@/models/transferBooking";
+import { useTransferBookingDetailQuery } from "@/features/transfers/useTransferBookings";
 import TransferBookingStatusBadge from "./TransferBookingStatusBadge";
+import TransferBookingPricingCard from "./TransferBookingPricingCard";
 import {
   getCommunicationLabel,
   parseTransferStatus,
@@ -28,24 +30,37 @@ export default function TransferBookingDetailsDrawer({
 }: TransferBookingDetailsDrawerProps) {
   useModalDismiss({ isOpen, onClose });
 
-  if (!isOpen || !booking) return null;
+  const { data: freshBooking } = useTransferBookingDetailQuery(
+    isOpen && booking?.id ? booking.id : undefined
+  );
 
-  const isCompleted = isTransferBookingCompleted(booking);
+  const activeBooking = freshBooking || booking;
+
+  if (!isOpen || !activeBooking) return null;
+
+  const isCompleted = isTransferBookingCompleted(activeBooking);
 
   const priceEur =
-    booking.pricing?.finalPriceConverted ??
-    booking.pricing?.finalPriceUsd ??
+    activeBooking.pricing?.finalPriceConverted ??
+    activeBooking.pricing?.finalPriceUsd ??
     0;
+
+  const handleStatusSelect = (valStr: string) => {
+    const nextStatus = Number(valStr) as TransferBookingStatusEnum;
+    if (nextStatus === TransferBookingStatusEnum.Completed) {
+      onCompleteClick(activeBooking);
+      return;
+    }
+    onStatusChange(activeBooking.id, nextStatus);
+  };
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden font-[family-name:var(--font-lato)]">
-      {/* Backdrop */}
       <div
         aria-hidden="true"
         className="absolute inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
       />
 
-      {/* Drawer Panel */}
       <div className="absolute inset-y-0 right-0 max-w-full flex pl-10">
         <div className="w-screen max-w-xl bg-white shadow-2xl flex flex-col">
           {/* Header */}
@@ -54,7 +69,7 @@ export default function TransferBookingDetailsDrawer({
               <span className="text-xs uppercase tracking-wider text-[#E8B34A] font-bold block">
                 Transfer Booking Details
               </span>
-              <h2 className="text-lg font-bold font-mono">#{booking.id}</h2>
+              <h2 className="text-lg font-bold font-mono">#{activeBooking.id}</h2>
             </div>
             <button
               type="button"
@@ -73,40 +88,35 @@ export default function TransferBookingDetailsDrawer({
                 <span className="text-xs text-gray-500 font-bold block">Current Status</span>
                 <div className="mt-1">
                   <TransferBookingStatusBadge
-                    status={booking.status}
-                    isCompleted={booking.isCompleted}
+                    status={activeBooking.status}
+                    isCompleted={activeBooking.isCompleted}
                   />
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
-                <select
-                  value={parseTransferStatus(booking.status)}
-                  onChange={(e) =>
-                    onStatusChange(
-                      booking.id,
-                      Number(e.target.value) as TransferBookingStatusEnum
-                    )
-                  }
-                  className="py-1.5 px-2.5 rounded-xl border border-gray-200 text-xs font-bold text-[#013E51] bg-white cursor-pointer"
-                >
-                  <option value={TransferBookingStatusEnum.Pending}>Pending</option>
-                  <option value={TransferBookingStatusEnum.Confirmed}>Confirmed</option>
-                  <option value={TransferBookingStatusEnum.Completed}>Completed</option>
-                  <option value={TransferBookingStatusEnum.Cancelled}>Cancelled</option>
-                </select>
+              {!isCompleted && (
+                <div className="flex items-center gap-2">
+                  <select
+                    value={parseTransferStatus(activeBooking.status)}
+                    onChange={(e) => handleStatusSelect(e.target.value)}
+                    className="py-1.5 px-2.5 rounded-xl border border-gray-200 text-xs font-bold text-[#013E51] bg-white cursor-pointer"
+                  >
+                    <option value={TransferBookingStatusEnum.Pending}>Pending</option>
+                    <option value={TransferBookingStatusEnum.Confirmed}>Confirmed</option>
+                    <option value={TransferBookingStatusEnum.Completed}>Completed</option>
+                    <option value={TransferBookingStatusEnum.Cancelled}>Cancelled</option>
+                  </select>
 
-                {!isCompleted && (
                   <button
                     type="button"
-                    onClick={() => onCompleteClick(booking)}
+                    onClick={() => onCompleteClick(activeBooking)}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors cursor-pointer"
                   >
                     <FiCheckCircle className="w-3.5 h-3.5" />
                     <span>Complete</span>
                   </button>
-                )}
-              </div>
+                </div>
+              )}
             </div>
 
             {/* Customer Information */}
@@ -118,26 +128,26 @@ export default function TransferBookingDetailsDrawer({
               <div className="grid grid-cols-2 gap-3 bg-gray-50/70 p-4 rounded-xl border border-gray-100 text-xs">
                 <div>
                   <span className="text-gray-400 block">Name</span>
-                  <span className="font-bold text-[#013E51]">{booking.customerName}</span>
+                  <span className="font-bold text-[#013E51]">{activeBooking.customerName}</span>
                 </div>
                 <div>
                   <span className="text-gray-400 block">Email</span>
-                  <span className="font-bold text-[#013E51] break-all">{booking.email}</span>
+                  <span className="font-bold text-[#013E51] break-all">{activeBooking.email}</span>
                 </div>
                 <div>
                   <span className="text-gray-400 block">Phone</span>
-                  <span className="font-bold text-[#013E51]">{booking.phoneNumber}</span>
+                  <span className="font-bold text-[#013E51]">{activeBooking.phoneNumber}</span>
                 </div>
                 <div>
                   <span className="text-gray-400 block">Preferred Contact</span>
                   <span className="font-bold text-[#013E51]">
-                    {getCommunicationLabel(booking.communicationMethod)}
+                    {getCommunicationLabel(activeBooking.communicationMethod)}
                   </span>
                 </div>
-                {booking.countryTransferName && (
+                {activeBooking.countryTransferName && (
                   <div className="col-span-2">
                     <span className="text-gray-400 block">Customer Country / Dial Code</span>
-                    <span className="font-bold text-[#013E51]">{booking.countryTransferName}</span>
+                    <span className="font-bold text-[#013E51]">{activeBooking.countryTransferName}</span>
                   </div>
                 )}
               </div>
@@ -153,29 +163,29 @@ export default function TransferBookingDetailsDrawer({
                 <div>
                   <span className="text-gray-400 block">From Location</span>
                   <span className="font-bold text-[#013E51]">
-                    {booking.fromLocationName || booking.fromLocationId}
+                    {activeBooking.fromLocationName || activeBooking.fromLocationId}
                   </span>
                 </div>
                 <div>
                   <span className="text-gray-400 block">To Location</span>
                   <span className="font-bold text-[#013E51]">
-                    {booking.toLocationName || booking.toLocationId}
+                    {activeBooking.toLocationName || activeBooking.toLocationId}
                   </span>
                 </div>
                 <div>
                   <span className="text-gray-400 block">Trip Type</span>
-                  <span className="font-bold text-[#013E51]">{booking.tripType}</span>
+                  <span className="font-bold text-[#013E51]">{activeBooking.tripType}</span>
                 </div>
                 <div>
                   <span className="text-gray-400 block">Luggage Count</span>
-                  <span className="font-bold text-[#013E51]">{booking.luggageCount}</span>
+                  <span className="font-bold text-[#013E51]">{activeBooking.luggageCount}</span>
                 </div>
                 <div>
                   <span className="text-gray-400 block">Trip Date</span>
                   <span className="font-bold text-[#013E51] flex items-center gap-1 mt-0.5">
                     <FiCalendar className="w-3.5 h-3.5 text-gray-400" />
-                    {booking.tripDate
-                      ? new Date(booking.tripDate).toLocaleDateString()
+                    {activeBooking.tripDate
+                      ? new Date(activeBooking.tripDate).toLocaleDateString()
                       : "-"}
                   </span>
                 </div>
@@ -183,7 +193,7 @@ export default function TransferBookingDetailsDrawer({
                   <span className="text-gray-400 block">Trip Time</span>
                   <span className="font-bold text-[#013E51] flex items-center gap-1 mt-0.5">
                     <FiClock className="w-3.5 h-3.5 text-gray-400" />
-                    {booking.tripTime || "Anytime"}
+                    {activeBooking.tripTime || "Anytime"}
                   </span>
                 </div>
               </div>
@@ -197,79 +207,39 @@ export default function TransferBookingDetailsDrawer({
               <div className="bg-gray-50/70 p-4 rounded-xl border border-gray-100 text-xs space-y-2">
                 <div className="flex justify-between">
                   <span className="text-gray-500">Vehicle Name:</span>
-                  <span className="font-bold text-[#013E51]">{booking.vehicleName || "-"}</span>
+                  <span className="font-bold text-[#013E51]">{activeBooking.vehicleName || "-"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">Vehicle Range:</span>
                   <span className="font-bold text-[#013E51]">
-                    {booking.vehicleFromPerson ?? 1} - {booking.vehicleToPerson ?? 4} persons
+                    {activeBooking.vehicleFromPerson ?? 1} - {activeBooking.vehicleToPerson ?? 4} persons
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">Passengers:</span>
                   <span className="font-bold text-[#013E51]">
-                    {booking.totalPersons} total ({booking.adults} adults, {booking.children} children)
+                    {activeBooking.totalPersons} total ({activeBooking.adults} adults, {activeBooking.children} children)
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Pricing Breakdown */}
-            {booking.pricing && (
-              <div className="space-y-3">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-[#013E51] flex items-center gap-2">
-                  <span className="font-bold text-[#E8B34A] text-sm">&euro;</span>
-                  <span>Pricing Breakdown (EUR)</span>
-                </h3>
-                <div className="bg-gray-50/70 p-4 rounded-xl border border-gray-100 text-xs space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Outbound Price:</span>
-                    <span className="font-semibold text-gray-700">
-                      {Number(booking.pricing.outboundPriceUsd).toFixed(2)} &euro;
-                    </span>
-                  </div>
-                  {booking.pricing.returnPriceUsd > 0 && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Return Price:</span>
-                      <span className="font-semibold text-gray-700">
-                        {Number(booking.pricing.returnPriceUsd).toFixed(2)} &euro;
-                      </span>
-                    </div>
-                  )}
-                  {booking.pricing.discountAmountUsd > 0 && (
-                    <div className="flex justify-between text-emerald-700">
-                      <span>Discount ({booking.pricing.discountPercentage}%):</span>
-                      <span>-{Number(booking.pricing.discountAmountUsd).toFixed(2)} &euro;</span>
-                    </div>
-                  )}
-                  {booking.pricing.additionalHours > 0 && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">
-                        Additional Hours ({booking.pricing.additionalHours}h @ {booking.pricing.additionalHoursRateUsd}&euro;):
-                      </span>
-                      <span className="font-semibold text-gray-700">
-                        +{Number(booking.pricing.additionalHoursCostUsd).toFixed(2)} &euro;
-                      </span>
-                    </div>
-                  )}
-                  <div className="border-t border-gray-200 pt-2 flex justify-between items-center text-sm">
-                    <span className="font-bold text-[#013E51]">Final Total:</span>
-                    <span className="font-extrabold text-[#013E51] text-base">
-                      {Number(priceEur).toFixed(2)} &euro;
-                    </span>
-                  </div>
-                </div>
-              </div>
+            {/* Pricing Breakdown Card in EUR */}
+            {activeBooking.pricing && (
+              <TransferBookingPricingCard
+                pricing={activeBooking.pricing}
+                priceEur={priceEur}
+              />
             )}
 
-            {/* Notes */}
-            {booking.notes && (
+            {/* Customer Notes */}
+            {activeBooking.notes && (
               <div className="space-y-2">
                 <h3 className="text-sm font-bold uppercase tracking-wider text-[#013E51]">
                   Customer Notes
                 </h3>
                 <div className="bg-amber-50/60 p-4 rounded-xl border border-amber-200/60 text-xs text-amber-900 leading-relaxed">
-                  {booking.notes}
+                  {activeBooking.notes}
                 </div>
               </div>
             )}

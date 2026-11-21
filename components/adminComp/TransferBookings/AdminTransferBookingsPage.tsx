@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { FiCalendar, FiClock, FiCheck, FiCheckCircle, FiDollarSign, FiPlus } from "react-icons/fi";
+import { FiPlus } from "react-icons/fi";
 import AdminShell from "@/components/adminComp/Common/AdminShell";
 import {
   TransferBookingApiItem,
@@ -16,6 +16,7 @@ import {
   parseTransferStatus,
   isTransferBookingCompleted,
 } from "./transferBookingHelpers";
+import TransferBookingsMetricsGrid from "./TransferBookingsMetricsGrid";
 import TransferBookingsFiltersBar from "./TransferBookingsFiltersBar";
 import TransferBookingsTable from "./TransferBookingsTable";
 import TransferBookingDetailsDrawer from "./TransferBookingDetailsDrawer";
@@ -42,10 +43,20 @@ export default function AdminTransferBookingsPage() {
   };
 
   const { data: bookings = [], isLoading, isFetching } = useTransferBookingsQuery(queryParams);
-  const { data: allBookings = [] } = useTransferBookingsQuery({ pageSize: 1000 });
+  const { data: allBookings = [] } = useTransferBookingsQuery({ pageSize: 100 });
   const updateStatusMutation = useUpdateTransferBookingStatusMutation();
 
   const handleStatusChange = async (id: string, newStatus: TransferBookingStatusEnum) => {
+    const existing =
+      bookings.find((b) => b.id === id) ||
+      allBookings.find((b) => b.id === id) ||
+      (selectedBooking?.id === id ? selectedBooking : null);
+
+    if (existing && isTransferBookingCompleted(existing)) {
+      toast.error("Completed transfer bookings cannot be modified.");
+      return;
+    }
+
     try {
       await updateStatusMutation.mutateAsync({ id, status: newStatus });
       toast.success("Transfer booking status updated.");
@@ -69,24 +80,43 @@ export default function AdminTransferBookingsPage() {
 
   // Metrics summary
   const metricsSource = allBookings.length > 0 ? allBookings : bookings;
-  const totalCount = metricsSource.length;
-  const pendingCount = metricsSource.filter(
-    (b) =>
-      parseTransferStatus(b.status) === TransferBookingStatusEnum.Pending &&
-      !b.isCompleted
-  ).length;
-  const confirmedCount = metricsSource.filter(
-    (b) =>
-      parseTransferStatus(b.status) === TransferBookingStatusEnum.Confirmed &&
-      !b.isCompleted
-  ).length;
-  const completedCount = metricsSource.filter(
-    (b) => isTransferBookingCompleted(b)
-  ).length;
-  const totalRevenue = metricsSource.reduce((acc, b) => {
-    const val = b.pricing?.finalPriceConverted ?? b.pricing?.finalPriceUsd ?? 0;
-    return acc + Number(val || 0);
-  }, 0);
+
+  const metrics = useMemo(() => {
+    let pending = 0;
+    let confirmed = 0;
+    let completed = 0;
+    let cancelled = 0;
+    let revenueEur = 0;
+
+    metricsSource.forEach((b) => {
+      const isComp = isTransferBookingCompleted(b);
+      const s = parseTransferStatus(b.status);
+
+      if (isComp) {
+        completed += 1;
+      } else if (s === TransferBookingStatusEnum.Pending) {
+        pending += 1;
+      } else if (s === TransferBookingStatusEnum.Confirmed) {
+        confirmed += 1;
+      } else if (s === TransferBookingStatusEnum.Cancelled) {
+        cancelled += 1;
+      }
+
+      if (s !== TransferBookingStatusEnum.Cancelled) {
+        const val = b.pricing?.finalPriceConverted ?? b.pricing?.finalPriceUsd ?? 0;
+        revenueEur += Number(val || 0);
+      }
+    });
+
+    return {
+      total: metricsSource.length,
+      pending,
+      confirmed,
+      completed,
+      cancelled,
+      revenueEur,
+    };
+  }, [metricsSource]);
 
   return (
     <AdminShell
@@ -106,69 +136,7 @@ export default function AdminTransferBookingsPage() {
     >
       <div className="space-y-6 font-[family-name:var(--font-lato)]">
         {/* Metrics Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
-          <div className="bg-white rounded-2xl p-4 border border-[#013E51]/10 shadow-[0px_4px_20px_0px_rgba(0,0,0,0.03)] flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#013E51]/5 text-[#013E51] flex items-center justify-center shrink-0">
-              <FiCalendar className="w-5 h-5 text-[#E8B34A]" />
-            </div>
-            <div>
-              <span className="block text-[11px] font-bold uppercase tracking-wider text-gray-500">
-                Total
-              </span>
-              <span className="text-xl font-extrabold text-[#013E51]">{totalCount}</span>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl p-4 border border-[#013E51]/10 shadow-[0px_4px_20px_0px_rgba(0,0,0,0.03)] flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center shrink-0">
-              <FiClock className="w-5 h-5 text-amber-600" />
-            </div>
-            <div>
-              <span className="block text-[11px] font-bold uppercase tracking-wider text-gray-500">
-                Pending
-              </span>
-              <span className="text-xl font-extrabold text-amber-700">{pendingCount}</span>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl p-4 border border-[#013E51]/10 shadow-[0px_4px_20px_0px_rgba(0,0,0,0.03)] flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center shrink-0">
-              <FiCheck className="w-5 h-5 text-sky-600" />
-            </div>
-            <div>
-              <span className="block text-[11px] font-bold uppercase tracking-wider text-gray-500">
-                Confirmed
-              </span>
-              <span className="text-xl font-extrabold text-sky-700">{confirmedCount}</span>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl p-4 border border-[#013E51]/10 shadow-[0px_4px_20px_0px_rgba(0,0,0,0.03)] flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
-              <FiCheckCircle className="w-5 h-5 text-emerald-600" />
-            </div>
-            <div>
-              <span className="block text-[11px] font-bold uppercase tracking-wider text-gray-500">
-                Completed
-              </span>
-              <span className="text-xl font-extrabold text-emerald-700">{completedCount}</span>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl p-4 border border-[#013E51]/10 shadow-[0px_4px_20px_0px_rgba(0,0,0,0.03)] flex items-center gap-3 col-span-2 sm:col-span-1">
-            <div className="w-10 h-10 rounded-xl bg-[#013E51]/5 text-[#013E51] flex items-center justify-center shrink-0">
-              <span className="text-lg font-black text-[#E8B34A] leading-none">&euro;</span>
-            </div>
-            <div>
-              <span className="block text-[11px] font-bold uppercase tracking-wider text-gray-500">
-                Revenue (EUR)
-              </span>
-              <span className="text-xl font-extrabold text-[#013E51]">
-                &euro;{totalRevenue.toFixed(2)}
-              </span>
-            </div>
-          </div>
-        </div>
+        <TransferBookingsMetricsGrid metrics={metrics} />
 
         {/* Filters Bar */}
         <TransferBookingsFiltersBar

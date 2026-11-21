@@ -1,27 +1,110 @@
 "use client";
 
-import { useState } from "react";
-import { FiBookOpen, FiPlus, FiSearch, FiCheck } from "react-icons/fi";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import { FiPlus } from "react-icons/fi";
 import AdminShell from "@/components/adminComp/Common/AdminShell";
-import AdminDrawer from "@/components/adminComp/Common/AdminDrawer";
+import { BlogApiItem } from "@/models/blog";
+import {
+  useBlogsQuery,
+  useDeleteBlogMutation,
+} from "@/features/blogs/useBlogs";
+import BlogsMetricsGrid from "./BlogsMetricsGrid";
+import BlogsFiltersBar from "./BlogsFiltersBar";
+import BlogsTable from "./BlogsTable";
+import BlogDetailsDrawer from "./BlogDetailsDrawer";
+import BlogFormDrawer from "./BlogFormDrawer";
+import BlogDeleteModal from "./BlogDeleteModal";
 
 export default function AdminBlogsPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [title, setTitle] = useState("");
-  const [summary, setSummary] = useState("");
+  const [hasImageFilter, setHasImageFilter] = useState<
+    "all" | "with-image" | "no-image"
+  >("all");
+  const [pageNumber, setPageNumber] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
-  const handleCloseDrawer = () => {
-    setIsDrawerOpen(false);
-    setTitle("");
-    setSummary("");
+  const [selectedBlog, setSelectedBlog] = useState<BlogApiItem | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+
+  const [editingBlog, setEditingBlog] = useState<BlogApiItem | null>(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+
+  const [deletingBlog, setDeletingBlog] = useState<BlogApiItem | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const {
+    data: rawBlogs = [],
+    isLoading,
+    isFetching,
+  } = useBlogsQuery({
+    PageNumber: pageNumber,
+    PageSize: pageSize,
+  });
+
+  const { data: allBlogs = [] } = useBlogsQuery({ PageSize: 100 });
+  const deleteMutation = useDeleteBlogMutation();
+
+  // Client-side search and media filtering
+  const filteredBlogs = useMemo(() => {
+    return rawBlogs.filter((b) => {
+      if (hasImageFilter === "with-image" && !b.imageUrl) return false;
+      if (hasImageFilter === "no-image" && b.imageUrl) return false;
+
+      if (searchQuery.trim()) {
+        const q = searchQuery.trim().toLowerCase();
+        const inTitle = (b.title || "").toLowerCase().includes(q);
+        const inContent = (b.content || "").toLowerCase().includes(q);
+        const inSections = (b.blogSections || []).some(
+          (s) =>
+            (s.title || "").toLowerCase().includes(q) ||
+            (s.content || "").toLowerCase().includes(q)
+        );
+        if (!inTitle && !inContent && !inSections) return false;
+      }
+      return true;
+    });
+  }, [rawBlogs, hasImageFilter, searchQuery]);
+
+  // Metrics summary
+  const metricsSource = allBlogs.length > 0 ? allBlogs : rawBlogs;
+  const metrics = useMemo(() => {
+    let withCoverImage = 0;
+    let totalSections = 0;
+
+    metricsSource.forEach((b) => {
+      if (b.imageUrl) withCoverImage += 1;
+      totalSections += b.blogSections?.length || 0;
+    });
+
+    const totalBlogs = metricsSource.length;
+    const avgSectionsPerBlog =
+      totalBlogs > 0 ? totalSections / totalBlogs : 0;
+
+    return {
+      totalBlogs,
+      withCoverImage,
+      totalSections,
+      avgSectionsPerBlog,
+    };
+  }, [metricsSource]);
+
+  const handleResetFilters = () => {
+    setSearchQuery("");
+    setHasImageFilter("all");
+    setPageNumber(1);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast.info("Articles & Blogs API integration is pending.");
-    handleCloseDrawer();
+  const handleDeleteConfirm = async () => {
+    if (!deletingBlog) return;
+    try {
+      await deleteMutation.mutateAsync(deletingBlog.id);
+      toast.success(`Article #${deletingBlog.id} deleted.`);
+      setIsDeleteModalOpen(false);
+      setDeletingBlog(null);
+    } catch {
+      toast.error("Failed to delete article.");
+    }
   };
 
   return (
@@ -32,105 +115,109 @@ export default function AdminBlogsPage() {
       action={
         <button
           type="button"
-          onClick={() => setIsDrawerOpen(true)}
-          className="inline-flex items-center gap-2 bg-[#013E51] hover:bg-[#025670] text-white px-5 py-2.5 rounded-xl font-[family-name:var(--font-lato)] text-xs font-bold uppercase tracking-wider transition shadow-sm cursor-pointer"
+          onClick={() => {
+            setEditingBlog(null);
+            setIsFormOpen(true);
+          }}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#013E51] text-white text-xs sm:text-sm font-semibold hover:bg-[#024f67] transition-colors shadow-xs cursor-pointer"
         >
           <FiPlus className="w-4 h-4 text-[#E8B34A]" />
           <span>New Article</span>
         </button>
       }
     >
-      <div className="space-y-6">
-        {/* Search Bar */}
-        <div className="bg-white rounded-[20px] p-4 sm:p-5 shadow-[0px_4px_20px_0px_rgba(0,0,0,0.04)] border border-[#013E51]/10">
-          <div className="relative w-full max-w-md">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search articles by title or keyword..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 bg-[#FAF7F2]/50 text-xs sm:text-sm text-[#013E51] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
-            />
-            <FiSearch className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+      <div className="space-y-6 font-[family-name:var(--font-lato)]">
+        <BlogsMetricsGrid metrics={metrics} />
+
+        <BlogsFiltersBar
+          searchQuery={searchQuery}
+          onSearchChange={(val) => {
+            setSearchQuery(val);
+            setPageNumber(1);
+          }}
+          hasImageFilter={hasImageFilter}
+          onHasImageChange={(val) => {
+            setHasImageFilter(val);
+            setPageNumber(1);
+          }}
+          pageSize={pageSize}
+          onPageSizeChange={(val) => {
+            setPageSize(val);
+            setPageNumber(1);
+          }}
+          onResetFilters={handleResetFilters}
+        />
+
+        <BlogsTable
+          blogs={filteredBlogs}
+          isLoading={isLoading || isFetching}
+          onViewDetails={(item) => {
+            setSelectedBlog(item);
+            setIsDetailsOpen(true);
+          }}
+          onEdit={(item) => {
+            setEditingBlog(item);
+            setIsFormOpen(true);
+          }}
+          onDelete={(item) => {
+            setDeletingBlog(item);
+            setIsDeleteModalOpen(true);
+          }}
+        />
+
+        {/* Pagination */}
+        <div className="flex items-center justify-between bg-white px-4 py-3 rounded-2xl border border-[#013E51]/10 shadow-[0px_4px_20px_0px_rgba(0,0,0,0.03)] text-xs text-gray-600">
+          <span>Page {pageNumber}</span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              disabled={pageNumber <= 1}
+              onClick={() => setPageNumber((p) => Math.max(1, p - 1))}
+              className="px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-40 cursor-pointer"
+            >
+              Previous
+            </button>
+            <button
+              type="button"
+              disabled={rawBlogs.length < pageSize}
+              onClick={() => setPageNumber((p) => p + 1)}
+              className="px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-40 cursor-pointer"
+            >
+              Next
+            </button>
           </div>
         </div>
 
-        {/* Empty State Card */}
-        <div className="bg-white rounded-[24px] sm:rounded-[28px] p-10 sm:p-16 shadow-[0px_4px_24px_0px_rgba(0,0,0,0.04)] border border-[#013E51]/10 text-center flex flex-col items-center justify-center">
-          <div className="w-16 h-16 rounded-2xl bg-[#013E51]/5 text-[#013E51] flex items-center justify-center mb-4">
-            <FiBookOpen className="w-8 h-8 text-[#013E51]" />
-          </div>
-          <h2 className="font-[family-name:var(--font-cormorant)] text-2xl sm:text-3xl font-bold text-[#013E51]">
-            No Articles Found
-          </h2>
-          <p className="font-[family-name:var(--font-lato)] text-xs sm:text-sm text-[#888888] max-w-md mt-2 mb-6">
-            There are no blog stories or destination guides currently created. Click below to draft your first article with structured sections and images.
-          </p>
-          <button
-            type="button"
-            onClick={() => setIsDrawerOpen(true)}
-            className="inline-flex items-center gap-2 bg-[#FAF7F2] hover:bg-[#013E51] text-[#013E51] hover:text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition cursor-pointer border border-[#013E51]/10"
-          >
-            <FiPlus className="w-4 h-4" />
-            <span>Draft Your First Article</span>
-          </button>
-        </div>
+        {/* Drawers and Modals */}
+        <BlogDetailsDrawer
+          blog={selectedBlog}
+          isOpen={isDetailsOpen}
+          onClose={() => setIsDetailsOpen(false)}
+          onEdit={(item) => {
+            setEditingBlog(item);
+            setIsFormOpen(true);
+          }}
+        />
 
-        <AdminDrawer
-          isOpen={isDrawerOpen}
-          onClose={handleCloseDrawer}
-          eyebrow="Content Management"
-          title="New Article"
-          subtitle="Draft a travel guide or editorial insight for visitors."
-          footer={
-            <div className="flex items-center justify-end gap-3">
-              <button
-                type="button"
-                onClick={handleCloseDrawer}
-                className="px-5 py-2.5 rounded-xl border border-gray-200 bg-white text-xs font-bold uppercase tracking-wider text-[#013E51] hover:bg-[#FAF7F2] transition cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                form="blog-drawer-form"
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#013E51] hover:bg-[#025670] text-white text-xs font-bold uppercase tracking-wider transition shadow-sm cursor-pointer"
-              >
-                <FiCheck className="w-4 h-4 text-[#E8B34A]" />
-                <span>Publish Article</span>
-              </button>
-            </div>
-          }
-        >
-          <form id="blog-drawer-form" onSubmit={handleSubmit} className="space-y-5">
-            <div className="space-y-1.5">
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#013E51]">
-                Article Headline *
-              </label>
-              <input
-                type="text"
-                required
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. Best Time to Visit Egypt"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-[#FAF7F2]/50 text-xs sm:text-sm text-[#013E51] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
-              />
-            </div>
+        <BlogFormDrawer
+          isOpen={isFormOpen}
+          onClose={() => {
+            setIsFormOpen(false);
+            setEditingBlog(null);
+          }}
+          editingBlog={editingBlog}
+        />
 
-            <div className="space-y-1.5">
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#013E51]">
-                Article Excerpt
-              </label>
-              <textarea
-                rows={5}
-                value={summary}
-                onChange={(e) => setSummary(e.target.value)}
-                placeholder="Write a concise summary of the travel story..."
-                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-[#FAF7F2]/50 text-xs sm:text-sm text-[#013E51] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
-              />
-            </div>
-          </form>
-        </AdminDrawer>
+        <BlogDeleteModal
+          blog={deletingBlog}
+          isOpen={isDeleteModalOpen}
+          isDeleting={deleteMutation.isPending}
+          onClose={() => {
+            setIsDeleteModalOpen(false);
+            setDeletingBlog(null);
+          }}
+          onConfirm={handleDeleteConfirm}
+        />
       </div>
     </AdminShell>
   );

@@ -1,9 +1,15 @@
 import { useState } from "react";
-import { FiX, FiCheckCircle } from "react-icons/fi";
+import { FiX, FiCheckCircle, FiClock, FiDollarSign } from "react-icons/fi";
 import { toast } from "sonner";
 import { useModalDismiss } from "@/shared/utils/useModalDismiss";
-import { TransferBookingApiItem } from "@/models/transferBooking";
-import { useCompleteTransferBookingMutation } from "@/features/transfers/useTransferBookings";
+import {
+  TransferBookingApiItem,
+  TransferTripTypeEnum,
+} from "@/models/transferBooking";
+import {
+  useCompleteTransferBookingMutation,
+  useTransferPreviewQuery,
+} from "@/features/transfers/useTransferBookings";
 
 interface TransferBookingCompleteModalProps {
   booking: TransferBookingApiItem | null;
@@ -19,9 +25,35 @@ export default function TransferBookingCompleteModal({
   const [additionalHours, setAdditionalHours] = useState<number>(0);
   const completeMutation = useCompleteTransferBookingMutation();
 
+  const previewPayload =
+    booking && booking.fromLocationId && booking.toLocationId
+      ? {
+          fromLocationId: booking.fromLocationId,
+          toLocationId: booking.toLocationId,
+          adults: booking.adults || 1,
+          children: booking.children || 0,
+          tripType:
+            booking.tripType?.toLowerCase().includes("round")
+              ? TransferTripTypeEnum.RoundTrip
+              : TransferTripTypeEnum.OneWay,
+          additionalHours: Number(additionalHours) || 0,
+        }
+      : null;
+
+  const { data: previewData, isLoading: isPreviewLoading } =
+    useTransferPreviewQuery(previewPayload);
+
   useModalDismiss({ isOpen, onClose, disabled: completeMutation.isPending });
 
   if (!isOpen || !booking) return null;
+
+  const currentFinalEur =
+    booking.pricing?.finalPriceConverted ??
+    booking.pricing?.finalPriceUsd ??
+    0;
+
+  const previewFinalEur = previewData?.pricing?.finalPrice;
+  const previewAddCostEur = previewData?.pricing?.additionalHoursCost;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,7 +62,9 @@ export default function TransferBookingCompleteModal({
         bookingId: booking.id,
         payload: { additionalHours: Number(additionalHours) || 0 },
       });
-      toast.success(`Booking #${booking.id.slice(0, 8)} successfully marked as completed.`);
+      toast.success(
+        `Booking #${booking.id.slice(0, 8)} successfully marked as completed.`
+      );
       onClose();
     } catch {
       toast.error("Failed to complete transfer booking. Please try again.");
@@ -64,7 +98,7 @@ export default function TransferBookingCompleteModal({
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div className="bg-[#F8F9FA] p-3 rounded-xl border border-gray-100 text-xs space-y-1">
+          <div className="bg-[#F8F9FA] p-3 rounded-xl border border-gray-100 text-xs space-y-1.5">
             <div className="flex justify-between">
               <span className="text-gray-500">Booking ID:</span>
               <span className="font-mono font-bold text-[#013E51]">
@@ -81,11 +115,18 @@ export default function TransferBookingCompleteModal({
                 {booking.vehicleName || "Transfer Vehicle"}
               </span>
             </div>
+            <div className="flex justify-between pt-1 border-t border-gray-200/60">
+              <span className="text-gray-500">Base Price (EUR):</span>
+              <span className="font-bold text-[#013E51]">
+                &euro;{Number(currentFinalEur).toFixed(2)}
+              </span>
+            </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#013E51] uppercase tracking-wider mb-1.5">
-              Additional Hours (if any)
+            <label className="block text-xs font-bold text-[#013E51] uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+              <FiClock className="w-3.5 h-3.5 text-[#E8B34A]" />
+              <span>Additional Waiting Hours (if any)</span>
             </label>
             <input
               type="number"
@@ -99,6 +140,35 @@ export default function TransferBookingCompleteModal({
               Enter any extra waiting or service hours to be added to the final completed invoice.
             </p>
           </div>
+
+          {/* Live Preview Pricing Card */}
+          {additionalHours > 0 && (
+            <div className="bg-amber-50/60 p-3.5 rounded-xl border border-amber-200/70 text-xs space-y-1.5">
+              <div className="flex items-center justify-between text-amber-900 font-bold">
+                <span className="flex items-center gap-1">
+                  <FiDollarSign className="w-3.5 h-3.5 text-[#E8B34A]" />
+                  <span>Waiting Hours Cost:</span>
+                </span>
+                <span>
+                  {isPreviewLoading
+                    ? "Calculating..."
+                    : previewAddCostEur !== undefined
+                    ? `+€${Number(previewAddCostEur).toFixed(2)}`
+                    : "Included in invoice"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-[#013E51] font-extrabold text-sm pt-1 border-t border-amber-200/60">
+                <span>Updated Final Total:</span>
+                <span>
+                  {isPreviewLoading
+                    ? "Calculating..."
+                    : previewFinalEur !== undefined
+                    ? `€${Number(previewFinalEur).toFixed(2)}`
+                    : `€${Number(currentFinalEur).toFixed(2)}`}
+                </span>
+              </div>
+            </div>
+          )}
 
           <div className="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
             <button

@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { FiMenu } from "react-icons/fi";
+import { useAuthStore } from "@/features/auth/useAuthStore";
 import AdminSidebar from "./AdminSidebar";
 
 interface AdminShellProps {
@@ -20,11 +21,20 @@ export default function AdminShell({
   subtitle,
   action,
 }: AdminShellProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const { accessToken, hasHydrated } = useAuthStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const pathname = usePathname();
 
-  // Scroll to top of workspace on route changes
+  useEffect(() => {
+    if (hasHydrated && !accessToken) {
+      if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
+        router.replace("/admin/login");
+      }
+    }
+  }, [hasHydrated, accessToken, pathname, router]);
+
   useEffect(() => {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTop = 0;

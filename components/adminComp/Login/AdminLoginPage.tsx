@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { FiEye, FiEyeOff, FiLogIn, FiArrowLeft, FiMail } from "react-icons/fi";
+import { FiEye, FiEyeOff, FiLogIn } from "react-icons/fi";
 import { toast } from "sonner";
 import { useAuthStore } from "@/features/auth/useAuthStore";
-import { loginAdmin, forgotPasswordAdmin } from "@/clientApi/authApi";
+import { loginAdmin } from "@/clientApi/authApi";
 import AdminBrandingPanel from "./AdminBrandingPanel";
+import ForgotPasswordFlow from "./ForgotPasswordFlow";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -16,10 +17,7 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
   const [isForgotMode, setIsForgotMode] = useState(false);
-  const [forgotEmail, setForgotEmail] = useState("");
-  const [isForgotLoading, setIsForgotLoading] = useState(false);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -32,78 +30,39 @@ export default function AdminLoginPage() {
     setIsLoading(true);
 
     try {
-      try {
-        const response = await loginAdmin({
-          email: trimmedEmail,
-          password,
-        });
+      const response = await loginAdmin({
+        email: trimmedEmail,
+        password,
+      });
 
-        if (response?.data?.accessToken || response?.data?.refreshToken) {
-          const effectiveToken =
-            response.data.refreshToken || response.data.accessToken || "";
-          setAuth({
-            accessToken: effectiveToken,
-            refreshToken: effectiveToken,
-            email: response.data.email || trimmedEmail,
-            fullName: response.data.fullName || trimmedEmail.split("@")[0],
-            role: response.data.role || "SuperAdmin",
-          });
-          toast.success("Signed in successfully");
-          router.push("/admin/dashboard");
-          return;
-        }
-      } catch (apiError: unknown) {
-        const errObj = apiError as {
-          response?: { status?: number; data?: { Message?: string; message?: string } };
-        };
-        if (errObj?.response?.status === 401 || errObj?.response?.status === 400) {
-          const msg =
-            errObj.response.data?.Message ||
-            errObj.response.data?.message ||
-            "Invalid email or password.";
-          toast.error(msg);
-          setIsLoading(false);
-          return;
-        }
+      if (response?.data?.accessToken || response?.data?.refreshToken) {
+        setAuth({
+          accessToken: response.data.accessToken,
+          refreshToken: response.data.refreshToken,
+          email: response.data.email || trimmedEmail,
+          fullName: response.data.fullName || trimmedEmail.split("@")[0],
+          role: response.data.role || "Admin",
+        });
+        toast.success("Signed in successfully");
+        router.push("/admin/dashboard");
+        return;
       }
 
-      // Fallback for development / mock session if backend is pending deployment
-      setAuth({
-        accessToken: "mock-jwt-access-token",
-        refreshToken: "mock-jwt-refresh-token",
-        email: trimmedEmail,
-        fullName: "System Admin",
-        role: "SuperAdmin",
-      });
-      toast.success("Signed in successfully");
-      router.push("/admin/dashboard");
-    } catch {
-      toast.error("Failed to sign in. Please verify credentials.");
+      toast.error("Invalid response from server.");
+    } catch (apiError: unknown) {
+      const errObj = apiError as {
+        response?: {
+          status?: number;
+          data?: { Message?: string; message?: string };
+        };
+      };
+      const msg =
+        errObj?.response?.data?.Message ||
+        errObj?.response?.data?.message ||
+        "Invalid email or password.";
+      toast.error(msg);
     } finally {
       setIsLoading(false);
-    }
-  }
-
-  async function handleForgotPassword(e: React.FormEvent) {
-    e.preventDefault();
-    const trimmed = forgotEmail.trim();
-    if (!trimmed || !trimmed.includes("@")) {
-      toast.error("Please enter a valid email address.");
-      return;
-    }
-
-    setIsForgotLoading(true);
-    try {
-      await forgotPasswordAdmin(trimmed);
-      toast.success("Password reset instructions sent if account exists.");
-      setIsForgotMode(false);
-      setForgotEmail("");
-    } catch {
-      toast.info("Password reset request logged for " + trimmed);
-      setIsForgotMode(false);
-      setForgotEmail("");
-    } finally {
-      setIsForgotLoading(false);
     }
   }
 
@@ -112,7 +71,7 @@ export default function AdminLoginPage() {
       {/* 1. Left Section: Visual Branding Panel */}
       <AdminBrandingPanel />
 
-      {/* 2. Right Section: Clean Login Card Area */}
+      {/* 2. Right Section: Login Card Area */}
       <section className="flex-1 flex items-center justify-center p-6 sm:p-10 lg:p-16 bg-[#F8FAFC]">
         <div className="w-full max-w-md bg-white rounded-[28px] sm:rounded-[34px] p-7 sm:p-10 shadow-[0px_10px_35px_rgba(1,62,81,0.06)] border border-[#013E51]/10">
           {!isForgotMode ? (
@@ -126,7 +85,7 @@ export default function AdminLoginPage() {
                   Sign in
                 </h2>
                 <p className="font-[family-name:var(--font-lato)] text-xs sm:text-sm text-[#888888] mt-1.5">
-                  Use your admin account to access the dashboard.
+                  Use your administrator credentials to access the portal.
                 </p>
               </div>
 
@@ -135,7 +94,7 @@ export default function AdminLoginPage() {
                 {/* Email Field */}
                 <div className="space-y-1.5">
                   <label className="block text-xs sm:text-sm font-semibold text-[#013E51]">
-                    Email
+                    Email Address
                   </label>
                   <input
                     type="email"
@@ -180,17 +139,14 @@ export default function AdminLoginPage() {
                 <div className="flex justify-end pt-0.5">
                   <button
                     type="button"
-                    onClick={() => {
-                      setForgotEmail(email);
-                      setIsForgotMode(true);
-                    }}
+                    onClick={() => setIsForgotMode(true)}
                     className="text-xs sm:text-sm font-semibold text-[#013E51] hover:text-[#E8B34A] transition cursor-pointer"
                   >
                     Forgot password?
                   </button>
                 </div>
 
-                {/* Sign In Submit Button */}
+                {/* Submit Button */}
                 <button
                   type="submit"
                   disabled={isLoading}
@@ -202,52 +158,14 @@ export default function AdminLoginPage() {
               </form>
             </>
           ) : (
-            /* Forgot Password Drawer View */
-            <div className="space-y-6">
-              <div>
-                <button
-                  type="button"
-                  onClick={() => setIsForgotMode(false)}
-                  className="inline-flex items-center gap-2 text-xs font-semibold text-[#013E51] hover:text-[#E8B34A] mb-4 transition cursor-pointer"
-                >
-                  <FiArrowLeft className="w-4 h-4" />
-                  <span>Back to Sign In</span>
-                </button>
-                <h2 className="font-[family-name:var(--font-cormorant)] text-2xl sm:text-3xl font-bold text-[#013E51]">
-                  Reset Password
-                </h2>
-                <p className="font-[family-name:var(--font-lato)] text-xs sm:text-sm text-[#888888] mt-1.5">
-                  Enter your admin email to receive a password reset link.
-                </p>
-              </div>
-
-              <form onSubmit={handleForgotPassword} className="space-y-5">
-                <div className="space-y-1.5">
-                  <label className="block text-xs sm:text-sm font-semibold text-[#013E51]">
-                    Admin Email Address
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="email"
-                      required
-                      value={forgotEmail}
-                      onChange={(e) => setForgotEmail(e.target.value)}
-                      placeholder="admin@example.com"
-                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-[#FAF7F2]/50 text-sm text-[#013E51] font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51] transition"
-                    />
-                    <FiMail className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isForgotLoading}
-                  className="w-full py-3.5 rounded-xl bg-[#013E51] hover:bg-[#025670] text-white font-[family-name:var(--font-lato)] font-bold text-sm tracking-wide shadow-md transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                >
-                  <span>{isForgotLoading ? "Sending..." : "Send Reset Link"}</span>
-                </button>
-              </form>
-            </div>
+            <ForgotPasswordFlow
+              initialEmail={email}
+              onBackToLogin={() => setIsForgotMode(false)}
+              onResetSuccess={() => {
+                setIsForgotMode(false);
+                setPassword("");
+              }}
+            />
           )}
         </div>
       </section>

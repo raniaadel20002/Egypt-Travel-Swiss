@@ -26,6 +26,7 @@ const VALID_ADMIN_SUBPATHS = new Set([
   "hotel-bookings",
   "flight-bookings",
   "transfer-bookings",
+  "diving-course-bookings",
   "trips",
   "trip-types",
   "destinations",

@@ -1,75 +1,253 @@
 "use client";
 
-import { useState } from "react";
-import { FiHome, FiSearch, FiCalendar } from "react-icons/fi";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
+import { FiPlus } from "react-icons/fi";
 import AdminShell from "@/components/adminComp/Common/AdminShell";
+import {
+  HotelBookingApiItem,
+  HotelBookingStatusEnum,
+} from "@/models/hotelBooking";
+import {
+  useDeleteHotelBookingMutation,
+  useHotelBookingsQuery,
+  useUpdateHotelBookingStatusMutation,
+} from "@/features/hotels/useHotelBookings";
+import { useHotelsQuery } from "@/features/hotels/useHotels";
+import HotelBookingsFiltersBar from "./HotelBookingsFiltersBar";
+import HotelBookingsTable from "./HotelBookingsTable";
+import HotelBookingDetailsDrawer from "./HotelBookingDetailsDrawer";
+import HotelBookingCreateDrawer from "./HotelBookingCreateDrawer";
+import HotelBookingDeleteModal from "./HotelBookingDeleteModal";
+import HotelBookingsMetricsGrid from "./HotelBookingsMetricsGrid";
+import { parseHotelBookingStatus } from "./hotelBookingHelpers";
 
 export default function AdminHotelBookingsPage() {
+  const [statusFilter, setStatusFilter] = useState<
+    HotelBookingStatusEnum | "all"
+  >("all");
+  const [hotelIdFilter, setHotelIdFilter] = useState<number | "all">("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [nationalityFilter, setNationalityFilter] = useState("");
+  const [pageNumber, setPageNumber] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
-  const filterTabs = [
-    { id: "all", label: "All Reservations" },
-    { id: "pending", label: "Pending" },
-    { id: "confirmed", label: "Confirmed" },
-    { id: "cancelled", label: "Cancelled" },
-  ];
+  const [selectedBooking, setSelectedBooking] =
+    useState<HotelBookingApiItem | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [deletingBooking, setDeletingBooking] =
+    useState<HotelBookingApiItem | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  // Queries
+  const { data: rawBookings = [], isLoading } = useHotelBookingsQuery({
+    HotelId: hotelIdFilter === "all" ? undefined : hotelIdFilter,
+    Status: statusFilter === "all" ? undefined : statusFilter,
+    Nationality: nationalityFilter.trim() || undefined,
+  });
+
+  const { data: allBookings = [] } = useHotelBookingsQuery({});
+  const { data: hotels = [] } = useHotelsQuery({ PageSize: 100 });
+
+  const updateStatusMutation = useUpdateHotelBookingStatusMutation();
+  const deleteMutation = useDeleteHotelBookingMutation();
+
+  // Client-side search across guest name, email, WhatsApp, hotel name
+  const filteredBookings = useMemo(() => {
+    if (!searchQuery.trim()) return rawBookings;
+    const q = searchQuery.trim().toLowerCase();
+    return rawBookings.filter((b) => {
+      const inGuest =
+        b.name.toLowerCase().includes(q) ||
+        b.email.toLowerCase().includes(q) ||
+        b.whatsApp.toLowerCase().includes(q);
+      const inHotel = (b.hotelName || "").toLowerCase().includes(q);
+      const inNat = (b.nationality || "").toLowerCase().includes(q);
+      return inGuest || inHotel || inNat;
+    });
+  }, [rawBookings, searchQuery]);
+
+  // Pagination slice
+  const totalCount = filteredBookings.length;
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+  const paginatedBookings = useMemo(() => {
+    const start = (pageNumber - 1) * pageSize;
+    return filteredBookings.slice(start, start + pageSize);
+  }, [filteredBookings, pageNumber, pageSize]);
+
+  // Overview metrics (calculated from unfiltered allBookings)
+  const metricsSource = allBookings.length > 0 ? allBookings : rawBookings;
+  const metrics = useMemo(() => {
+    let pending = 0;
+    let confirmed = 0;
+    let finished = 0;
+    let cancelled = 0;
+
+    metricsSource.forEach((b) => {
+      const s = parseHotelBookingStatus(b.status);
+      if (s === HotelBookingStatusEnum.Pending) pending += 1;
+      else if (s === HotelBookingStatusEnum.Confirmed) confirmed += 1;
+      else if (s === HotelBookingStatusEnum.Finished) finished += 1;
+      else if (s === HotelBookingStatusEnum.Cancelled) cancelled += 1;
+    });
+
+    return {
+      total: metricsSource.length,
+      pending,
+      confirmed,
+      finished,
+      cancelled,
+    };
+  }, [metricsSource]);
+
+  const handleStatusChange = async (
+    id: number,
+    newStatus: HotelBookingStatusEnum
+  ) => {
+    try {
+      await updateStatusMutation.mutateAsync({ id, status: newStatus });
+      toast.success("Hotel booking status updated.");
+      if (selectedBooking && selectedBooking.id === id) {
+        setSelectedBooking({ ...selectedBooking, status: newStatus });
+      }
+    } catch {
+      toast.error("Failed to update status. Please try again.");
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deletingBooking) return;
+    try {
+      await deleteMutation.mutateAsync(deletingBooking.id);
+      toast.success("Hotel reservation deleted.");
+      setIsDeleteModalOpen(false);
+      setDeletingBooking(null);
+    } catch {
+      toast.error("Failed to delete hotel booking.");
+    }
+  };
 
   return (
     <AdminShell
-      eyebrow="Accommodation"
+      eyebrow="Reservations"
       title="Hotel & Resort Bookings"
-      subtitle="Review room inquiries, reservation statuses, and guest check-in dates across partner resorts."
+      subtitle="Review guest reservations, stay details, room rate plans, and booking statuses."
+      action={
+        <button
+          type="button"
+          onClick={() => setIsCreateOpen(true)}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#013E51] text-white text-xs sm:text-sm font-semibold hover:bg-[#024f67] transition-colors shadow-xs cursor-pointer"
+        >
+          <FiPlus className="w-4 h-4 text-[#E8B34A]" />
+          <span>New Hotel Booking</span>
+        </button>
+      }
     >
-      <div className="space-y-6">
-        {/* Search & Filter Bar */}
-        <div className="bg-white rounded-[20px] p-4 sm:p-5 shadow-[0px_4px_20px_0px_rgba(0,0,0,0.04)] border border-[#013E51]/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="relative w-full sm:w-80">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by guest name or hotel..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 bg-[#FAF7F2]/50 text-xs sm:text-sm text-[#013E51] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
-            />
-            <FiSearch className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-          </div>
+      <div className="space-y-6 font-[family-name:var(--font-lato)]">
+        {/* Top Metric Cards */}
+        <HotelBookingsMetricsGrid metrics={metrics} />
 
-          <div className="flex flex-wrap items-center gap-1.5 w-full sm:w-auto">
-            {filterTabs.map((tab) => (
+        {/* Filters */}
+        <HotelBookingsFiltersBar
+          statusFilter={statusFilter}
+          onStatusChange={(val) => {
+            setStatusFilter(val);
+            setPageNumber(1);
+          }}
+          hotelIdFilter={hotelIdFilter}
+          onHotelIdChange={(val) => {
+            setHotelIdFilter(val);
+            setPageNumber(1);
+          }}
+          hotels={hotels}
+          searchQuery={searchQuery}
+          onSearchChange={(val) => {
+            setSearchQuery(val);
+            setPageNumber(1);
+          }}
+          nationalityFilter={nationalityFilter}
+          onNationalityChange={(val) => {
+            setNationalityFilter(val);
+            setPageNumber(1);
+          }}
+          pageSize={pageSize}
+          onPageSizeChange={(val) => {
+            setPageSize(val);
+            setPageNumber(1);
+          }}
+          onCreateClick={() => setIsCreateOpen(true)}
+        />
+
+        {/* Table */}
+        <HotelBookingsTable
+          bookings={paginatedBookings}
+          isLoading={isLoading}
+          onViewDetails={(item) => {
+            setSelectedBooking(item);
+            setIsDetailsOpen(true);
+          }}
+          onStatusChange={handleStatusChange}
+          onDeleteClick={(item) => {
+            setDeletingBooking(item);
+            setIsDeleteModalOpen(true);
+          }}
+        />
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between bg-white rounded-2xl p-4 border border-[#013E51]/10 shadow-[0px_4px_20px_0px_rgba(0,0,0,0.03)] text-xs text-gray-600">
+            <span>
+              Showing Page <strong>{pageNumber}</strong> of{" "}
+              <strong>{totalPages}</strong> ({totalCount} total)
+            </span>
+            <div className="flex items-center gap-2">
               <button
-                key={tab.id}
                 type="button"
-                onClick={() => setStatusFilter(tab.id)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
-                  statusFilter === tab.id
-                    ? "bg-[#013E51] text-white"
-                    : "text-[#013E51]/70 hover:bg-[#FAF7F2]"
-                }`}
+                disabled={pageNumber <= 1}
+                onClick={() => setPageNumber((p) => Math.max(1, p - 1))}
+                className="px-3 py-1.5 rounded-lg border border-gray-200 font-semibold hover:bg-gray-50 disabled:opacity-40 cursor-pointer"
               >
-                {tab.label}
+                Previous
               </button>
-            ))}
+              <button
+                type="button"
+                disabled={pageNumber >= totalPages}
+                onClick={() => setPageNumber((p) => Math.min(totalPages, p + 1))}
+                className="px-3 py-1.5 rounded-lg border border-gray-200 font-semibold hover:bg-gray-50 disabled:opacity-40 cursor-pointer"
+              >
+                Next
+              </button>
+            </div>
           </div>
-        </div>
-
-        {/* Empty State Card */}
-        <div className="bg-white rounded-[24px] sm:rounded-[28px] p-10 sm:p-16 shadow-[0px_4px_24px_0px_rgba(0,0,0,0.04)] border border-[#013E51]/10 text-center flex flex-col items-center justify-center">
-          <div className="w-16 h-16 rounded-2xl bg-[#013E51]/5 text-[#013E51] flex items-center justify-center mb-4">
-            <FiHome className="w-8 h-8 text-[#013E51]" />
-          </div>
-          <h2 className="font-[family-name:var(--font-cormorant)] text-2xl sm:text-3xl font-bold text-[#013E51]">
-            No Hotel Bookings Found
-          </h2>
-          <p className="font-[family-name:var(--font-lato)] text-xs sm:text-sm text-[#888888] max-w-md mt-2 mb-4 leading-relaxed">
-            There are currently no hotel or resort reservations matching this filter. New bookings submitted through the Accommodation service will be listed here.
-          </p>
-          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#888888] bg-[#FAF7F2] px-3.5 py-1.5 rounded-full border border-[#013E51]/10">
-            <FiCalendar className="w-3.5 h-3.5 text-[#E8B34A]" />
-            <span>Ready for incoming resort inquiries</span>
-          </span>
-        </div>
+        )}
       </div>
+
+      {/* Details Drawer */}
+      <HotelBookingDetailsDrawer
+        booking={selectedBooking}
+        isOpen={isDetailsOpen}
+        onClose={() => setIsDetailsOpen(false)}
+        onStatusChange={handleStatusChange}
+      />
+
+      {/* Create Drawer */}
+      <HotelBookingCreateDrawer
+        isOpen={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+      />
+
+      {/* Delete Modal */}
+      <HotelBookingDeleteModal
+        booking={deletingBooking}
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setDeletingBooking(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        isLoading={deleteMutation.isPending}
+      />
     </AdminShell>
   );
 }

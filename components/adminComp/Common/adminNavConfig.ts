@@ -78,6 +78,12 @@ export function getAdminNavGroups(pathname: string): NavGroupConfig[] {
           icon: FiNavigation,
           active: pathname.startsWith("/admin/transfer-bookings"),
         },
+        {
+          label: "Diving Course Bookings",
+          href: "/admin/diving-course-bookings",
+          icon: FaLifeRing,
+          active: pathname.startsWith("/admin/diving-course-bookings"),
+        },
       ],
     },
     {

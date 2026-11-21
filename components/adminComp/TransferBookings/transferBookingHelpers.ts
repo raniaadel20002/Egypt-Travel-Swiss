@@ -19,22 +19,43 @@ export function getTomorrowDateString(): string {
 }
 
 export function parseTransferStatus(status: unknown): TransferBookingStatusEnum {
+  if (status === null || status === undefined) {
+    return TransferBookingStatusEnum.Pending;
+  }
+
+  // Handle object serialization
+  if (typeof status === "object") {
+    const obj = status as Record<string, unknown>;
+    const extracted = obj.value ?? obj.id ?? obj.status ?? obj.name;
+    return parseTransferStatus(extracted);
+  }
+
   if (typeof status === "number") {
+    if (status === 0) return TransferBookingStatusEnum.Pending;
+    if (status === 1) return TransferBookingStatusEnum.Confirmed;
+    if (status === 2) return TransferBookingStatusEnum.Completed;
+    if (status === 3) return TransferBookingStatusEnum.Cancelled;
     return status in TransferBookingStatusEnum
       ? (status as TransferBookingStatusEnum)
       : TransferBookingStatusEnum.Pending;
   }
+
   if (typeof status === "string") {
     const s = status.trim().toLowerCase();
     if (s === "0" || s === "pending") return TransferBookingStatusEnum.Pending;
     if (s === "1" || s === "confirmed") return TransferBookingStatusEnum.Confirmed;
     if (s === "2" || s === "completed" || s === "finished") return TransferBookingStatusEnum.Completed;
     if (s === "3" || s === "cancelled" || s === "canceled") return TransferBookingStatusEnum.Cancelled;
+
     const num = Number(status);
-    if (!isNaN(num) && num in TransferBookingStatusEnum) {
-      return num as TransferBookingStatusEnum;
+    if (!isNaN(num)) {
+      if (num === 0) return TransferBookingStatusEnum.Pending;
+      if (num === 1) return TransferBookingStatusEnum.Confirmed;
+      if (num === 2) return TransferBookingStatusEnum.Completed;
+      if (num === 3) return TransferBookingStatusEnum.Cancelled;
     }
   }
+
   return TransferBookingStatusEnum.Pending;
 }
 
