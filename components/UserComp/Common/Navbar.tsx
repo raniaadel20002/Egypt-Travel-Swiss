@@ -33,8 +33,8 @@ export default function Navbar() {
   ];
 
   const aboutDropdownItems = [
-    { label: "About Us", href: `/${locale}#why-choose-us` },
-    { label: "FAQ", href: `/${locale}/faq` },
+    { label: "About Us", href: `/${locale}/about` },
+    { label: "Contact Us", href: `/${locale}/contact` },
   ];
 
   const isHomeActive = pathname === `/${locale}` || pathname === `/${locale}/`;

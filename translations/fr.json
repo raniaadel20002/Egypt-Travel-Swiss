@@ -1,0 +1,121 @@
+{
+  "common": {
+    "appName": "Egypt Dreams",
+    "home": "Accueil",
+    "destinations": "Destinations",
+    "trips": "Voyages",
+    "categories": "Categories",
+    "about": "A propos",
+    "contact": "Contact",
+    "search": "Rechercher",
+    "bookNow": "Reserver",
+    "learnMore": "En savoir plus",
+    "viewAll": "Voir tout"
+  },
+  "about": {
+    "hero": {
+      "eyebrow": "PROFIL EDITORIAL",
+      "heading": "Au coeur de la mer Rouge et de l'Egypte eternelle",
+      "description": "Une maison de voyage cotiere qui unit exploration des recifs, horizons desertiques et coordination locale attentive a travers l'Egypte.",
+      "pills": ["Qui sommes-nous", "Ce que nous offrons", "Vision & Mission", "Concepts de voyage"]
+    },
+    "whoWeAre": {
+      "heading": "Qui sommes-nous",
+      "para1": "Nous sommes une equipe de coordinateurs cotiers, d'educateurs en plongee et de planificateurs de destinations qui appellent la mer Rouge leur maison. Chaque voyage que nous organisons est ancre dans une connaissance de premiere main des eaux locales, des vents saisonniers, des sentiers desertiques et des partenaires d'hospitalite de confiance a travers l'Egypte.",
+      "para2": "Plutot que de traiter le voyage comme une liste de controle rigide, nous nous concentrons sur un rythme calme, des conseils honnetes, la securite dans le desert et la preparation culturelle—afin que les clients puissent monter sur un bateau, dans un canyon ou dans une suite cotiere avec une confiance totale.",
+      "tags": ["Operations locales en mer Rouge", "Planification axee sur la securite", "Support personnel aux invites"]
+    },
+    "mission": {
+      "heading": "Notre Mission",
+      "statement": "Offrir des voyages surs, bien structures et transparents, de la premiere demande jusqu'au depart final.",
+      "points": [
+        "Privilegier la securite avec des instructeurs certifies, du materiel entretenu et des briefings clairs.",
+        "Maintenir les horaires organises avec des transferts fiables et une coordination locale directe.",
+        "Communiquer les inclusions, les options et les tarifs ouvertement, sans aucune ambiguite."
+      ],
+      "footer": "Standards concrets sur chaque route terrestre et maritime"
+    },
+    "whatWeOffer": {
+      "heading": "Ce que nous offrons",
+      "description": "Six piliers fondamentaux couvrant chaque aspect d'un voyage en Egypte — des sorties en recif et des cours de plongee aux sejours et aux transferts.",
+      "pillars": [
+        {
+          "title": "Excursions & Voyages",
+          "description": "Sorties de snorkeling guidees, journees en bateau aux iles, safaris dans le desert et escales cotieres iconiques pour le confort et la facilite."
+        },
+        {
+          "title": "Destinations de la mer Rouge",
+          "description": "Decouvrez des baies vibrantes, des lagunes calmes et des escales cotieres iconiques a Hurghada, Marsa Alam et les rivages voisins."
+        },
+        {
+          "title": "Cours de plongee certifies",
+          "description": "Plongees d'introduction structurees et parcours de certification reconnus, diriges par des instructeurs experimentes sur des sites peu frequentes."
+        },
+        {
+          "title": "Hebergements selectionnes",
+          "description": "Resorts et hotels soigneusement choisis avec des plans tarifaires clairs et une flexibilite d'occupation des chambres pour les voyageurs solo, les couples et les familles."
+        },
+        {
+          "title": "Transferts prives",
+          "description": "Transferts aeroportuaires fiables, liaisons hotel-marina et transport fluide entre les destinations."
+        },
+        {
+          "title": "Offres & Forfaits personnalises",
+          "description": "Sejours, excursions en mer et transferts combines de maniere reflechie pour une valeur optimale tout au long de votre visite."
+        }
+      ]
+    },
+    "vision": {
+      "heading": "Notre Vision",
+      "statement": "Une mer Rouge et une Egypte ou les recifs florissants, le patrimoine vivant et l'hospitalite reflechie perdurent ensemble.",
+      "description": "Nous regardons vers un avenir ou le voyage approfondit le respect des habitats coralliens fragiles, des paysages desertiques et des communautes locales—laissant chaque lieu visite en meilleur etat et chaque client plus connecte a l'Egypte.",
+      "footer": "Gestion a long terme & Decouverte responsable"
+    }
+  },
+  "contact": {
+    "hero": {
+      "heading": "Contactez-nous au bord de la mer Rouge",
+      "description": "Planifiez vos excursions en mer Rouge, sejours a l'hotel et transferts prives avec notre equipe a Hurghada. Support local direct en cinq langues, chaque jour.",
+      "location": "Hurghada El Kawther, Egypte"
+    },
+    "cards": {
+      "whatsapp": "WhatsApp",
+      "phone": "Telephone",
+      "email": "Email",
+      "hours": "Heures du bureau mer Rouge",
+      "hoursValue": "Quotidien, 08h00 – 22h00",
+      "airportLine": "Ligne transfert aeroport 24h/24",
+      "chat": "Chatter",
+      "call": "Appeler",
+      "copy": "Copier",
+      "copied": "Copie",
+      "copiedToClipboard": "copie dans le presse-papiers"
+    },
+    "form": {
+      "heading": "Envoyer un message",
+      "fullName": "Nom complet",
+      "email": "Email",
+      "phoneWhatsApp": "Telephone / WhatsApp",
+      "subject": "Sujet",
+      "message": "Message",
+      "messagePlaceholder": "Parlez-nous de vos dates de voyage, de votre hotel ou de vos questions...",
+      "send": "Envoyer le message",
+      "sending": "Envoi en cours...",
+      "sent": "Message envoye",
+      "errorRequired": "Veuillez remplir les champs obligatoires",
+      "successMessage": "Merci ! Votre message a ete envoye avec succes.",
+      "subjects": [
+        "Excursions & Voyages",
+        "Reservation d'hotel",
+        "Transfert prive",
+        "Cours de plongee",
+        "Renseignement general"
+      ]
+    },
+    "map": {
+      "heading": "Hurghada Marina",
+      "address": "Boulevard de la Marina de Hurghada, mer Rouge, Egypte",
+      "openInMaps": "Ouvrir dans Google Maps"
+    }
+  }
+}

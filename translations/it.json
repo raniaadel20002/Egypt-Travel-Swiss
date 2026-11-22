@@ -1,0 +1,121 @@
+{
+  "common": {
+    "appName": "Egypt Dreams",
+    "home": "Home",
+    "destinations": "Destinazioni",
+    "trips": "Viaggi",
+    "categories": "Categorie",
+    "about": "Chi siamo",
+    "contact": "Contatti",
+    "search": "Cerca",
+    "bookNow": "Prenota ora",
+    "learnMore": "Scopri di piu",
+    "viewAll": "Vedi tutto"
+  },
+  "about": {
+    "hero": {
+      "eyebrow": "PROFILO EDITORIALE",
+      "heading": "Pensato per il Mar Rosso e l'Egitto senza tempo",
+      "description": "Una casa di viaggio costiera che unisce esplorazione delle barriere coralline, orizzonti desertici e coordinamento locale attento in tutto l'Egitto.",
+      "pills": ["Chi siamo", "Cosa offriamo", "Visione e Missione", "Concetti di viaggio"]
+    },
+    "whoWeAre": {
+      "heading": "Chi siamo",
+      "para1": "Siamo un team di coordinatori costieri, istruttori di immersioni e pianificatori di destinazioni che chiamano il Mar Rosso casa. Ogni viaggio che organizziamo e basato sulla conoscenza diretta delle acque locali, dei venti stagionali, dei sentieri nel deserto e dei partner di ospitalita di fiducia in tutto l'Egitto.",
+      "para2": "Invece di trattare il viaggio come un rigido elenco di controllo, ci concentriamo su un ritmo calmo, una guida onesta, la sicurezza nel deserto e la preparazione culturale—in modo che gli ospiti possano salire su una barca, in un canyon o in una suite costiera con piena fiducia.",
+      "tags": ["Operazioni locali nel Mar Rosso", "Pianificazione orientata alla sicurezza", "Supporto personale agli ospiti"]
+    },
+    "mission": {
+      "heading": "La nostra Missione",
+      "statement": "Offrire viaggi sicuri, ben strutturati e trasparenti, dalla prima richiesta alla partenza finale.",
+      "points": [
+        "Dare priorita alla sicurezza con istruttori certificati, attrezzatura manutenuta e briefing chiari.",
+        "Mantenere gli orari organizzati con trasferimenti affidabili e coordinamento locale diretto.",
+        "Comunicare inclusioni, opzioni e prezzi apertamente, senza alcuna ambiguita."
+      ],
+      "footer": "Standard concreti su ogni rotta terrestre e marittima"
+    },
+    "whatWeOffer": {
+      "heading": "Cosa offriamo",
+      "description": "Sei pilastri fondamentali pensati per coprire ogni parte di un viaggio in Egitto—dalle uscite alle barriere coralline e ai corsi di immersione ai soggiorni e ai trasferimenti.",
+      "pillars": [
+        {
+          "title": "Esperienze & Escursioni",
+          "description": "Uscite di snorkeling guidate, giornate in barca alle isole, safari nel deserto e tappe costiere iconiche per comfort e facilita."
+        },
+        {
+          "title": "Destinazioni del Mar Rosso",
+          "description": "Scopri baie vivaci, lagune calme e tappe costiere iconiche ad Hurghada, Marsa Alam e le rive vicine."
+        },
+        {
+          "title": "Corsi di immersione certificati",
+          "description": "Immersioni introduttive strutturate e percorsi di certificazione riconosciuti, condotti da istruttori esperti in siti non affollati."
+        },
+        {
+          "title": "Sistemazioni selezionate",
+          "description": "Resort e hotel scelti con cura con piani tariffari chiari e flessibilita nell'occupazione delle camere per viaggiatori singoli, coppie e famiglie."
+        },
+        {
+          "title": "Trasferimenti privati",
+          "description": "Trasferimenti aeroportuali affidabili, collegamento hotel-marina e trasporto comodo tra le destinazioni."
+        },
+        {
+          "title": "Offerte & Pacchetti personalizzati",
+          "description": "Soggiorni, escursioni in mare e trasferimenti combinati con cura per un valore ottimale durante la vostra visita."
+        }
+      ]
+    },
+    "vision": {
+      "heading": "La nostra Visione",
+      "statement": "Un Mar Rosso e un Egitto dove barriere coralline prospere, patrimonio vivente e ospitalita premurosa perdurano insieme.",
+      "description": "Guardiamo verso un futuro in cui il viaggio approfondisce il rispetto per i fragili habitat corallini, i paesaggi desertici e le comunita locali—lasciando ogni luogo visitato piu sano e ogni ospite piu connesso all'Egitto.",
+      "footer": "Gestione a lungo termine e scoperta responsabile"
+    }
+  },
+  "contact": {
+    "hero": {
+      "heading": "Contattaci lungo il Mar Rosso",
+      "description": "Pianifica escursioni nel Mar Rosso, soggiorni in hotel e trasferimenti privati con il nostro team di Hurghada. Supporto locale diretto in cinque lingue ogni giorno.",
+      "location": "Hurghada El Kawther, Egitto"
+    },
+    "cards": {
+      "whatsapp": "WhatsApp",
+      "phone": "Telefono",
+      "email": "Email",
+      "hours": "Orari ufficio Mar Rosso",
+      "hoursValue": "Giornaliero, 08:00 – 22:00",
+      "airportLine": "Linea trasferimento aeroporto 24/7",
+      "chat": "Chatta",
+      "call": "Chiama",
+      "copy": "Copia",
+      "copied": "Copiato",
+      "copiedToClipboard": "copiato negli appunti"
+    },
+    "form": {
+      "heading": "Invia un messaggio",
+      "fullName": "Nome completo",
+      "email": "Email",
+      "phoneWhatsApp": "Telefono / WhatsApp",
+      "subject": "Oggetto",
+      "message": "Messaggio",
+      "messagePlaceholder": "Raccontaci delle tue date di viaggio, del resort o delle tue domande...",
+      "send": "Invia messaggio",
+      "sending": "Invio in corso...",
+      "sent": "Messaggio inviato",
+      "errorRequired": "Si prega di compilare i campi obbligatori",
+      "successMessage": "Grazie! Il tuo messaggio e stato inviato con successo.",
+      "subjects": [
+        "Escursioni & Viaggi",
+        "Prenotazione hotel",
+        "Trasferimento privato",
+        "Corsi di immersione",
+        "Richiesta generale"
+      ]
+    },
+    "map": {
+      "heading": "Hurghada Marina",
+      "address": "Viale Hurghada Marina, Mar Rosso, Egitto",
+      "openInMaps": "Apri in Google Maps"
+    }
+  }
+}

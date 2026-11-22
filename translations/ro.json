@@ -1,0 +1,121 @@
+{
+  "common": {
+    "appName": "Egypt Dreams",
+    "home": "Acasa",
+    "destinations": "Destinatii",
+    "trips": "Calatorii",
+    "categories": "Categorii",
+    "about": "Despre noi",
+    "contact": "Contact",
+    "search": "Cauta",
+    "bookNow": "Rezerva acum",
+    "learnMore": "Afla mai multe",
+    "viewAll": "Vezi tot"
+  },
+  "about": {
+    "hero": {
+      "eyebrow": "PROFIL EDITORIAL",
+      "heading": "Conceput pentru Marea Rosie si Egiptul etern",
+      "description": "O casa de calatorie costiera care uneste explorarea recifelor, orizonturile desertice si coordonarea locala atenta in toata Egipt.",
+      "pills": ["Cine suntem", "Ce oferim", "Viziune si Misiune", "Concepte de calatorie"]
+    },
+    "whoWeAre": {
+      "heading": "Cine suntem",
+      "para1": "Suntem o echipa de coordonatori costieri, instructori de scuba diving si planificatori de destinatii care numesc Marea Rosie casa. Fiecare calatorie pe care o organizam este fundamentata pe cunoasterea directa a apelor locale, a vanturilor sezoniere, a traseelor din desert si a partenerilor de ospitalitate de incredere din toata Egipt.",
+      "para2": "In loc sa tratam calatoria ca pe o lista rigida, ne concentram pe un ritm calm, indrumari oneste, siguranta in desert si pregatire culturala—pentru ca oaspetii sa poata urca pe o barca, intr-un canion sau intr-o suita costiera cu deplina incredere.",
+      "tags": ["Operatiuni locale la Marea Rosie", "Planificare axata pe siguranta", "Suport personal pentru oaspeti"]
+    },
+    "mission": {
+      "heading": "Misiunea noastra",
+      "statement": "Oferirea de calatorii sigure, bine structurate si transparente, de la prima solicitare pana la plecarea finala.",
+      "points": [
+        "Prioritizarea sigurantei cu instructori certificati, echipamente intretinute si briefinguri clare.",
+        "Mentinerea programelor organizate cu transferuri de incredere si coordonare locala directa.",
+        "Comunicarea transparenta a incluziunilor, optiunilor si preturilor, fara nicio ambiguitate."
+      ],
+      "footer": "Standarde concrete pe fiecare ruta terestra si maritima"
+    },
+    "whatWeOffer": {
+      "heading": "Ce oferim",
+      "description": "Sase piloni fundamentali conceputi sa acopere fiecare parte a unei calatorii in Egipt—de la excursii la recife si cursuri de scuba diving pana la cazare si transferuri.",
+      "pillars": [
+        {
+          "title": "Experiente & Excursii",
+          "description": "Iesiri de snorkeling ghidate, zile pe barca la insule, safari in desert si opriri costiere iconice pentru confort si usurinta."
+        },
+        {
+          "title": "Destinatii la Marea Rosie",
+          "description": "Descopera golfuri vibrante, lagune calme si opriri costiere iconice in Hurghada, Marsa Alam si tarmurile vecine."
+        },
+        {
+          "title": "Cursuri de scuba diving certificate",
+          "description": "Scufundari introductive structurate si trasee de certificare recunoscute, conduse de instructori experimentati la situri neaglomerate."
+        },
+        {
+          "title": "Cazari selectate cu grija",
+          "description": "Statiuni si hoteluri alese cu atentie, cu planuri tarifare clare si flexibilitate in ocuparea camerelor pentru calatori solo, cupluri si familii."
+        },
+        {
+          "title": "Transferuri private",
+          "description": "Transferuri de la aeroport de incredere, conexiuni hotel-marina si transport fara probleme intre destinatii."
+        },
+        {
+          "title": "Oferte & Pachete personalizate",
+          "description": "Sejururi, excursii maritime si transferuri combinate cu atentie pentru o valoare optima pe parcursul vizitei tale."
+        }
+      ]
+    },
+    "vision": {
+      "heading": "Viziunea noastra",
+      "statement": "O Mare Rosie si un Egipt unde recifele prospere, patrimoniul viu si ospitalitatea atenta dureaza impreuna.",
+      "description": "Privim spre un viitor in care calatoria aprofundeaza respectul fata de habitatele coralifere fragile, peisajele desertice si comunitatile locale—lasand fiecare loc vizitat mai sanatos si fiecare oaspete mai conectat la Egipt.",
+      "footer": "Administrare pe termen lung & Descoperire responsabila"
+    }
+  },
+  "contact": {
+    "hero": {
+      "heading": "Contactati-ne la Marea Rosie",
+      "description": "Planificati excursii la Marea Rosie, sejururi la hotel si transferuri private cu echipa noastra din Hurghada. Suport local direct in cinci limbi, in fiecare zi.",
+      "location": "Hurghada El Kawther, Egipt"
+    },
+    "cards": {
+      "whatsapp": "WhatsApp",
+      "phone": "Telefon",
+      "email": "Email",
+      "hours": "Program birou Marea Rosie",
+      "hoursValue": "Zilnic, 08:00 – 22:00",
+      "airportLine": "Linie transfer aeroport 24/7",
+      "chat": "Chat",
+      "call": "Suna",
+      "copy": "Copiaza",
+      "copied": "Copiat",
+      "copiedToClipboard": "copiat in clipboard"
+    },
+    "form": {
+      "heading": "Trimite un mesaj",
+      "fullName": "Nume complet",
+      "email": "Email",
+      "phoneWhatsApp": "Telefon / WhatsApp",
+      "subject": "Subiect",
+      "message": "Mesaj",
+      "messagePlaceholder": "Spune-ne despre datele calatoriei, statiunea sau intrebarile tale...",
+      "send": "Trimite mesaj",
+      "sending": "Se trimite...",
+      "sent": "Mesaj trimis",
+      "errorRequired": "Completati campurile obligatorii",
+      "successMessage": "Multumim! Mesajul tau a fost trimis cu succes.",
+      "subjects": [
+        "Excursii & Calatorii",
+        "Rezervare hotel",
+        "Transfer privat",
+        "Cursuri de scuba diving",
+        "Solicitare generala"
+      ]
+    },
+    "map": {
+      "heading": "Hurghada Marina",
+      "address": "Bulevardul Hurghada Marina, Marea Rosie, Egipt",
+      "openInMaps": "Deschide in Google Maps"
+    }
+  }
+}

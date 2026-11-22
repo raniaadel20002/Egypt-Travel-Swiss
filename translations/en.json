@@ -11,5 +11,111 @@
     "bookNow": "Book Now",
     "learnMore": "Learn More",
     "viewAll": "View All"
+  },
+  "about": {
+    "hero": {
+      "eyebrow": "EDITORIAL PROFILE",
+      "heading": "Crafted for the Red Sea & Timeless Egypt",
+      "description": "A coastal travel house uniting reef exploration, desert horizons, and attentive local coordination across Egypt.",
+      "pills": ["Who We Are", "What We Offer", "Vision & Mission", "Journey Concepts"]
+    },
+    "whoWeAre": {
+      "heading": "Who We Are",
+      "para1": "We are a team of coastal coordinators, diving educators, and destination planners who call the Red Sea home. Every trip we arrange is grounded in first-hand knowledge of local waters, seasonal winds, desert trails, and trusted hospitality partners across Egypt.",
+      "para2": "Rather than treating travel as a rigid checklist, we focus on calm pacing, honest guidance, desert safety, and cultural preparation—so guests can step onto a boat, into a canyon, or into a coastal suite with complete confidence.",
+      "tags": ["Local Red Sea Operations", "Safety-Minded Planning", "Personal Guest Support"]
+    },
+    "mission": {
+      "heading": "Our Mission",
+      "statement": "Deliver safe, well-structured, and transparent journeys from first inquiry to final departure.",
+      "points": [
+        "Prioritize safety with certified instructors, maintained gear, and clear briefings.",
+        "Keep schedules organized with dependable pickups and direct local coordination.",
+        "Communicate inclusions, options, and pricing openly with zero ambiguity."
+      ],
+      "footer": "Actionable Standards on Every Land & Sea Route"
+    },
+    "whatWeOffer": {
+      "heading": "What We Offer",
+      "description": "Six core pillars designed to cover every part of an Egyptian journey—from reef outings and diving courses to stays and transfers.",
+      "pillars": [
+        {
+          "title": "Experiences & Trips",
+          "description": "Guided snorkeling outings, island boat days, desert safaris, and iconic coastal stops for comfort and ease."
+        },
+        {
+          "title": "Red Sea Destinations",
+          "description": "Discover vibrant bays, calm lagoons, and iconic coastal stops across Hurghada, Marsa Alam, and neighboring shores."
+        },
+        {
+          "title": "Certified Diving Courses",
+          "description": "Structured introductory dives and recognized certification paths led by experienced instructors at uncrowded sites."
+        },
+        {
+          "title": "Curated Accommodations",
+          "description": "Handpicked resorts and hotels with clear rate plans and flexible room occupancy for solo guests, couples, and families."
+        },
+        {
+          "title": "Private Transfers",
+          "description": "Dependable airport pickups, hotel-to-marina connections, and smooth point-to-point transport across destinations."
+        },
+        {
+          "title": "Tailored Offers & Packages",
+          "description": "Thoughtfully combined stays, sea excursions, and transfers crafted for effortless value throughout your visit."
+        }
+      ]
+    },
+    "vision": {
+      "heading": "Our Vision",
+      "statement": "A Red Sea and Egypt where thriving reefs, living heritage, and thoughtful hospitality endure together.",
+      "description": "We look toward a future where travel deepens respect for fragile coral habitats, desert landscapes, and local communities—leaving every place we visit healthier and every guest more connected to Egypt.",
+      "footer": "Long-Term Stewardship & Responsible Discovery"
+    }
+  },
+  "contact": {
+    "hero": {
+      "heading": "Get in Touch Along the Red Sea",
+      "description": "Plan Red Sea excursions, hotel stays, and private transfers with our Hurghada team. Direct local support in five languages every day.",
+      "location": "Hurghada El Kawther, Egypt"
+    },
+    "cards": {
+      "whatsapp": "WhatsApp",
+      "phone": "Phone",
+      "email": "Email",
+      "hours": "Red Sea Desk Hours",
+      "hoursValue": "Daily, 08:00 AM – 22:00 PM",
+      "airportLine": "24/7 airport transfer line",
+      "chat": "Chat",
+      "call": "Call",
+      "copy": "Copy",
+      "copied": "Copied",
+      "copiedToClipboard": "copied to clipboard"
+    },
+    "form": {
+      "heading": "Send a Message",
+      "fullName": "Full Name",
+      "email": "Email",
+      "phoneWhatsApp": "Phone / WhatsApp",
+      "subject": "Subject",
+      "message": "Message",
+      "messagePlaceholder": "Tell us about your travel dates, resort, or questions...",
+      "send": "Send Message",
+      "sending": "Sending...",
+      "sent": "Message Sent",
+      "errorRequired": "Please fill in the required fields",
+      "successMessage": "Thank you! Your message has been sent successfully.",
+      "subjects": [
+        "Excursions & Trips",
+        "Hotel Booking",
+        "Private Transfer",
+        "Diving Courses",
+        "General Inquiry"
+      ]
+    },
+    "map": {
+      "heading": "Hurghada Marina",
+      "address": "Hurghada Marina Boulevard, Red Sea, Egypt",
+      "openInMaps": "Open in Google Maps"
+    }
   }
 }

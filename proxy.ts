@@ -20,6 +20,8 @@ const VALID_PUBLIC_SUBPATHS = new Set([
   "blog",
   "faq",
   "cart",
+  "contact",
+  "about",
 ]);
 
 // Sections that allow exactly one additional dynamic slug segment: /<section>/<slug>

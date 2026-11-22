@@ -23,9 +23,9 @@ export default function Footer() {
   ];
 
   const companyLinks = [
-    { label: "About Us", href: `/${locale}#why-choose-us` },
+    { label: "About Us", href: `/${locale}/about` },
     { label: "FAQ", href: `/${locale}/faq` },
-    { label: "Contact Us", href: `/${locale}#reviews` },
+    { label: "Contact Us", href: `/${locale}/contact` },
   ];
 
   const socialLinks = [
