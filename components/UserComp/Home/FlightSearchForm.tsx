@@ -219,7 +219,7 @@ export default function FlightSearchForm() {
       {/* Submit Button */}
       <div className="shrink-0">
         <Link
-          href={`/${locale}/bookings?service=flight&from=${encodeURIComponent(
+          href={`/${locale}/flights?from=${encodeURIComponent(
             fromAirport
           )}&to=${encodeURIComponent(
             toAirport

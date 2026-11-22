@@ -1,18 +1,20 @@
 import Image from "next/image";
 import { FiTrash2, FiUpload, FiImage } from "react-icons/fi";
-import { resolveBlogImageUrl } from "./blogHelpers";
+import { BlogLocalizedText } from "@/models/blog";
+import { BLOG_LANGUAGES, resolveBlogImageUrl } from "./blogHelpers";
 
 export interface BlogSectionDraft {
   id?: number;
   sectionNumber: number;
-  title: string;
-  content: string;
+  title: BlogLocalizedText;
+  content: BlogLocalizedText;
   existingImageUrl?: string | null;
   newImageFile?: File | null;
 }
 
 interface BlogSectionFormCardProps {
   index: number;
+  activeLang: keyof BlogLocalizedText;
   section: BlogSectionDraft;
   canRemove: boolean;
   onChange: (updated: BlogSectionDraft) => void;
@@ -21,7 +23,7 @@ interface BlogSectionFormCardProps {
 }
 
 export default function BlogSectionFormCard({
-  index,
+  activeLang,
   section,
   canRemove,
   onChange,
@@ -32,6 +34,10 @@ export default function BlogSectionFormCard({
   const previewUrl = section.newImageFile
     ? URL.createObjectURL(section.newImageFile)
     : existingUrl;
+
+  const currentLangMeta =
+    BLOG_LANGUAGES.find((l) => l.key === activeLang) || BLOG_LANGUAGES[0];
+  const isEn = activeLang === "en";
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -47,9 +53,14 @@ export default function BlogSectionFormCard({
   return (
     <div className="bg-[#F8F9FA] p-4 rounded-2xl border border-gray-200 space-y-3 font-[family-name:var(--font-lato)]">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-extrabold uppercase tracking-wider text-[#013E51]">
-          Section #{section.sectionNumber}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-extrabold uppercase tracking-wider text-[#013E51]">
+            Section #{section.sectionNumber}
+          </span>
+          <span className="px-2 py-0.5 rounded-md bg-[#013E51]/10 text-[#013E51] text-[10px] font-bold">
+            Editing {currentLangMeta.code}
+          </span>
+        </div>
         {canRemove && (
           <button
             type="button"
@@ -63,29 +74,65 @@ export default function BlogSectionFormCard({
       </div>
 
       <div className="space-y-1.5">
-        <label className="block text-[11px] text-gray-500 font-bold uppercase">
-          Section Title *
-        </label>
+        <div className="flex items-center justify-between">
+          <label className="block text-[11px] text-gray-500 font-bold uppercase">
+            Section Title ({currentLangMeta.label}) {isEn && "*"}
+          </label>
+          {!isEn &&
+            !section.title[activeLang]?.trim() &&
+            section.title.en?.trim() && (
+              <span className="text-[10px] text-amber-600 font-medium">
+                Fallback: {section.title.en.slice(0, 32)}
+              </span>
+            )}
+        </div>
         <input
           type="text"
-          value={section.title}
-          onChange={(e) => onChange({ ...section, title: e.target.value })}
-          placeholder="e.g. Diving Gear & Coral Reefs"
-          required
+          value={section.title[activeLang] || ""}
+          onChange={(e) =>
+            onChange({
+              ...section,
+              title: { ...section.title, [activeLang]: e.target.value },
+            })
+          }
+          placeholder={
+            isEn
+              ? "e.g. Diving Gear & Coral Reefs"
+              : `Section title in ${currentLangMeta.label} (optional)...`
+          }
+          required={isEn}
           className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs text-[#013E51] bg-white font-semibold"
         />
       </div>
 
       <div className="space-y-1.5">
-        <label className="block text-[11px] text-gray-500 font-bold uppercase">
-          Section Content *
-        </label>
+        <div className="flex items-center justify-between">
+          <label className="block text-[11px] text-gray-500 font-bold uppercase">
+            Section Content ({currentLangMeta.label}) {isEn && "*"}
+          </label>
+          {!isEn &&
+            !section.content[activeLang]?.trim() &&
+            section.content.en?.trim() && (
+              <span className="text-[10px] text-amber-600 font-medium">
+                Auto-falls back to EN
+              </span>
+            )}
+        </div>
         <textarea
           rows={3}
-          value={section.content}
-          onChange={(e) => onChange({ ...section, content: e.target.value })}
-          placeholder="Detailed insights, paragraphs, and descriptions..."
-          required
+          value={section.content[activeLang] || ""}
+          onChange={(e) =>
+            onChange({
+              ...section,
+              content: { ...section.content, [activeLang]: e.target.value },
+            })
+          }
+          placeholder={
+            isEn
+              ? "Detailed insights, paragraphs, and descriptions..."
+              : `Section content in ${currentLangMeta.label} (optional)...`
+          }
+          required={isEn}
           className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs text-[#013E51] bg-white leading-relaxed"
         />
       </div>
@@ -100,7 +147,7 @@ export default function BlogSectionFormCard({
             {previewUrl ? (
               <Image
                 src={previewUrl}
-                alt={section.title || "Section"}
+                alt={section.title.en || "Section"}
                 fill
                 sizes="64px"
                 className="object-cover"
@@ -132,16 +179,18 @@ export default function BlogSectionFormCard({
               </button>
             )}
 
-            {!section.newImageFile && section.existingImageUrl && onDeleteExistingImage && (
-              <button
-                type="button"
-                onClick={onDeleteExistingImage}
-                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 text-xs font-semibold transition-colors cursor-pointer"
-              >
-                <FiTrash2 className="w-3 h-3" />
-                <span>Delete Image</span>
-              </button>
-            )}
+            {!section.newImageFile &&
+              section.existingImageUrl &&
+              onDeleteExistingImage && (
+                <button
+                  type="button"
+                  onClick={onDeleteExistingImage}
+                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 text-xs font-semibold transition-colors cursor-pointer"
+                >
+                  <FiTrash2 className="w-3 h-3" />
+                  <span>Delete Image</span>
+                </button>
+              )}
           </div>
         </div>
       </div>

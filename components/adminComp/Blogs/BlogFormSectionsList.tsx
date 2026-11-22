@@ -1,7 +1,9 @@
 import { FiLayers, FiPlus } from "react-icons/fi";
+import { BlogLocalizedText } from "@/models/blog";
 import BlogSectionFormCard, { BlogSectionDraft } from "./BlogSectionFormCard";
 
 interface BlogFormSectionsListProps {
+  activeLang: keyof BlogLocalizedText;
   sections: BlogSectionDraft[];
   onAddSection: () => void;
   onUpdateSection: (idx: number, updated: BlogSectionDraft) => void;
@@ -10,6 +12,7 @@ interface BlogFormSectionsListProps {
 }
 
 export default function BlogFormSectionsList({
+  activeLang,
   sections,
   onAddSection,
   onUpdateSection,
@@ -43,6 +46,7 @@ export default function BlogFormSectionsList({
           <BlogSectionFormCard
             key={idx}
             index={idx}
+            activeLang={activeLang}
             section={sec}
             canRemove={true}
             onChange={(updated) => onUpdateSection(idx, updated)}

@@ -1,4 +1,5 @@
-import { apiClient } from "./apiConfig";
+import { apiClient, getActiveLanguage } from "./apiConfig";
+import { localeToBackendLanguage } from "@/shared/utils/localeToBackendLanguage";
 import { ApiResponse } from "@/models/api";
 import {
   CreateDivingCoursePayload,
@@ -27,16 +28,16 @@ export async function getDivingCourses(
   if (params?.pageSize) queryParams.pageSize = params.pageSize;
 
   const requestHeaders: Record<string, string> = {};
-  if (params?.language) {
-    requestHeaders["Accept-Language"] = params.language;
-  }
+  const resolvedLang = params?.language
+    ? localeToBackendLanguage(params.language)
+    : getActiveLanguage();
+  requestHeaders["Accept-Language"] = resolvedLang;
 
   const response = await apiClient.get<ApiResponse<PaginatedDivingCoursesData>>(
     "/api/DivingCourses",
     {
       params: Object.keys(queryParams).length > 0 ? queryParams : undefined,
-      headers:
-        Object.keys(requestHeaders).length > 0 ? requestHeaders : undefined,
+      headers: requestHeaders,
     }
   );
 
@@ -52,12 +53,15 @@ export async function getDivingCourses(
 
 export async function getDivingCourseById(
   id: string,
-  language = "en"
+  language?: string
 ): Promise<DivingCourseApiItem> {
+  const resolvedLang = language
+    ? localeToBackendLanguage(language)
+    : getActiveLanguage();
   const response = await apiClient.get<ApiResponse<DivingCourseApiItem>>(
     `/api/DivingCourses/${id}`,
     {
-      headers: { "Accept-Language": language },
+      headers: { "Accept-Language": resolvedLang },
     }
   );
   return response.data?.data;

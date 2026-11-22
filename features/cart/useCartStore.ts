@@ -18,6 +18,21 @@ export interface CartStoreState {
   hasHydrated: boolean;
   setHasHydrated: (status: boolean) => void;
   addTrip: (trip: TripApiItem) => AddTripResult;
+  addCustomConfiguredTrip: (config: {
+    trip: TripApiItem;
+    leaveDate: string;
+    noAdult: number;
+    noChild: number;
+    noInf: number;
+    serviceIds?: number[];
+    selectedServices?: {
+      id: number;
+      name: string;
+      adultPrice: number;
+      childPrice: number;
+      infPrice: number;
+    }[];
+  }) => void;
   removeTrip: (tripId: number) => void;
   updateTravelers: (
     tripId: number,
@@ -95,6 +110,62 @@ export const useCartStore = create<CartStoreState>()(
           item: newItem,
           quantity: 1,
         };
+      },
+
+      addCustomConfiguredTrip: (config) => {
+        const {
+          trip,
+          leaveDate,
+          noAdult,
+          noChild,
+          noInf,
+          serviceIds = [],
+          selectedServices = [],
+        } = config;
+
+        const currentItems = get().items;
+        const existingIndex = currentItems.findIndex(
+          (i) => i.tripId === trip.id
+        );
+
+        const primaryImageRaw =
+          trip.images?.find((img) => img.isPrimary)?.imageUrl ||
+          trip.images?.[0]?.imageUrl ||
+          trip.destinationInfo?.imageUrl ||
+          "/Trips/heroTrips.png";
+
+        const rawCat = trip.categoryName?.trim().toLowerCase() || "";
+        const categoryLabel: "Group" | "Private" = rawCat.includes("private")
+          ? "Private"
+          : "Group";
+
+        const configuredItem: CartTripItem = {
+          tripId: trip.id,
+          name: trip.name,
+          destination:
+            trip.destination || trip.destinationInfo?.name || "Egypt",
+          tripTypeName: trip.tripTypeName || "Trip",
+          categoryLabel,
+          imageUrl: resolveApiImageUrl(primaryImageRaw),
+          adultPrice: Number(trip.adultPrice) || 0,
+          childPrice: Number(trip.childPrice) || 0,
+          infPrice: Number(trip.infPrice) || 0,
+          availableDays: trip.availableDays,
+          noAdult: Math.max(1, noAdult),
+          noChild: Math.max(0, noChild),
+          noInf: Math.max(0, noInf),
+          leaveDate: leaveDate || getTomorrowIsoDate(),
+          serviceIds,
+          selectedServices,
+        };
+
+        if (existingIndex > -1) {
+          const nextItems = [...currentItems];
+          nextItems[existingIndex] = configuredItem;
+          set({ items: nextItems });
+        } else {
+          set({ items: [configuredItem, ...currentItems] });
+        }
       },
 
       removeTrip: (tripId) => {

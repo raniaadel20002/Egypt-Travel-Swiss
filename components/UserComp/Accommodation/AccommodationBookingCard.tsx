@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { FiCalendar, FiUsers, FiCheck } from "react-icons/fi";
 import { toast } from "sonner";
+import { useLocale } from "@/shared/providers/LocaleProvider";
 import { useCreateHotelBookingMutation } from "@/features/hotels/useHotelBookings";
 import { HotelApiItem } from "@/models/hotel";
 
@@ -10,14 +12,23 @@ interface AccommodationBookingCardProps {
   hotel: HotelApiItem;
 }
 
+function getTomorrowDateString(): string {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  return tomorrow.toISOString().split("T")[0];
+}
+
 export default function AccommodationBookingCard({
   hotel,
 }: AccommodationBookingCardProps) {
+  const router = useRouter();
+  const { locale } = useLocale();
+  const minCheckIn = getTomorrowDateString();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [whatsApp, setWhatsApp] = useState("");
   const [nationality, setNationality] = useState("");
-  const [bookingDate, setBookingDate] = useState("");
+  const [bookingDate, setBookingDate] = useState(getTomorrowDateString());
   const [nightsCount, setNightsCount] = useState(3);
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
@@ -33,7 +44,7 @@ export default function AccommodationBookingCard({
     }
 
     try {
-      await createBookingMutation.mutateAsync({
+      const created = await createBookingMutation.mutateAsync({
         hotelId: hotel.id,
         name: name.trim(),
         email: email.trim(),
@@ -57,12 +68,26 @@ export default function AccommodationBookingCard({
       });
 
       toast.success(
-        "Reservation inquiry sent! Our concierge will contact you within a few hours."
+        "Reservation inquiry sent! Redirecting to confirmation voucher..."
       );
       setName("");
       setEmail("");
       setWhatsApp("");
       setNationality("");
+
+      const params = new URLSearchParams({
+        type: "hotel",
+        id: String(created?.id || ""),
+        hotel: hotel.name,
+        location: hotel.location,
+        checkIn: bookingDate,
+        nights: String(nightsCount),
+        rooms: "1",
+        adults: String(adults),
+        children: String(children),
+        name: name.trim(),
+      });
+      router.push(`/${locale}/booking-success?${params.toString()}`);
     } catch {
       toast.error("Failed to submit inquiry. Please try again or reach out on WhatsApp.");
     }
@@ -78,7 +103,7 @@ export default function AccommodationBookingCard({
           Inquire &amp; Book
         </h3>
         <p className="font-[family-name:var(--font-lato)] text-xs text-[#888888] mt-1">
-          Best rates guaranteed directly with Egypt Dreams Concierge.
+          Best rates guaranteed directly with Egypt Travel Swiss Concierge.
         </p>
       </div>
 
@@ -147,6 +172,7 @@ export default function AccommodationBookingCard({
             </label>
             <input
               type="date"
+              min={minCheckIn}
               value={bookingDate}
               onChange={(e) => setBookingDate(e.target.value)}
               className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-hidden focus:border-[#013E51]"

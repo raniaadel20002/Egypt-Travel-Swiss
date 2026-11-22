@@ -11,6 +11,7 @@ interface BlogDetailHeroProps {
   tag: string;
   readTime: string;
   backHref: string;
+  backLabel?: string;
 }
 
 const FALLBACK_IMAGE = "/home/blog/dive-sites.jpg";
@@ -20,6 +21,7 @@ export default function BlogDetailHero({
   tag,
   readTime,
   backHref,
+  backLabel = "Back to all articles",
 }: BlogDetailHeroProps) {
   const imageSrc = blog.imageUrl
     ? resolveApiImageUrl(blog.imageUrl)
@@ -34,7 +36,7 @@ export default function BlogDetailHero({
           className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#888888] hover:text-[#013E51] transition-colors font-[family-name:var(--font-lato)] group"
         >
           <FiArrowLeft className="w-4 h-4 transition-transform duration-200 group-hover:-translate-x-1" />
-          <span>Back to all articles</span>
+          <span>{backLabel}</span>
         </Link>
       </div>
 

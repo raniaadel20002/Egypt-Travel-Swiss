@@ -5,35 +5,9 @@ import { persist } from "zustand/middleware";
 import { apiClient } from "@/clientApi/apiConfig";
 import { attachAuthInterceptors } from "@/clientApi/authApi";
 import { AdminRole, AuthTokenData, CurrentAdminSession } from "@/models/auth";
+import { parseJwtPayload, isJwtExpired } from "@/shared/utils/jwt";
 
-interface JwtPayload {
-  nameid?: string;
-  email?: string;
-  unique_name?: string;
-  role?: string | string[];
-  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"?: string;
-  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"?: string;
-  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone"?: string;
-  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"?: string | string[];
-  exp?: number;
-}
-
-function parseJwtPayload(token: string): JwtPayload | null {
-  try {
-    const parts = token.split(".");
-    if (parts.length !== 3) return null;
-    const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split("")
-        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-        .join("")
-    );
-    return JSON.parse(jsonPayload) as JwtPayload;
-  } catch {
-    return null;
-  }
-}
+export { isJwtExpired, parseJwtPayload };
 
 export function isSuperAdminSession(
   user: CurrentAdminSession | null,
@@ -211,7 +185,7 @@ attachAuthInterceptors(apiClient, {
     if (typeof window !== "undefined") {
       const path = window.location.pathname;
       if (path.startsWith("/admin") && path !== "/admin/login") {
-        window.location.href = "/admin/login";
+        window.location.replace("/admin/login");
       }
     }
   },

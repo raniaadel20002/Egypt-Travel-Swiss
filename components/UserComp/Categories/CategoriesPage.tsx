@@ -2,88 +2,130 @@
 
 import { useMemo } from "react";
 import Image from "next/image";
+import { motion, useReducedMotion } from "framer-motion";
 import CategoryCard from "./CategoryCard";
 import { useTripTypesQuery } from "@/features/tripTypes/useTripTypes";
 import { useLocale } from "@/shared/providers/LocaleProvider";
 import { localeToBackendLanguage } from "@/shared/utils/localeToBackendLanguage";
 
+const BRAND_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
 export default function CategoriesPage() {
-  const { locale } = useLocale();
+  const { locale, dictionary: dict } = useLocale();
+  const shouldReduce = useReducedMotion();
+
   const backendLanguage = useMemo(
     () => localeToBackendLanguage(locale),
     [locale]
   );
 
-  const { data: tripTypes = [], isLoading } = useTripTypesQuery({
+  const {
+    data: tripTypes = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useTripTypesQuery({
     PageSize: 100,
     language: backendLanguage,
   });
 
   return (
-    <div className="w-full bg-[#F7EDE1] py-12 sm:py-16 lg:py-20 min-h-screen">
-      <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 space-y-8 sm:space-y-10 lg:space-y-12">
+    <main className="w-full bg-[#F7EDE1] py-14 sm:py-18 lg:py-24 min-h-screen">
+      <div className="max-w-[1180px] mx-auto px-5 sm:px-8 lg:px-10 space-y-10 sm:space-y-12">
         {/* Header Section */}
         <div className="text-center">
-          <h1 className="font-[family-name:var(--font-cormorant)] text-4xl sm:text-5xl lg:text-[64px] font-bold text-[#013E51] tracking-tight leading-tight">
-            Find Your Way to Wonder
-          </h1>
+          <motion.h1
+            initial={shouldReduce ? undefined : { opacity: 0, y: 16 }}
+            animate={shouldReduce ? undefined : { opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, ease: BRAND_EASE }}
+            className="font-[family-name:var(--font-cormorant)] text-3xl sm:text-5xl lg:text-[58px] font-semibold text-[#013E51] tracking-tight leading-tight"
+          >
+            {dict.categoriesPage.title}
+          </motion.h1>
 
-          <p className="font-[family-name:var(--font-lato)] text-base sm:text-lg lg:text-xl text-[#013E51]/80 font-normal mt-3 sm:mt-4">
-            Five ways to experience the extraordinary.
-          </p>
+          <motion.p
+            initial={shouldReduce ? undefined : { opacity: 0, y: 14 }}
+            animate={shouldReduce ? undefined : { opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.08, ease: BRAND_EASE }}
+            className="font-[family-name:var(--font-lato)] text-sm sm:text-base lg:text-lg text-[#013E51]/85 font-normal mt-2.5 sm:mt-3"
+          >
+            {dict.categoriesPage.subtitle}
+          </motion.p>
 
           {/* Decorative Sun Ornament Divider */}
-          <div className="flex items-center justify-center gap-4 sm:gap-6 my-6 sm:my-8">
+          <motion.div
+            initial={shouldReduce ? undefined : { opacity: 0, scale: 0.94 }}
+            animate={shouldReduce ? undefined : { opacity: 1, scale: 1 }}
+            transition={{ duration: 0.45, delay: 0.16, ease: BRAND_EASE }}
+            className="flex items-center justify-center gap-3 sm:gap-5 my-5 sm:my-7"
+          >
             <span
               aria-hidden="true"
-              className="w-16 sm:w-28 md:w-36 h-[1.5px] bg-[#E8B34A]"
+              className="w-14 sm:w-24 md:w-32 h-[1.5px] bg-[#E8B34A]"
             />
-            <div className="w-12 h-6 sm:w-16 sm:h-8 flex items-center justify-center">
+            <div className="w-10 h-5 sm:w-12 sm:h-6 flex items-center justify-center">
               <Image
                 src="/Categories/sun-ornament.svg"
                 alt=""
-                width={64}
-                height={34}
+                width={48}
+                height={26}
+                priority
                 className="w-full h-auto object-contain"
               />
             </div>
             <span
               aria-hidden="true"
-              className="w-16 sm:w-28 md:w-36 h-[1.5px] bg-[#E8B34A]"
+              className="w-14 sm:w-24 md:w-32 h-[1.5px] bg-[#E8B34A]"
             />
-          </div>
+          </motion.div>
         </div>
 
         {/* Loading Skeletons */}
         {isLoading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 lg:gap-8">
-            {[1, 2, 3].map((idx) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-7">
+            {[1, 2, 3, 4, 5, 6].map((idx) => (
               <div
                 key={idx}
-                className="w-full aspect-[1.05/1] sm:aspect-square rounded-[28px] sm:rounded-[34px] lg:rounded-[38px] bg-[#013E51]/10 border-2 border-[#E8B34A]/30 animate-pulse"
+                className="w-full aspect-[1/1.14] rounded-[20px] sm:rounded-[24px] bg-[#013E51]/10 border-2 border-[#E8B34A]/30 animate-pulse shadow-sm"
               />
             ))}
           </div>
         )}
 
+        {/* Error State */}
+        {isError && !isLoading && (
+          <div className="text-center py-16 bg-white/60 rounded-3xl border border-rose-200/80 p-8 space-y-4 max-w-md mx-auto">
+            <p className="font-[family-name:var(--font-cormorant)] text-2xl font-bold text-[#013E51]">
+              {dict.categoriesPage.errorTitle}
+            </p>
+            <button
+              type="button"
+              onClick={() => refetch()}
+              className="px-5 py-2.5 rounded-full bg-[#013E51] text-white text-xs font-bold hover:bg-[#024f67] transition-colors cursor-pointer"
+            >
+              {dict.categoriesPage.retry}
+            </button>
+          </div>
+        )}
+
         {/* Empty State */}
-        {!isLoading && tripTypes.length === 0 && (
-          <div className="text-center py-16">
-            <p className="font-[family-name:var(--font-lato)] text-lg text-[#013E51]/70">
-              No categories available at the moment.
+        {!isLoading && !isError && tripTypes.length === 0 && (
+          <div className="text-center py-16 bg-white/50 rounded-3xl border border-[#013E51]/10 p-8 max-w-md mx-auto">
+            <p className="font-[family-name:var(--font-lato)] text-base text-[#013E51]/75">
+              {dict.categoriesPage.emptyTitle}
             </p>
           </div>
         )}
 
-        {/* Backend Trip Types / Categories Grid */}
-        {!isLoading && tripTypes.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 lg:gap-8">
-            {tripTypes.map((cat) => (
-              <CategoryCard key={cat.id} category={cat} />
+        {/* Trip Types / Categories 3-Column Grid */}
+        {!isLoading && !isError && tripTypes.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-7">
+            {tripTypes.map((cat, idx) => (
+              <CategoryCard key={cat.id} category={cat} index={idx} />
             ))}
           </div>
         )}
       </div>
-    </div>
+    </main>
   );
 }

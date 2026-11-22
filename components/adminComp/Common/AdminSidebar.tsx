@@ -85,7 +85,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
               </svg>
               <div className="flex flex-col leading-tight">
                 <span className="font-[family-name:var(--font-cormorant)] text-xl font-bold tracking-[0.12em] text-[#013E51] uppercase">
-                  Egypt Dreams
+                  Egypt Travel Swiss
                 </span>
                 <span className="font-[family-name:var(--font-lato)] text-[9px] font-semibold tracking-[0.28em] text-[#E8B34A] uppercase -mt-0.5">
                   Admin Portal

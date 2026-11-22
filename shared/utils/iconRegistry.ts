@@ -55,6 +55,7 @@ import {
   FaLifeRing,
   FaBookOpen,
   FaAward,
+  FaCheckCircle,
 } from "react-icons/fa";
 
 export type IconCategory =
@@ -166,6 +167,7 @@ export const APP_ICON_CATALOG: AppIconOption[] = [
   { name: "life-buoy", label: "Safety / Rescue", category: "Wellness & Sports", keywords: ["diving", "rescue", "safety", "water", "float"], icon: FaLifeRing },
   { name: "book-open", label: "Study / Manual", category: "General & Leisure", keywords: ["book", "study", "exam", "theory", "guide"], icon: FaBookOpen },
   { name: "award", label: "Certification / PADI", category: "Services & Safety", keywords: ["padi", "license", "badge", "award", "certificate"], icon: FaAward },
+  { name: "check-circle", label: "Requirement / Completed", category: "Services & Safety", keywords: ["check", "done", "dives", "requirement", "verify"], icon: FaCheckCircle },
 ];
 
 const ALIAS_MAP: Record<string, string> = {
@@ -209,6 +211,11 @@ const ALIAS_MAP: Record<string, string> = {
   lifering: "life-buoy",
   diploma: "graduation-cap",
   certificate: "award",
+  certification: "award",
+  check: "check-circle",
+  dives: "check-circle",
+  duration: "clock",
+  depth: "compass",
   fawater: "waves",
   faswimmingpool: "swimming-pool",
   faumbrellabeach: "umbrella",

@@ -21,7 +21,8 @@ export * from "./useTripImages";
 export const TRIPS_QUERY_KEYS = {
   all: ["trips"] as const,
   list: (params?: TripsQueryParams) => ["trips", "list", params] as const,
-  detail: (id: number) => ["trips", "detail", id] as const,
+  detail: (id: number, language?: string) =>
+    ["trips", "detail", id, language] as const,
   multiLangDetail: (id: number) => ["trips", "multiLangDetail", id] as const,
 };
 
@@ -33,10 +34,19 @@ export function useTripsQuery(params?: TripsQueryParams) {
   });
 }
 
-export function useTripByIdQuery(id: number | null, enabled = true) {
+export function useTripByIdQuery(
+  id: number | null,
+  language?: string,
+  enabled = true
+) {
   return useQuery({
-    queryKey: id ? TRIPS_QUERY_KEYS.detail(id) : ["trips", "detail", "none"],
-    queryFn: () => (id ? getTripById(id) : Promise.reject("No id")),
+    queryKey: id
+      ? TRIPS_QUERY_KEYS.detail(id, language)
+      : ["trips", "detail", "none"],
+    queryFn: () =>
+      id
+        ? getTripById(id, (language as any) || "EN")
+        : Promise.reject("No id"),
     enabled: Boolean(enabled && id),
     staleTime: 0,
   });

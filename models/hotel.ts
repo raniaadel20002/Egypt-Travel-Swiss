@@ -62,6 +62,24 @@ export interface HotelImageApiItem {
   displayOrder: number;
 }
 
+export interface RatePlanTranslationInput {
+  en: string;
+  fr: string;
+  ru: string;
+  ro: string;
+  it: string;
+}
+
+export function createEmptyRatePlanTranslation(): RatePlanTranslationInput {
+  return {
+    en: "",
+    fr: "",
+    ru: "",
+    ro: "",
+    it: "",
+  };
+}
+
 export interface HotelRatePlanApiItem {
   id: number;
   hotelId: number;
@@ -70,6 +88,36 @@ export interface HotelRatePlanApiItem {
   description: string;
   createdAt: string;
   updatedAt: string | null;
+}
+
+export interface HotelRatePlanMultiLangDetails {
+  id: number;
+  hotelId: number;
+  hotelName: string;
+  name: RatePlanTranslationInput;
+  description: RatePlanTranslationInput;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
+export interface CreateRatePlanPayload {
+  hotelId: number;
+  name: RatePlanTranslationInput;
+  description: RatePlanTranslationInput;
+}
+
+export interface UpdateRatePlanPayload {
+  id: number;
+  hotelId: number;
+  name: RatePlanTranslationInput;
+  description: RatePlanTranslationInput;
+}
+
+export interface RatePlansQueryParams {
+  PageNumber?: number;
+  PageSize?: number;
+  HotelId?: number;
+  Language?: string;
 }
 
 export interface HotelApiItem {

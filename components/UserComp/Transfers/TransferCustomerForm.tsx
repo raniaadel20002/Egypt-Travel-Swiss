@@ -1,84 +1,74 @@
 "use client";
 
-import { FiMail, FiPhone, FiUser, FiGlobe, FiPackage } from "react-icons/fi";
-
-const NATIONALITIES = [
-  "Germany",
-  "United Kingdom",
-  "Egypt",
-  "Russia",
-  "Poland",
-  "Czech Republic",
-  "Italy",
-  "France",
-  "United States",
-  "Canada",
-  "Netherlands",
-  "Switzerland",
-  "Austria",
-  "Belgium",
-  "Saudi Arabia",
-  "United Arab Emirates",
-  "Other",
-];
-
-const CONTACT_METHODS = [
-  "WhatsApp",
-  "Phone Call",
-  "Email",
-  "Telegram",
-];
+import { FiMail, FiPhone, FiUser, FiMessageCircle } from "react-icons/fi";
+import { useLocale } from "@/shared/providers/LocaleProvider";
+import { CountryTransferItem } from "@/models/countryTransfer";
+import { TransferCommunicationMethodEnum } from "@/models/transferBooking";
 
 interface TransferCustomerFormProps {
   name: string;
-  nationality: string;
+  countryTransferId: number;
+  countries: CountryTransferItem[];
   email: string;
-  preferredContactMethod: string;
+  communicationMethod: TransferCommunicationMethodEnum;
   phone: string;
-  luggagePieces: number;
   onNameChange: (val: string) => void;
-  onNationalityChange: (val: string) => void;
+  onCountryChange: (id: number) => void;
   onEmailChange: (val: string) => void;
-  onContactMethodChange: (val: string) => void;
+  onCommunicationMethodChange: (method: TransferCommunicationMethodEnum) => void;
   onPhoneChange: (val: string) => void;
-  onLuggageChange: (count: number) => void;
 }
 
 export default function TransferCustomerForm({
   name,
-  nationality,
+  countryTransferId,
+  countries,
   email,
-  preferredContactMethod,
+  communicationMethod,
   phone,
-  luggagePieces,
   onNameChange,
-  onNationalityChange,
+  onCountryChange,
   onEmailChange,
-  onContactMethodChange,
+  onCommunicationMethodChange,
   onPhoneChange,
-  onLuggageChange,
 }: TransferCustomerFormProps) {
+  const { dictionary: dict } = useLocale();
+  const t = dict.transfers.customer;
+
+  const methods = [
+    { id: TransferCommunicationMethodEnum.WhatsApp, label: t.methods.whatsapp },
+    { id: TransferCommunicationMethodEnum.Phone, label: t.methods.phone },
+    { id: TransferCommunicationMethodEnum.Email, label: t.methods.email },
+    { id: TransferCommunicationMethodEnum.Viber, label: t.methods.viber },
+  ];
+
   return (
     <div className="w-full bg-white rounded-[24px] sm:rounded-[32px] p-6 sm:p-8 shadow-[0px_4px_24px_0px_rgba(0,0,0,0.06)] border border-[#013E51]/10">
-      <h2 className="font-[family-name:var(--font-cormorant)] text-2xl sm:text-3xl font-bold text-[#013E51] pb-4 mb-6 border-b border-gray-100">
-        Customer Information
-      </h2>
+      {/* Step Header */}
+      <div className="flex items-center gap-2.5 pb-4 mb-6 border-b border-gray-100">
+        <span className="w-7 h-7 rounded-full bg-[#013E51] text-[#E8B34A] flex items-center justify-center font-mono text-xs font-bold">
+          4
+        </span>
+        <h2 className="font-[family-name:var(--font-cormorant)] text-2xl sm:text-3xl font-bold text-[#013E51]">
+          {t.heading}
+        </h2>
+      </div>
 
       <div className="space-y-5">
-        {/* Name & Nationality */}
+        {/* Name & Email */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <label className="block text-xs sm:text-sm font-semibold text-[#013E51]">
-              Full Name <span className="text-[#E8B34A]">*</span>
+              {t.fullName} <span className="text-[#E8B34A]">*</span>
             </label>
             <div className="relative">
               <input
                 type="text"
-                placeholder="e.g. John Smith"
+                placeholder={t.fullNamePlaceholder}
                 value={name}
                 onChange={(e) => onNameChange(e.target.value)}
                 required
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-[#FAF7F2] text-sm text-[#013E51] font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
+                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-[#FAF7F2] text-sm text-[#013E51] font-medium placeholder-gray-400 focus:outline-hidden focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
               />
               <FiUser className="w-4 h-4 text-[#888888] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
@@ -86,98 +76,77 @@ export default function TransferCustomerForm({
 
           <div className="space-y-1.5">
             <label className="block text-xs sm:text-sm font-semibold text-[#013E51]">
-              Nationality <span className="text-[#E8B34A]">*</span>
-            </label>
-            <div className="relative">
-              <select
-                value={nationality}
-                onChange={(e) => onNationalityChange(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-[#FAF7F2] text-sm text-[#013E51] font-medium focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
-              >
-                <option value="" disabled>
-                  Select Nationality
-                </option>
-                {NATIONALITIES.map((nat) => (
-                  <option key={nat} value={nat}>
-                    {nat}
-                  </option>
-                ))}
-              </select>
-              <FiGlobe className="w-4 h-4 text-[#888888] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            </div>
-          </div>
-        </div>
-
-        {/* Email & Preferred Contact Method */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <label className="block text-xs sm:text-sm font-semibold text-[#013E51]">
-              Email Address <span className="text-[#E8B34A]">*</span>
+              {t.email} <span className="text-[#E8B34A]">*</span>
             </label>
             <div className="relative">
               <input
                 type="email"
-                placeholder="you@example.com"
+                placeholder={t.emailPlaceholder}
                 value={email}
                 onChange={(e) => onEmailChange(e.target.value)}
                 required
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-[#FAF7F2] text-sm text-[#013E51] font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
+                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-[#FAF7F2] text-sm text-[#013E51] font-medium placeholder-gray-400 focus:outline-hidden focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
               />
               <FiMail className="w-4 h-4 text-[#888888] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
           </div>
-
-          <div className="space-y-1.5">
-            <label className="block text-xs sm:text-sm font-semibold text-[#013E51]">
-              Preferred Contact Method <span className="text-[#E8B34A]">*</span>
-            </label>
-            <select
-              value={preferredContactMethod}
-              onChange={(e) => onContactMethodChange(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-[#FAF7F2] text-sm text-[#013E51] font-medium focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
-            >
-              {CONTACT_METHODS.map((method) => (
-                <option key={method} value={method}>
-                  {method}
-                </option>
-              ))}
-            </select>
-          </div>
         </div>
 
-        {/* Phone & Luggage Pieces */}
+        {/* Preferred Contact & Phone with Country Code */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <label className="block text-xs sm:text-sm font-semibold text-[#013E51]">
-              Phone (prefer WhatsApp) <span className="text-[#E8B34A]">*</span>
+              {t.preferredContact} <span className="text-[#E8B34A]">*</span>
             </label>
             <div className="relative">
-              <input
-                type="tel"
-                placeholder="+201000000000"
-                value={phone}
-                onChange={(e) => onPhoneChange(e.target.value.replace(/\s+/g, ""))}
-                required
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-[#FAF7F2] text-sm text-[#013E51] font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
-              />
-              <FiPhone className="w-4 h-4 text-[#888888] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <select
+                value={communicationMethod}
+                onChange={(e) =>
+                  onCommunicationMethodChange(
+                    Number(e.target.value) as TransferCommunicationMethodEnum
+                  )
+                }
+                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-[#FAF7F2] text-sm text-[#013E51] font-medium focus:outline-hidden focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51] cursor-pointer"
+              >
+                {methods.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.label}
+                  </option>
+                ))}
+              </select>
+              <FiMessageCircle className="w-4 h-4 text-[#888888] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
           </div>
 
           <div className="space-y-1.5">
             <label className="block text-xs sm:text-sm font-semibold text-[#013E51]">
-              Luggage Pieces
+              {t.phone} <span className="text-[#E8B34A]">*</span>
             </label>
-            <div className="relative">
-              <input
-                type="number"
-                min={0}
-                max={30}
-                value={luggagePieces}
-                onChange={(e) => onLuggageChange(Number(e.target.value))}
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-[#FAF7F2] text-sm text-[#013E51] font-medium focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
-              />
-              <FiPackage className="w-4 h-4 text-[#888888] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <div className="flex gap-2">
+              <select
+                value={countryTransferId}
+                onChange={(e) => onCountryChange(Number(e.target.value))}
+                className="w-36 sm:w-44 px-3 py-3 rounded-xl border border-gray-200 bg-[#FAF7F2] text-xs sm:text-sm text-[#013E51] font-medium focus:outline-hidden focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51] cursor-pointer shrink-0 truncate"
+                title="Country Phone Code"
+              >
+                {countries.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.code ? `${c.code} ${c.name}` : c.name}
+                  </option>
+                ))}
+              </select>
+
+              <div className="relative flex-1">
+                <input
+                  type="tel"
+                  placeholder={t.phonePlaceholder}
+                  value={phone}
+                  onChange={(e) => onPhoneChange(e.target.value)}
+                  required
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-[#FAF7F2] text-sm text-[#013E51] font-medium placeholder-gray-400 focus:outline-hidden focus:ring-2 focus:ring-[#013E51]/20 focus:border-[#013E51]"
+                />
+                <FiPhone className="w-4 h-4 text-[#888888] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
             </div>
           </div>
         </div>

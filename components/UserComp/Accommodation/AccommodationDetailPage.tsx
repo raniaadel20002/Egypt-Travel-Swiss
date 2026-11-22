@@ -1,31 +1,34 @@
 "use client";
 
 import Link from "next/link";
-import { FiArrowLeft, FiCheck, FiPackage } from "react-icons/fi";
+import { motion, useReducedMotion } from "framer-motion";
+import { FiArrowLeft } from "react-icons/fi";
 import { useHotelByIdQuery, useHotelsQuery } from "@/features/hotels/useHotels";
 import { parseNumericIdFromSlug } from "@/shared/utils/slugify";
-import AccommodationBookingCard from "./AccommodationBookingCard";
+import { useLocale } from "@/shared/providers/LocaleProvider";
 import AccommodationCard from "./AccommodationCard";
-import AccommodationDetailHero from "./AccommodationDetailHero";
+import HotelDetailHeroCard from "./HotelDetailHeroCard";
+import HotelAboutSection from "./HotelAboutSection";
+import HotelFacilitiesGrid from "./HotelFacilitiesGrid";
+import HotelBookingEngine from "./HotelBookingEngine";
 
 interface AccommodationDetailPageProps {
   slug: string;
   locale: string;
 }
 
+const BRAND_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
 function AccommodationDetailSkeleton() {
   return (
-    <div className="animate-pulse max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-      <div className="h-4 bg-slate-200 rounded w-32" />
-      <div className="h-8 bg-slate-200 rounded w-2/3" />
-      <div className="w-full h-[360px] sm:h-[460px] bg-slate-200 rounded-3xl" />
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-6">
-        <div className="lg:col-span-2 space-y-4">
-          <div className="h-6 bg-slate-200 rounded w-1/4" />
-          <div className="h-4 bg-slate-200 rounded w-full" />
-          <div className="h-4 bg-slate-200 rounded w-5/6" />
-        </div>
-        <div className="h-96 bg-slate-200 rounded-3xl" />
+    <div className="animate-pulse max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <div className="h-4 bg-slate-200 rounded w-48" />
+      <div className="h-9 bg-slate-200 rounded w-2/3" />
+      <div className="w-full h-[400px] bg-slate-200 rounded-3xl" />
+      <div className="h-40 bg-slate-200 rounded-3xl" />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="h-48 bg-slate-200 rounded-3xl" />
+        <div className="h-48 bg-slate-200 rounded-3xl" />
       </div>
     </div>
   );
@@ -35,6 +38,10 @@ export default function AccommodationDetailPage({
   slug,
   locale,
 }: AccommodationDetailPageProps) {
+  const { dictionary } = useLocale();
+  const shouldReduce = useReducedMotion();
+  const t = dictionary.accommodation.detail;
+
   const hotelId = parseNumericIdFromSlug(slug);
   const backHref = `/${locale}/accommodation`;
 
@@ -51,7 +58,7 @@ export default function AccommodationDetailPage({
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-[#F7EDE1]/30">
+      <main className="min-h-screen bg-[#FBF8F3]">
         <AccommodationDetailSkeleton />
       </main>
     );
@@ -61,117 +68,82 @@ export default function AccommodationDetailPage({
     return (
       <main className="min-h-screen bg-white flex flex-col items-center justify-center px-4 py-20 text-center">
         <p className="font-[family-name:var(--font-cormorant)] text-3xl sm:text-4xl font-bold text-[#013E51] mb-4">
-          Accommodation Not Found
+          {t.notFoundTitle}
         </p>
         <p className="font-[family-name:var(--font-lato)] text-[#888888] mb-8 max-w-sm">
-          The hotel or resort you requested does not exist or has been removed.
+          {t.notFoundDesc}
         </p>
         <Link
           href={backHref}
           className="inline-flex items-center gap-2 font-[family-name:var(--font-lato)] text-sm font-semibold text-white bg-[#013E51] hover:bg-[#E8B34A] hover:text-[#013E51] transition-colors px-6 py-3 rounded-full"
         >
           <FiArrowLeft className="w-4 h-4" />
-          Back to Accommodations
+          <span>{t.backToAccommodations}</span>
         </Link>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-[#F7EDE1]/20 pb-20">
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-        {/* Hero & Image Gallery */}
-        <AccommodationDetailHero hotel={hotel} backHref={backHref} />
+    <main className="min-h-screen bg-[#FBF8F3] pb-24">
+      <div className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-10">
+        {/* Top Hero Showcase & Mosaic Gallery */}
+        <motion.div
+          initial={shouldReduce ? undefined : { opacity: 0, y: 16 }}
+          animate={shouldReduce ? undefined : { opacity: 1, y: 0 }}
+          transition={{ duration: 0.42, ease: BRAND_EASE }}
+        >
+          <HotelDetailHeroCard hotel={hotel} backHref={backHref} />
+        </motion.div>
 
-        {/* Content Body & Booking Form Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 mt-10">
-          {/* Main Info Column */}
-          <div className="lg:col-span-2 space-y-10">
-            {/* About Property */}
-            <section className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-[#013E51]/10">
-              <h2 className="font-[family-name:var(--font-cormorant)] text-2xl sm:text-3xl font-bold text-[#013E51] mb-4">
-                About the Property
-              </h2>
-              <p className="font-[family-name:var(--font-lato)] text-base sm:text-[17px] text-[#374151] leading-[1.85] whitespace-pre-line">
-                {hotel.description}
-              </p>
-            </section>
+        {/* About Property Card */}
+        <motion.div
+          initial={shouldReduce ? undefined : { opacity: 0, y: 20 }}
+          whileInView={shouldReduce ? undefined : { opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.15 }}
+          transition={{ duration: 0.42, ease: BRAND_EASE }}
+        >
+          <HotelAboutSection description={hotel.description} />
+        </motion.div>
 
-            {/* Rate Plans & Packages */}
-            {hotel.ratePlans && hotel.ratePlans.length > 0 && (
-              <section className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-[#013E51]/10">
-                <div className="flex items-center gap-2 mb-5">
-                  <FiPackage className="w-5 h-5 text-[#E8B34A]" />
-                  <h2 className="font-[family-name:var(--font-cormorant)] text-2xl sm:text-3xl font-bold text-[#013E51]">
-                    Available Packages &amp; Board Plans
-                  </h2>
-                </div>
-                <div className="space-y-4">
-                  {hotel.ratePlans.map((plan) => (
-                    <div
-                      key={plan.id}
-                      className="p-5 rounded-2xl bg-[#F7EDE1]/50 border border-[#E8B34A]/30"
-                    >
-                      <h3 className="font-[family-name:var(--font-cormorant)] text-xl font-bold text-[#013E51] mb-1.5">
-                        {plan.name}
-                      </h3>
-                      <p className="font-[family-name:var(--font-lato)] text-sm text-[#374151] leading-relaxed">
-                        {plan.description}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
+        {/* Facilities & Amenities Grid */}
+        <motion.div
+          initial={shouldReduce ? undefined : { opacity: 0, y: 20 }}
+          whileInView={shouldReduce ? undefined : { opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.15 }}
+          transition={{ duration: 0.42, ease: BRAND_EASE }}
+        >
+          <HotelFacilitiesGrid facilities={hotel.facilities} />
+        </motion.div>
 
-            {/* Comprehensive Amenities & Facilities */}
-            {hotel.facilities && hotel.facilities.length > 0 && (
-              <section className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-[#013E51]/10">
-                <h2 className="font-[family-name:var(--font-cormorant)] text-2xl sm:text-3xl font-bold text-[#013E51] mb-6">
-                  Facilities &amp; Amenities
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {hotel.facilities.map((fac) => (
-                    <div
-                      key={fac.id || fac.name}
-                      className="p-4 rounded-2xl bg-slate-50 border border-slate-100"
-                    >
-                      <h4 className="font-[family-name:var(--font-lato)] text-sm font-bold text-[#013E51] uppercase tracking-wider mb-2.5">
-                        {fac.name}
-                      </h4>
-                      <ul className="space-y-1.5">
-                        {(fac.values || []).map((val, idx) => (
-                          <li
-                            key={idx}
-                            className="flex items-start gap-2 text-xs sm:text-sm text-[#555555]"
-                          >
-                            <FiCheck className="w-4 h-4 text-[#19B8A5] shrink-0 mt-0.5" />
-                            <span>{val}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
-          </div>
-
-          {/* Sticky Booking Inquiry Column */}
-          <div className="lg:col-span-1">
-            <AccommodationBookingCard hotel={hotel} />
-          </div>
-        </div>
+        {/* Interactive 2-Step Multi-Room Booking Engine & Live Stay Overview */}
+        <motion.div
+          initial={shouldReduce ? undefined : { opacity: 0, y: 20 }}
+          whileInView={shouldReduce ? undefined : { opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.1 }}
+          transition={{ duration: 0.45, ease: BRAND_EASE }}
+        >
+          <HotelBookingEngine hotel={hotel} />
+        </motion.div>
 
         {/* Other Recommended Accommodations */}
         {otherHotels.length > 0 && (
-          <section className="mt-16 sm:mt-24 pt-12 border-t border-[#013E51]/10">
-            <h2 className="font-[family-name:var(--font-cormorant)] text-3xl sm:text-4xl font-bold text-[#013E51] mb-2 text-center">
-              Other Handpicked Stays
-            </h2>
-            <p className="font-[family-name:var(--font-lato)] text-sm text-[#888888] text-center mb-10">
-              Explore more luxury hotels &amp; beachfront resorts in Egypt
-            </p>
+          <motion.section
+            initial={shouldReduce ? undefined : { opacity: 0, y: 20 }}
+            whileInView={shouldReduce ? undefined : { opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.1 }}
+            transition={{ duration: 0.45, ease: BRAND_EASE }}
+            className="pt-16 border-t border-[#013E51]/10 space-y-8"
+          >
+            <div className="text-center space-y-1">
+              <h2 className="font-[family-name:var(--font-cormorant)] text-3xl sm:text-4xl font-bold text-[#013E51]">
+                {t.otherStaysTitle}
+              </h2>
+              <p className="font-[family-name:var(--font-lato)] text-sm text-[#888888]">
+                {t.otherStaysSubtitle}
+              </p>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
               {otherHotels.map((other) => (
                 <AccommodationCard
@@ -181,7 +153,7 @@ export default function AccommodationDetailPage({
                 />
               ))}
             </div>
-          </section>
+          </motion.section>
         )}
       </div>
     </main>

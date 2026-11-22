@@ -1,8 +1,33 @@
 "use client";
 
-export default function AccommodationCardSkeleton() {
+import { motion, useReducedMotion } from "framer-motion";
+
+const EASE = [0.22, 1, 0.36, 1] as const;
+
+interface AccommodationCardSkeletonProps {
+  index?: number;
+}
+
+export default function AccommodationCardSkeleton({
+  index = 0,
+}: AccommodationCardSkeletonProps) {
+  const reduced = useReducedMotion();
+
+  const skeletonVariant = {
+    initial: { opacity: 0, y: reduced ? 0 : 16 },
+    animate: { opacity: 1, y: 0 },
+    transition: {
+      duration: reduced ? 0.1 : 0.4,
+      delay: reduced ? 0 : index * 0.06,
+      ease: EASE,
+    },
+  };
+
   return (
-    <div className="bg-white rounded-[24px] sm:rounded-[28px] overflow-hidden shadow-sm border border-[#013E51]/10 animate-pulse flex flex-col justify-between">
+    <motion.div
+      {...skeletonVariant}
+      className="bg-white rounded-[24px] sm:rounded-[28px] overflow-hidden shadow-sm border border-[#013E51]/10 animate-pulse flex flex-col justify-between"
+    >
       <div>
         {/* Cover Skeleton */}
         <div className="w-full h-56 sm:h-64 bg-slate-200" />
@@ -23,9 +48,10 @@ export default function AccommodationCardSkeleton() {
       </div>
 
       {/* Button Skeleton */}
-      <div className="p-5 sm:p-6 pt-0">
-        <div className="w-full h-11 bg-slate-200 rounded-xl" />
+      <div className="p-5 sm:p-6 pt-0 grid grid-cols-2 gap-2.5">
+        <div className="h-11 bg-slate-200 rounded-xl" />
+        <div className="h-11 bg-slate-200 rounded-xl" />
       </div>
-    </div>
+    </motion.div>
   );
 }

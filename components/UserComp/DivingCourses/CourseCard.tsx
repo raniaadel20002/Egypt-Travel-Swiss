@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { motion, useReducedMotion } from "framer-motion";
 import { FiStar, FiCheckCircle } from "react-icons/fi";
 import { DivingCourseApiItem } from "@/models/divingCourse";
 import { useLocale } from "@/shared/providers/LocaleProvider";
@@ -11,6 +12,7 @@ import { buildDivingCourseDetailsPath } from "@/shared/utils/slugify";
 
 interface CourseCardProps {
   course: DivingCourseApiItem;
+  index?: number;
 }
 
 const FALLBACK_IMAGE =
@@ -24,9 +26,11 @@ function formatCurrencyPrice(price: number, currency: string) {
   return `${price} ${code}`;
 }
 
-export default function CourseCard({ course }: CourseCardProps) {
+export default function CourseCard({ course, index = 0 }: CourseCardProps) {
   const router = useRouter();
-  const { locale } = useLocale();
+  const { locale, dictionary } = useLocale();
+  const shouldReduce = useReducedMotion();
+  const cardT = dictionary.divingCourses.card;
 
   const detailsPath = buildDivingCourseDetailsPath(
     locale,
@@ -63,8 +67,17 @@ export default function CourseCard({ course }: CourseCardProps) {
   };
 
   return (
-    <article
+    <motion.article
       onClick={handleCardClick}
+      initial={shouldReduce ? undefined : { opacity: 0, y: 16 }}
+      whileInView={shouldReduce ? undefined : { opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.15 }}
+      transition={{
+        duration: 0.38,
+        delay: Math.min(index * 0.08, 0.4),
+        ease: [0.22, 1, 0.36, 1],
+      }}
+      whileHover={shouldReduce ? undefined : { y: -4 }}
       className="bg-white rounded-[24px] sm:rounded-[28px] overflow-hidden border border-[#888888]/20 shadow-[0px_2px_12px_0px_rgba(0,0,0,0.06)] hover:shadow-xl transition-all duration-300 flex flex-col group cursor-pointer"
     >
       {/* Course Image & Top Badges */}
@@ -77,12 +90,7 @@ export default function CourseCard({ course }: CourseCardProps) {
           className="object-cover group-hover:scale-105 transition-transform duration-500"
         />
 
-        {/* Top-left certification badge */}
-        <div className="absolute top-4 left-4 z-10">
-          <span className="text-[10px] sm:text-[11px] font-bold tracking-wider uppercase px-3.5 py-1.5 rounded-full shadow-xs inline-block bg-[#013E51]/90 backdrop-blur-xs text-white">
-            PADI Certified
-          </span>
-        </div>
+        
 
         {/* Top-right rating pill */}
         <div className="absolute top-4 right-4 z-10 flex items-center gap-1 bg-white/95 backdrop-blur-xs text-[#013E51] px-2.5 py-1 rounded-full shadow-xs text-xs font-bold">
@@ -117,7 +125,7 @@ export default function CourseCard({ course }: CourseCardProps) {
                   key={fac.id || fac.name}
                   className="inline-flex items-center gap-1 bg-[#F7EDE1]/60 text-[#013E51] text-[11px] px-2.5 py-1 rounded-full font-medium"
                 >
-                  <FiCheckCircle className="w-3 h-3 text-[#E8B34A] flex-shrink-0" />
+                  <FiCheckCircle className="w-3 h-3 text-[#E8B34A] shrink-0" />
                   <span className="truncate max-w-[140px]">
                     {fac.name || fac.values}
                   </span>
@@ -131,14 +139,14 @@ export default function CourseCard({ course }: CourseCardProps) {
           {/* Pricing Row */}
           <div className="flex items-baseline justify-between pt-4 border-t border-[#888888]/15">
             <span className="font-[family-name:var(--font-lato)] text-[10px] tracking-wider uppercase text-[#888888] font-bold">
-              Starting From
+              {cardT.startingFrom}
             </span>
             <div className="flex items-baseline gap-1">
               <span className="font-[family-name:var(--font-cormorant)] text-2xl sm:text-3xl font-bold text-[#013E51]">
                 {formatCurrencyPrice(course.price, course.currency)}
               </span>
               <span className="font-[family-name:var(--font-lato)] text-xs text-[#888888]">
-                / person
+                {cardT.perPerson}
               </span>
             </div>
           </div>
@@ -150,18 +158,18 @@ export default function CourseCard({ course }: CourseCardProps) {
               onClick={(e) => e.stopPropagation()}
               className="w-full text-center py-2.5 px-3 rounded-full border border-[#013E51] text-[#013E51] text-xs font-bold uppercase tracking-wider hover:bg-[#013E51] hover:text-white transition-colors duration-200"
             >
-              Course Details
+              {cardT.details}
             </Link>
             <Link
               href={bookingPath}
               onClick={(e) => e.stopPropagation()}
-              className="w-full text-center py-2.5 px-3 rounded-full bg-[#013E51] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#024f67] transition-colors duration-200 shadow-sm"
+              className="w-full text-center py-2.5 px-3 rounded-full bg-[#013E51] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#024f67] transition-colors duration-200 shadow-xs"
             >
-              Book Course
+              {cardT.book}
             </Link>
           </div>
         </div>
       </div>
-    </article>
+    </motion.article>
   );
 }

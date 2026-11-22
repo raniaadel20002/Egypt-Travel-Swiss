@@ -1,122 +1,143 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import { motion, useReducedMotion } from "framer-motion";
 import { LuShieldCheck, LuStar, LuUser, LuHotel } from "react-icons/lu";
 import { useLocale } from "@/shared/providers/LocaleProvider";
 
-interface PromiseItem {
-  id: string;
-  number: string;
-  title: string;
-  subtitle: string;
-  icon: typeof LuShieldCheck;
-}
-
-const PROMISE_ITEMS: PromiseItem[] = [
-  {
-    id: "safety",
-    number: "1",
-    title: "Safety First Always",
-    subtitle: "Certified & insured",
-    icon: LuShieldCheck,
-  },
-  {
-    id: "exclusive",
-    number: "2",
-    title: "Exclusive Trips",
-    subtitle: "Curated experiences",
-    icon: LuStar,
-  },
-  {
-    id: "guides",
-    number: "3",
-    title: "Professional Guides",
-    subtitle: "Local experts",
-    icon: LuUser,
-  },
-  {
-    id: "hotels",
-    number: "4",
-    title: "Hand-Picked Hotels",
-    subtitle: "Top-rated stays",
-    icon: LuHotel,
-  },
-];
+const BRAND_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export default function WhyChooseUsSection() {
-  const { locale } = useLocale();
+  const { locale, dictionary } = useLocale();
+  const shouldReduce = useReducedMotion();
+  const w = dictionary.whyChooseUs;
+
+  const promiseItems = [
+    {
+      id: "safety",
+      number: "1",
+      title: w.safetyTitle,
+      subtitle: w.safetySubtitle,
+      icon: LuShieldCheck,
+    },
+    {
+      id: "exclusive",
+      number: "2",
+      title: w.exclusiveTitle,
+      subtitle: w.exclusiveSubtitle,
+      icon: LuStar,
+    },
+    {
+      id: "guides",
+      number: "3",
+      title: w.guidesTitle,
+      subtitle: w.guidesSubtitle,
+      icon: LuUser,
+    },
+    {
+      id: "hotels",
+      number: "4",
+      title: w.hotelsTitle,
+      subtitle: w.hotelsSubtitle,
+      icon: LuHotel,
+    },
+  ];
 
   return (
-    <section id="why-choose-us" className="relative w-full py-2 sm:py-6 lg:py-8 bg-white overflow-hidden">
+    <section
+      id="why-choose-us"
+      className="relative w-full py-4 sm:py-6 lg:py-8 bg-white overflow-hidden font-[family-name:var(--font-lato)]"
+    >
       <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 xl:gap-16 items-center">
-          {/* Header: Order 1 on mobile, Col 1 Row 1 on desktop */}
-          <div className="order-1 lg:order-none text-center lg:text-left max-w-xl mx-auto lg:mx-0">
-            {/* Eyebrow */}
-            <span className="block font-[family-name:var(--font-lato)] text-xs sm:text-sm font-bold tracking-[0.2em] uppercase text-[#E8B34A] mb-2 sm:mb-3">
-              OUR PROMISE
-            </span>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 xl:gap-12 items-center">
+          {/* Left Column: Heading, Description, and 2x2 Value Cards */}
+          <div className="order-1 lg:order-none lg:col-span-6 xl:col-span-5 flex flex-col justify-center">
+            {/* Header Content */}
+            <motion.div
+              initial={shouldReduce ? undefined : { opacity: 0, y: 16 }}
+              whileInView={shouldReduce ? undefined : { opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.42, ease: BRAND_EASE }}
+              className="text-center lg:text-left mb-6 sm:mb-8"
+            >
+              <span className="block font-[family-name:var(--font-lato)] text-xs sm:text-sm font-bold tracking-[0.24em] uppercase text-[#E8B34A] mb-2 sm:mb-3">
+                {w.eyebrow}
+              </span>
 
-            {/* Main Heading */}
-            <h2 className="font-[family-name:var(--font-cormorant)] text-4xl sm:text-5xl lg:text-6xl font-bold text-[#013E51] leading-tight mb-4">
-              <span className="italic text-[#E8B34A]">Why</span> Choose Us
-            </h2>
+              <h2 className="font-[family-name:var(--font-cormorant)] text-4xl sm:text-5xl lg:text-[50px] xl:text-[54px] font-bold leading-[1.1] mb-3 sm:mb-4 tracking-tight">
+                <span className="italic font-normal text-[#E8B34A]">{w.why}</span>
+                <span className="text-[#013E51]"> {w.chooseUs}</span>
+              </h2>
 
-            {/* Paragraph Description */}
-            <p className="font-[family-name:var(--font-lato)] text-sm sm:text-base text-[#013E51]/80 font-normal leading-relaxed">
-              From the Red Sea reefs to the temples of the Nile, we plan every
-              detail so you can simply enjoy an authentic, safe and
-              unforgettable Egyptian journey.
-            </p>
+              <p className="font-[family-name:var(--font-lato)] text-sm sm:text-[15px] lg:text-base text-[#013E51]/75 font-normal leading-relaxed max-w-lg mx-auto lg:mx-0">
+                {w.description}
+              </p>
+            </motion.div>
+
+            {/* 2x2 Grid of Value Cards with Concentric Number Badges */}
+            <div className="grid grid-cols-2 gap-3.5 sm:gap-5 w-full">
+              {promiseItems.map((item, idx) => (
+                <motion.div
+                  key={item.id}
+                  initial={shouldReduce ? undefined : { opacity: 0, y: 16 }}
+                  whileInView={shouldReduce ? undefined : { opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{
+                    duration: 0.4,
+                    delay: idx * 0.08,
+                    ease: BRAND_EASE,
+                  }}
+                >
+                  <div className="flex flex-col items-center w-full select-none">
+                    {/* Concentric Number Badge: Outer warm sand/cream ring + inner navy circle */}
+                    <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#F5ECE1] flex items-center justify-center p-1 sm:p-1.5 shadow-xs mb-2.5">
+                      <div className="w-full h-full rounded-full bg-[#013E51] text-white flex items-center justify-center font-[family-name:var(--font-lato)] text-xs sm:text-sm font-bold">
+                        {item.number}
+                      </div>
+                    </div>
+
+                    {/* Card Body: Distinct darker slate-blue gradient matching the design */}
+                    <div className="w-full bg-gradient-to-br from-[#CAD6DD] via-[#D5DFE5] to-[#E8EEF2] rounded-[20px] sm:rounded-[24px] p-3.5 sm:p-4.5 flex items-center gap-3 sm:gap-3.5 shadow-[0_8px_24px_rgba(1,62,81,0.06)] border border-white/80">
+                      {/* Icon inside white container */}
+                      <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-[14px] sm:rounded-[16px] bg-white flex items-center justify-center shrink-0 shadow-xs border border-white/90 text-[#E0B660]">
+                        <item.icon className="w-5 h-5 sm:w-6 sm:h-6 stroke-[1.8]" />
+                      </div>
+
+                      {/* Text */}
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-[family-name:var(--font-lato)] text-xs sm:text-[14px] font-bold text-[#013E51] leading-tight truncate">
+                          {item.title}
+                        </h3>
+                        <p className="font-[family-name:var(--font-lato)] text-[10px] sm:text-[12px] text-[#5A7382] font-normal mt-0.5 leading-snug truncate">
+                          {item.subtitle}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </div>
 
-          {/* Painterly Traveler & Pyramids Image: Order 2 on mobile, Col 2 on desktop */}
-          <div className="order-2 lg:order-none lg:col-start-2 lg:row-start-1 lg:row-span-2 relative w-full flex items-center justify-center lg:justify-end">
-            <div className="relative w-full max-w-[750px] lg:max-w-[900px] xl:max-w-[1000px] h-[400px] sm:h-[500px] lg:h-[720px] xl:h-[800px]">
+          {/* Right Column: Balanced Watercolor Pyramids Artwork */}
+          <motion.div
+            initial={shouldReduce ? undefined : { opacity: 0, scale: 0.96 }}
+            whileInView={shouldReduce ? undefined : { opacity: 1, scale: 1 }}
+            viewport={{ once: true, amount: 0.15 }}
+            transition={{ duration: 0.5, ease: BRAND_EASE }}
+            className="order-2 lg:order-none lg:col-span-6 xl:col-span-7 flex items-center justify-center lg:justify-end w-full relative"
+          >
+            <div className="relative w-full max-w-[540px] sm:max-w-[620px] lg:max-w-[680px] xl:max-w-[720px] h-[340px] sm:h-[440px] md:h-[500px] lg:h-[560px] xl:h-[620px] flex items-center justify-center lg:justify-end">
               <Image
                 src="/home/WhyChooseUs/traveler-pyramids.png"
                 alt="Traveler with open arms in front of the Pyramids of Giza"
                 fill
                 priority
-                sizes="(max-width: 1024px) 100vw, 60vw"
-                className="object-contain object-center lg:object-right select-none"
+                sizes="(max-width: 1024px) 100vw, 55vw"
+                className="object-contain object-center lg:object-right select-none drop-shadow-xl"
               />
             </div>
-          </div>
-
-          {/* 2x2 Grid of Value Cards: Order 3 on mobile, Col 1 Row 2 on desktop */}
-          <div className="order-3 lg:order-none lg:col-start-1 w-full max-w-xl mx-auto lg:mx-0">
-            <div className="grid grid-cols-2 gap-3 sm:gap-10 lg:gap-15">
-              {PROMISE_ITEMS.map((item) => (
-                <Link
-                  key={item.number}
-                  href={`/${locale}/about#${item.id}`}
-                  className="group flex flex-col items-center w-full"
-                >
-                  {/* Floating Number Badge */}
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#013E51] text-white flex items-center justify-center font-[family-name:var(--font-lato)] text-xs sm:text-sm font-bold shadow-md mb-4 group-hover:bg-[#E8B34A] group-hover:text-[#013E51] transition-colors">
-                    {item.number}
-                  </div>
-
-                  {/* Card Body: Vertical centered on mobile, horizontal on desktop */}
-                  <div className="w-full h-full bg-gradient-to-br from-[#E2E6E8] via-[#D5DADC] to-[#ECEFF1] rounded-[20px] sm:rounded-[24px] p-3.5 sm:p-5 flex flex-col sm:flex-row items-center text-center sm:text-left gap-2 sm:gap-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 border border-white/60">
-                    <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-white flex items-center justify-center shrink-0 shadow-xs text-[#E8B34A]">
-                      <item.icon className="w-5 h-5 sm:w-6 sm:h-6 stroke-[1.8]" />
-                    </div>
-                    <div className="min-w-0 w-full">
-                      <h3 className="font-[family-name:var(--font-lato)] text-xs sm:text-base font-bold text-[#013E51] leading-tight group-hover:text-[#E8B34A] transition-colors">
-                        {item.title}
-                      </h3>
-                      <p className="font-[family-name:var(--font-lato)] text-[10px] sm:text-xs text-[#013E51]/70 font-normal mt-0.5 leading-snug">
-                        {item.subtitle}
-                      </p>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

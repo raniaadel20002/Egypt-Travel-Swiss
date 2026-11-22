@@ -95,7 +95,7 @@ export const REVIEW_SLIDES: ReviewSlide[] = [
         id: "r6",
         rating: 5,
         title: "Hand-picked luxury resort",
-        text: "The boutique hotel in El Gouna recommended by Egypt Dreams was pristine with exceptional beachfront views.",
+        text: "The boutique hotel in El Gouna recommended by Egypt Travel Swiss was pristine with exceptional beachfront views.",
         author: "Hannah Schmidt",
         initials: "HS",
         avatarBg: "bg-[#013E51]",

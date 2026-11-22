@@ -2,8 +2,11 @@
 
 import { useState } from "react";
 import { FiArrowRight, FiChevronDown, FiCheck } from "react-icons/fi";
+import { FaWhatsapp } from "react-icons/fa";
 import { toast } from "sonner";
 import { useLocale } from "@/shared/providers/LocaleProvider";
+
+const CONTACT_WHATSAPP_NUMBER = "201004829104";
 
 export default function ContactForm() {
   const { dictionary: dict } = useLocale();
@@ -30,20 +33,40 @@ export default function ContactForm() {
 
     setIsSubmitting(true);
 
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSent(true);
-      toast.success(f.successMessage);
-      setFormData({
-        fullName: "",
-        email: "",
-        phone: "",
-        subjectIndex: 0,
-        message: "",
-      });
+    const selectedSubject = f.subjects[formData.subjectIndex] || "General Inquiry";
 
-      setTimeout(() => setIsSent(false), 4000);
-    }, 700);
+    const textLines = [
+      "*New Contact Inquiry - Egypt Travel Swiss*",
+      "",
+      `*Name:* ${formData.fullName.trim()}`,
+      `*Email:* ${formData.email.trim()}`,
+      `*Phone:* ${formData.phone.trim() || "Not provided"}`,
+      `*Subject:* ${selectedSubject}`,
+      "",
+      "*Message:*",
+      formData.message.trim(),
+    ];
+
+    const encodedText = encodeURIComponent(textLines.join("\n"));
+    const whatsappUrl = `https://wa.me/${CONTACT_WHATSAPP_NUMBER}?text=${encodedText}`;
+
+    if (typeof window !== "undefined") {
+      window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+    }
+
+    setIsSubmitting(false);
+    setIsSent(true);
+    toast.success(f.successMessage);
+
+    setFormData({
+      fullName: "",
+      email: "",
+      phone: "",
+      subjectIndex: 0,
+      message: "",
+    });
+
+    setTimeout(() => setIsSent(false), 4000);
   };
 
   return (
@@ -173,11 +196,12 @@ export default function ContactForm() {
           >
             {isSent ? (
               <>
-                <FiCheck className="w-4 h-4" />
+                <FiCheck className="w-4 h-4 text-[#25D366]" />
                 <span>{f.sent}</span>
               </>
             ) : (
               <>
+                <FaWhatsapp className="w-4 h-4 text-[#25D366]" />
                 <span>{isSubmitting ? f.sending : f.send}</span>
                 <FiArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </>

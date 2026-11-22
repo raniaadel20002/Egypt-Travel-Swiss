@@ -4,7 +4,11 @@ export function calculateTripItemSubtotal(item: CartTripItem): number {
   const adultTotal = (item.noAdult || 0) * (item.adultPrice || 0);
   const childTotal = (item.noChild || 0) * (item.childPrice || 0);
   const infTotal = (item.noInf || 0) * (item.infPrice || 0);
-  return adultTotal + childTotal + infTotal;
+  const servicesTotal = (item.selectedServices || []).reduce(
+    (acc, s) => acc + (s.adultPrice || 0),
+    0
+  );
+  return adultTotal + childTotal + infTotal + servicesTotal;
 }
 
 export function calculateCartSummary(items: CartTripItem[]): CartPricingSummary {

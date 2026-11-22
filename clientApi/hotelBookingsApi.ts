@@ -50,6 +50,9 @@ export async function createHotelBooking(
     "/api/HotelBookings",
     payload
   );
+  if (response.data && !response.data.success) {
+    throw new Error(response.data.message || "Failed to create hotel booking");
+  }
   return response.data.data;
 }
 

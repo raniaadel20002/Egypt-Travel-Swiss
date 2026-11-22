@@ -16,42 +16,45 @@ const DEFAULT_CURRENCY = "EUR";
 const DEFAULT_LANGUAGE = "en";
 
 export async function matchTransferVehicle(
-  payload: TransferMatchPayload
+  payload: TransferMatchPayload,
+  language = DEFAULT_LANGUAGE
 ): Promise<TransferMatchResult> {
   const response = await apiClient.post<ApiResponse<TransferMatchResult>>(
     "/api/Transfer/match",
     payload,
     {
       params: { currency: DEFAULT_CURRENCY },
-      headers: { "Accept-Language": DEFAULT_LANGUAGE },
+      headers: { "Accept-Language": language },
     }
   );
   return response.data.data;
 }
 
 export async function previewTransferPrice(
-  payload: TransferPreviewPayload
+  payload: TransferPreviewPayload,
+  language = DEFAULT_LANGUAGE
 ): Promise<TransferPreviewResult> {
   const response = await apiClient.post<ApiResponse<TransferPreviewResult>>(
     "/api/Transfer/preview",
     payload,
     {
       params: { currency: DEFAULT_CURRENCY },
-      headers: { "Accept-Language": DEFAULT_LANGUAGE },
+      headers: { "Accept-Language": language },
     }
   );
   return response.data.data;
 }
 
 export async function createTransferBookingRecord(
-  payload: CreateTransferBookingPayload
+  payload: CreateTransferBookingPayload,
+  language = DEFAULT_LANGUAGE
 ): Promise<TransferBookingApiItem> {
   const response = await apiClient.post<ApiResponse<TransferBookingApiItem>>(
     "/api/TransferBooking/create",
     payload,
     {
       params: { currency: DEFAULT_CURRENCY },
-      headers: { "Accept-Language": DEFAULT_LANGUAGE },
+      headers: { "Accept-Language": language },
     }
   );
   return response.data.data;

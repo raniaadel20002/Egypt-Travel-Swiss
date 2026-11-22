@@ -1,4 +1,4 @@
-import { apiClient } from "./apiConfig";
+import { apiClient, getActiveLanguage } from "./apiConfig";
 import { ApiResponse } from "@/models/api";
 import {
   BackendLanguageCode,
@@ -14,7 +14,10 @@ import { urlToFile } from "@/shared/utils/imageUrl";
 export async function getTripTypes(
   params?: TripTypesQueryParams
 ): Promise<TripTypeItem[]> {
-  const language = params?.language || "EN";
+  const language =
+    params?.language ||
+    (getActiveLanguage() as BackendLanguageCode) ||
+    "EN";
   const queryParams: Record<string, number> = {};
 
   if (params?.PageNumber) queryParams.PageNumber = params.PageNumber;

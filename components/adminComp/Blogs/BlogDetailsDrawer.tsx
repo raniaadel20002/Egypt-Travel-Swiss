@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Image from "next/image";
 import {
   FiX,
@@ -9,14 +10,19 @@ import {
 } from "react-icons/fi";
 import { toast } from "sonner";
 import { useModalDismiss } from "@/shared/utils/useModalDismiss";
-import { BlogApiItem } from "@/models/blog";
+import { BlogApiItem, BlogLocalizedText } from "@/models/blog";
 import {
   useBlogDetailQuery,
   useDeleteBlogImageMutation,
   useDeleteBlogSectionImageMutation,
   useUploadBlogImageMutation,
 } from "@/features/blogs/useBlogs";
-import { resolveBlogImageUrl, sortBlogSections } from "./blogHelpers";
+import LanguageFlag from "@/components/adminComp/Common/LanguageFlag";
+import {
+  BLOG_LANGUAGES,
+  resolveBlogImageUrl,
+  sortBlogSections,
+} from "./blogHelpers";
 
 interface BlogDetailsDrawerProps {
   blog: BlogApiItem | null;
@@ -32,9 +38,12 @@ export default function BlogDetailsDrawer({
   onEdit,
 }: BlogDetailsDrawerProps) {
   useModalDismiss({ isOpen, onClose });
+  const [previewLang, setPreviewLang] =
+    useState<keyof BlogLocalizedText>("en");
 
   const { data: freshBlog } = useBlogDetailQuery(
-    isOpen && blog?.id ? blog.id : undefined
+    isOpen && blog?.id ? blog.id : undefined,
+    previewLang
   );
   const activeBlog = freshBlog || blog;
 
@@ -114,6 +123,30 @@ export default function BlogDetailsDrawer({
               >
                 <FiX className="w-5 h-5" />
               </button>
+            </div>
+          </div>
+
+          {/* Language Preview Switcher */}
+          <div className="px-6 py-3 bg-[#F8F9FA] border-b border-gray-200 flex items-center justify-between gap-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#013E51]">
+              Preview Language
+            </span>
+            <div className="flex items-center gap-1.5">
+              {BLOG_LANGUAGES.map((lang) => (
+                <button
+                  key={lang.key}
+                  type="button"
+                  onClick={() => setPreviewLang(lang.key)}
+                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                    previewLang === lang.key
+                      ? "bg-[#013E51] text-white"
+                      : "bg-white border border-gray-200 text-[#013E51] hover:bg-gray-50"
+                  }`}
+                >
+                  <LanguageFlag code={lang.code} size="sm" />
+                  <span>{lang.code}</span>
+                </button>
+              ))}
             </div>
           </div>
 

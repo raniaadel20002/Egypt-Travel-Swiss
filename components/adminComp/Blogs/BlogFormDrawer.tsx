@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { FiX, FiSave } from "react-icons/fi";
+import { FiX, FiSave, FiLoader } from "react-icons/fi";
 import { toast } from "sonner";
 import { useModalDismiss } from "@/shared/utils/useModalDismiss";
-import { BlogApiItem } from "@/models/blog";
+import { BlogApiItem, BlogLocalizedText } from "@/models/blog";
 import {
+  useBlogMultiLangQuery,
   useCreateBlogMutation,
   useDeleteBlogImageMutation,
   useDeleteBlogSectionImageMutation,
@@ -11,7 +12,7 @@ import {
   useUploadBlogImageMutation,
   useUploadBlogSectionImageMutation,
 } from "@/features/blogs/useBlogs";
-import { sortBlogSections } from "./blogHelpers";
+import { buildBlogDraftState, emptyBlogLocalizedText } from "./blogHelpers";
 import BlogFormCoverCard from "./BlogFormCoverCard";
 import BlogFormSectionsList from "./BlogFormSectionsList";
 import { BlogSectionDraft } from "./BlogSectionFormCard";
@@ -27,11 +28,16 @@ export default function BlogFormDrawer({
   onClose,
   editingBlog,
 }: BlogFormDrawerProps) {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [activeLang, setActiveLang] = useState<keyof BlogLocalizedText>("en");
+  const [title, setTitle] = useState<BlogLocalizedText>(emptyBlogLocalizedText());
+  const [content, setContent] = useState<BlogLocalizedText>(emptyBlogLocalizedText());
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
   const [sections, setSections] = useState<BlogSectionDraft[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isEdit = Boolean(editingBlog?.id);
+  const { data: multiLangBlog, isLoading: isLoadingMultiLang } =
+    useBlogMultiLangQuery(editingBlog?.id, isOpen && isEdit);
 
   const createMutation = useCreateBlogMutation();
   const updateMutation = useUpdateBlogMutation();
@@ -44,28 +50,13 @@ export default function BlogFormDrawer({
 
   useEffect(() => {
     if (!isOpen) return;
-    if (editingBlog) {
-      setTitle(editingBlog.title || "");
-      setContent(editingBlog.content || "");
-      setCoverImageFile(null);
-      const sorted = sortBlogSections(editingBlog.blogSections);
-      setSections(
-        sorted.map((s) => ({
-          id: s.id,
-          sectionNumber: s.sectionNumber,
-          title: s.title,
-          content: s.content,
-          existingImageUrl: s.imageUrl,
-          newImageFile: null,
-        }))
-      );
-    } else {
-      setTitle("");
-      setContent("");
-      setCoverImageFile(null);
-      setSections([]);
-    }
-  }, [isOpen, editingBlog]);
+    setActiveLang("en");
+    const draft = buildBlogDraftState(editingBlog, multiLangBlog);
+    setTitle(draft.title);
+    setContent(draft.content);
+    setCoverImageFile(null);
+    setSections(draft.sections);
+  }, [isOpen, editingBlog, multiLangBlog]);
 
   if (!isOpen) return null;
 
@@ -74,18 +65,17 @@ export default function BlogFormDrawer({
       ...prev,
       {
         sectionNumber: prev.length + 1,
-        title: "",
-        content: "",
+        title: emptyBlogLocalizedText(),
+        content: emptyBlogLocalizedText(),
         newImageFile: null,
       },
     ]);
   };
 
   const handleRemoveSection = (idx: number) => {
-    setSections((prev) => {
-      const filtered = prev.filter((_, i) => i !== idx);
-      return filtered.map((s, i) => ({ ...s, sectionNumber: i + 1 }));
-    });
+    setSections((prev) =>
+      prev.filter((_, i) => i !== idx).map((s, i) => ({ ...s, sectionNumber: i + 1 }))
+    );
   };
 
   const handleDeleteSectionImage = async (idx: number, sectionId: number) => {
@@ -93,9 +83,7 @@ export default function BlogFormDrawer({
       await deleteSectionImageMutation.mutateAsync(sectionId);
       toast.success("Section image removed.");
       setSections((prev) =>
-        prev.map((s, i) =>
-          i === idx ? { ...s, existingImageUrl: null } : s
-        )
+        prev.map((s, i) => (i === idx ? { ...s, existingImageUrl: null } : s))
       );
     } catch {
       toast.error("Failed to delete section image.");
@@ -104,50 +92,57 @@ export default function BlogFormDrawer({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !content.trim()) {
-      toast.error("Please provide both an article title and content.");
+    if (!title.en.trim() || !content.en.trim()) {
+      setActiveLang("en");
+      toast.error("Please provide both an English article title and English content.");
+      return;
+    }
+
+    const invalidSection = sections.find((s) => !s.title.en.trim() || !s.content.en.trim());
+    if (invalidSection) {
+      setActiveLang("en");
+      toast.error(
+        `Please provide an English title and content for Section #${invalidSection.sectionNumber}.`
+      );
       return;
     }
 
     setIsSubmitting(true);
     try {
-      let savedBlog: BlogApiItem;
-
-      if (editingBlog) {
-        savedBlog = await updateMutation.mutateAsync({
-          id: editingBlog.id,
-          payload: {
+      const savedBlog = editingBlog
+        ? await updateMutation.mutateAsync({
             id: editingBlog.id,
-            title: title.trim(),
-            content: content.trim(),
+            payload: {
+              id: editingBlog.id,
+              title,
+              content,
+              blogSections: sections.map((s) => ({
+                id: s.id || 0,
+                sectionNumber: s.sectionNumber,
+                title: s.title,
+                content: s.content,
+              })),
+            },
+          })
+        : await createMutation.mutateAsync({
+            title,
+            content,
             blogSections: sections.map((s) => ({
-              id: s.id || 0,
               sectionNumber: s.sectionNumber,
-              title: s.title.trim(),
-              content: s.content.trim(),
+              title: s.title,
+              content: s.content,
             })),
-          },
-        });
-        toast.success(`Article #${editingBlog.id} updated.`);
-      } else {
-        savedBlog = await createMutation.mutateAsync({
-          title: title.trim(),
-          content: content.trim(),
-          blogSections: sections.map((s) => ({
-            sectionNumber: s.sectionNumber,
-            title: s.title.trim(),
-            content: s.content.trim(),
-          })),
-        });
-        toast.success("New article published successfully.");
-      }
+          });
+
+      toast.success(
+        editingBlog
+          ? `Article #${editingBlog.id} updated across all languages.`
+          : "New multi-language article published successfully."
+      );
 
       if (coverImageFile && savedBlog?.id) {
         try {
-          await uploadCoverMutation.mutateAsync({
-            blogId: savedBlog.id,
-            file: coverImageFile,
-          });
+          await uploadCoverMutation.mutateAsync({ blogId: savedBlog.id, file: coverImageFile });
         } catch {
           toast.error("Article saved, but cover image upload failed.");
         }
@@ -167,9 +162,7 @@ export default function BlogFormDrawer({
                 file: draftSec.newImageFile,
               });
             } catch {
-              toast.error(
-                `Failed to upload image for Section ${draftSec.sectionNumber}.`
-              );
+              toast.error(`Failed to upload image for Section ${draftSec.sectionNumber}.`);
             }
           }
         }
@@ -194,12 +187,10 @@ export default function BlogFormDrawer({
           <div className="px-6 py-5 bg-[#013E51] text-white flex items-center justify-between">
             <div>
               <span className="text-xs uppercase tracking-wider text-[#E8B34A] font-bold block">
-                Travel Editor
+                Multi-Language Travel Editor
               </span>
               <h2 className="text-lg font-bold">
-                {editingBlog
-                  ? `Edit Article #${editingBlog.id}`
-                  : "Draft New Article"}
+                {editingBlog ? `Edit Article #${editingBlog.id}` : "Draft New Article"}
               </h2>
             </div>
             <button
@@ -212,69 +203,76 @@ export default function BlogFormDrawer({
             </button>
           </div>
 
-          <form
-            onSubmit={handleSubmit}
-            className="flex-1 overflow-y-auto p-6 space-y-6"
-          >
-            <BlogFormCoverCard
-              title={title}
-              setTitle={setTitle}
-              content={content}
-              setContent={setContent}
-              existingImageUrl={editingBlog?.imageUrl}
-              coverImageFile={coverImageFile}
-              setCoverImageFile={setCoverImageFile}
-              onDeleteExistingCover={
-                editingBlog?.id
-                  ? async () => {
-                      try {
-                        await deleteCoverMutation.mutateAsync(editingBlog.id);
-                        toast.success("Cover image removed.");
-                      } catch {
-                        toast.error("Failed to delete cover image.");
-                      }
-                    }
-                  : undefined
-              }
-            />
-
-            <BlogFormSectionsList
-              sections={sections}
-              onAddSection={handleAddSection}
-              onUpdateSection={(idx, updated) =>
-                setSections((prev) =>
-                  prev.map((s, i) => (i === idx ? updated : s))
-                )
-              }
-              onRemoveSection={handleRemoveSection}
-              onDeleteExistingImage={handleDeleteSectionImage}
-            />
-
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
-              <button
-                type="button"
-                onClick={onClose}
-                disabled={isSubmitting}
-                className="px-4 py-2 rounded-xl border border-gray-200 text-xs font-semibold text-gray-600 hover:bg-gray-50 cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#013E51] hover:bg-[#024f67] text-white text-xs font-bold transition-colors cursor-pointer disabled:opacity-60 shadow-xs"
-              >
-                <FiSave className="w-4 h-4 text-[#E8B34A]" />
-                <span>
-                  {isSubmitting
-                    ? "Saving & Uploading..."
-                    : editingBlog
-                    ? "Update Article"
-                    : "Publish Article"}
-                </span>
-              </button>
+          {isEdit && isLoadingMultiLang ? (
+            <div className="flex-1 flex flex-col items-center justify-center gap-2 text-gray-400">
+              <FiLoader className="w-6 h-6 animate-spin text-[#013E51]" />
+              <span className="text-xs font-medium">
+                Loading article translations across 5 languages...
+              </span>
             </div>
-          </form>
+          ) : (
+            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
+              <BlogFormCoverCard
+                activeLang={activeLang}
+                onActiveLangChange={setActiveLang}
+                title={title}
+                setTitle={setTitle}
+                content={content}
+                setContent={setContent}
+                existingImageUrl={multiLangBlog?.imageUrl ?? editingBlog?.imageUrl}
+                coverImageFile={coverImageFile}
+                setCoverImageFile={setCoverImageFile}
+                onDeleteExistingCover={
+                  editingBlog?.id
+                    ? async () => {
+                        try {
+                          await deleteCoverMutation.mutateAsync(editingBlog.id);
+                          toast.success("Cover image removed.");
+                        } catch {
+                          toast.error("Failed to delete cover image.");
+                        }
+                      }
+                    : undefined
+                }
+              />
+
+              <BlogFormSectionsList
+                activeLang={activeLang}
+                sections={sections}
+                onAddSection={handleAddSection}
+                onUpdateSection={(idx, updated) =>
+                  setSections((prev) => prev.map((s, i) => (i === idx ? updated : s)))
+                }
+                onRemoveSection={handleRemoveSection}
+                onDeleteExistingImage={handleDeleteSectionImage}
+              />
+
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  disabled={isSubmitting}
+                  className="px-4 py-2 rounded-xl border border-gray-200 text-xs font-semibold text-gray-600 hover:bg-gray-50 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#013E51] hover:bg-[#024f67] text-white text-xs font-bold transition-colors cursor-pointer disabled:opacity-60 shadow-xs"
+                >
+                  <FiSave className="w-4 h-4 text-[#E8B34A]" />
+                  <span>
+                    {isSubmitting
+                      ? "Saving & Uploading..."
+                      : editingBlog
+                      ? "Update Article"
+                      : "Publish Article"}
+                  </span>
+                </button>
+              </div>
+            </form>
+          )}
         </div>
       </div>
     </div>

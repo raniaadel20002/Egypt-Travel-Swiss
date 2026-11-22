@@ -35,10 +35,10 @@ export default function NotFoundPage() {
             {/* Brand Typography */}
             <div className="flex flex-col leading-tight">
               <span className="font-[family-name:var(--font-cormorant)] text-2xl font-bold tracking-[0.14em] text-[#013E51] uppercase transition-colors group-hover:text-[#024f67]">
-                Egypt Dreams
+                Egypt Travel
               </span>
               <span className="font-[family-name:var(--font-lato)] text-[10px] font-semibold tracking-[0.32em] text-[#E8B34A] uppercase -mt-0.5">
-                Travel
+                Swiss
               </span>
             </div>
           </Link>
@@ -119,7 +119,7 @@ export default function NotFoundPage() {
 
       {/* Brand Footer Strip */}
       <footer className="w-full py-6 text-center text-xs text-[#888888] border-t border-[#888888]/15 bg-white">
-        <p>© 2026 Egypt Dreams Travel. All rights reserved.</p>
+        <p>© 2026 Egypt Travel Swiss. All rights reserved.</p>
       </footer>
     </div>
   );

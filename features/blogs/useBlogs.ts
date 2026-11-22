@@ -9,6 +9,7 @@ import {
   deleteBlog,
   deleteBlogImage,
   deleteBlogSectionImage,
+  getBlogAllLanguages,
   getBlogById,
   getBlogs,
   updateBlog,
@@ -17,6 +18,7 @@ import {
 } from "@/clientApi/blogsApi";
 import {
   BlogApiItem,
+  BlogMultiLangDetails,
   BlogsQueryParams,
   CreateBlogPayload,
   UpdateBlogPayload,
@@ -31,11 +33,15 @@ export function useBlogsQuery(params?: BlogsQueryParams) {
   });
 }
 
-export function useInfiniteBlogsQuery(pageSize = 6) {
+export function useInfiniteBlogsQuery(pageSize = 6, language?: string) {
   return useInfiniteQuery<BlogApiItem[]>({
-    queryKey: [...BLOGS_QUERY_KEY, "infinite", pageSize],
+    queryKey: [...BLOGS_QUERY_KEY, "infinite", pageSize, language],
     queryFn: ({ pageParam = 1 }) =>
-      getBlogs({ PageNumber: pageParam as number, PageSize: pageSize }),
+      getBlogs({
+        PageNumber: pageParam as number,
+        PageSize: pageSize,
+        language,
+      }),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
       if (!lastPage || lastPage.length < pageSize) {
@@ -46,11 +52,19 @@ export function useInfiniteBlogsQuery(pageSize = 6) {
   });
 }
 
-export function useBlogDetailQuery(id?: number) {
+export function useBlogDetailQuery(id?: number, language?: string) {
   return useQuery<BlogApiItem>({
-    queryKey: [...BLOGS_QUERY_KEY, "detail", id],
-    queryFn: () => getBlogById(id!),
+    queryKey: [...BLOGS_QUERY_KEY, "detail", id, language],
+    queryFn: () => getBlogById(id!, language),
     enabled: Boolean(id && id > 0),
+  });
+}
+
+export function useBlogMultiLangQuery(id?: number, enabled = true) {
+  return useQuery<BlogMultiLangDetails>({
+    queryKey: [...BLOGS_QUERY_KEY, "multilang", id],
+    queryFn: () => getBlogAllLanguages(id!),
+    enabled: Boolean(id && id > 0 && enabled),
   });
 }
 

@@ -54,10 +54,24 @@ export function extractApiError(error: unknown): string {
     }
 
     if (status === 401) {
-      return "Unauthorized (401). Your session has expired. Please sign in again.";
+      if (typeof window !== "undefined") {
+        const path = window.location.pathname;
+        if (path.startsWith("/admin") && path !== "/admin/login") {
+          window.location.replace("/admin/login");
+          return "Your session has expired. Redirecting to login...";
+        }
+      }
+      return "Unauthorized access. Please sign in or check your credentials.";
     }
 
     if (error.message === "Network Error") {
+      if (typeof window !== "undefined") {
+        const path = window.location.pathname;
+        if (path.startsWith("/admin") && path !== "/admin/login") {
+          window.location.replace("/admin/login");
+          return "Your session has expired. Redirecting to login...";
+        }
+      }
       return "Network connection issue. Please check your internet connection or server availability.";
     }
 

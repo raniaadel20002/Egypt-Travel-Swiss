@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import QueryProvider from "@/shared/providers/QueryProvider";
 import ToastProvider from "@/shared/providers/ToastProvider";
+import ScrollToTop from "@/shared/providers/ScrollToTop";
 import "./globals.css";
 
 const cormorant = localFont({
@@ -27,8 +28,8 @@ const lato = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Egypt Dreams Travel",
-  description: "Egypt Dreams Travel Platform",
+  title: "Egypt Travel Swiss",
+  description: "Egypt Travel Swiss Platform",
 };
 
 export default function RootLayout({
@@ -37,9 +38,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${cormorant.variable} ${lato.variable} overflow-x-clip`}>
-      <body className="font-sans antialiased overflow-x-clip min-h-screen text-[#013E51] bg-white">
+    <html lang="en" className={`${cormorant.variable} ${lato.variable}`}>
+      <body className="font-sans antialiased min-h-screen text-[#013E51] bg-white">
         <QueryProvider>
+          <ScrollToTop />
           {children}
           <ToastProvider />
         </QueryProvider>

@@ -2,6 +2,7 @@
 
 import { FiTrash2 } from "react-icons/fi";
 import {
+  DIVING_COURSE_HIGHLIGHT_PRESETS,
   DivingCourseLocalizedText,
   UpdateDivingCourseFacilityInput,
 } from "@/models/divingCourse";
@@ -41,6 +42,12 @@ export default function DivingCourseFacilityCard({
     onChange({ ...facility, icon });
   };
 
+  const matchedPreset = DIVING_COURSE_HIGHLIGHT_PRESETS.find(
+    (p) =>
+      p.icon === facility.icon ||
+      p.name.en.toLowerCase() === (facility.name.en || "").trim().toLowerCase()
+  );
+
   return (
     <div className="rounded-2xl border border-gray-200 bg-[#FAF7F2]/40 p-4 space-y-3.5 shadow-2xs">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-200/80 pb-3">
@@ -56,6 +63,11 @@ export default function DivingCourseFacilityCard({
             <span className="text-xs font-bold text-[#013E51]">
               {facility.name.en || `Feature #${index + 1}`}
             </span>
+            {matchedPreset && (
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#E8B34A]/20 text-[#013E51] border border-[#E8B34A]/40">
+                Course Highlight ({matchedPreset.label})
+              </span>
+            )}
           </div>
         </div>
 
@@ -110,7 +122,9 @@ export default function DivingCourseFacilityCard({
                     onChange={(e) => handleUpdate("name", key, e.target.value)}
                     placeholder={
                       isEn
-                        ? "e.g. Course Duration"
+                        ? matchedPreset
+                          ? `e.g. ${matchedPreset.label}`
+                          : "e.g. Course Duration"
                         : `Feature name in ${lang.label}...`
                     }
                     className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-gray-200 bg-white focus:outline-hidden focus:border-[#013E51]"
@@ -130,7 +144,9 @@ export default function DivingCourseFacilityCard({
                     onChange={(e) => handleUpdate("values", key, e.target.value)}
                     placeholder={
                       isEn
-                        ? "e.g. 3 Days / 6 Dives"
+                        ? matchedPreset
+                          ? `e.g. ${matchedPreset.placeholderValue}`
+                          : "e.g. 3 Days / 6 Dives"
                         : `Value in ${lang.label}...`
                     }
                     className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-gray-200 bg-white focus:outline-hidden focus:border-[#013E51]"

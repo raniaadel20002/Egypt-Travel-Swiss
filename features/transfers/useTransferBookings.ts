@@ -91,10 +91,13 @@ export function useCompleteTransferBookingMutation() {
   });
 }
 
-export function useTransferPreviewQuery(payload: TransferPreviewPayload | null) {
+export function useTransferPreviewQuery(
+  payload: TransferPreviewPayload | null,
+  language?: string
+) {
   return useQuery({
-    queryKey: ["transferPreview", payload],
-    queryFn: () => previewTransferPrice(payload!),
+    queryKey: ["transferPreview", payload, language],
+    queryFn: () => previewTransferPrice(payload!, language),
     enabled: Boolean(
       payload &&
         payload.fromLocationId &&
@@ -105,10 +108,13 @@ export function useTransferPreviewQuery(payload: TransferPreviewPayload | null) 
   });
 }
 
-export function useTransferMatchQuery(payload: TransferMatchPayload | null) {
+export function useTransferMatchQuery(
+  payload: TransferMatchPayload | null,
+  language?: string
+) {
   return useQuery({
-    queryKey: ["transferMatch", payload],
-    queryFn: () => matchTransferVehicle(payload!),
+    queryKey: ["transferMatch", payload, language],
+    queryFn: () => matchTransferVehicle(payload!, language),
     enabled: Boolean(
       payload &&
         payload.fromLocationId &&

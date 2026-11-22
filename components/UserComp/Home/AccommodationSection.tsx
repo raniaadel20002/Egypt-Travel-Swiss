@@ -1,139 +1,164 @@
 "use client";
 
-import Image from "next/image";
+import { useState, useMemo } from "react";
 import Link from "next/link";
-import { FaStar } from "react-icons/fa";
+import { motion, useReducedMotion } from "framer-motion";
 import { useLocale } from "@/shared/providers/LocaleProvider";
+import { useHotelsQuery } from "@/features/hotels/useHotels";
+import { localeToBackendLanguage } from "@/shared/utils/localeToBackendLanguage";
+import { HotelApiItem } from "@/models/hotel";
+import AccommodationCard from "../Accommodation/AccommodationCard";
+import AccommodationCardSkeleton from "../Accommodation/AccommodationCardSkeleton";
+import HotelInquiryModal from "../Accommodation/HotelInquiryModal";
 
-interface AccommodationItem {
-  id: string;
-  name: string;
-  location: string;
-  feature: string;
-  rating: number;
-  image: string;
-  href: string;
-}
-
-const ACCOMMODATIONS: AccommodationItem[] = [
-  {
-    id: "jaz-aquamarine",
-    name: "Jaz Aquamarine Resort",
-    location: "Hurghada",
-    feature: "All-Inclusive Beachfront",
-    rating: 5,
-    image: "/home/Accommodation/0318738f5c14426967c57ff8e0e9dbf3df21077c.png",
-    href: "#accommodation",
-  },
-  {
-    id: "three-corners-fayrouz",
-    name: "Three Corners Fayrouz Plaza",
-    location: "Marsa Alam",
-    feature: "House Reef",
-    rating: 5,
-    image: "/home/Accommodation/11321959834a248722878fa22ef11979f7f876d0.jpg",
-    href: "#accommodation",
-  },
-  {
-    id: "sonesta-st-george",
-    name: "Sonesta St. George Hotel",
-    location: "Luxor",
-    feature: "Nilefront Palace",
-    rating: 5,
-    image: "/home/Accommodation/3de35f7a3ab464ff9164086e4b9ffbb4d5c04df7.jpg",
-    href: "#accommodation",
-  },
-];
+const EASE = [0.22, 1, 0.36, 1] as const;
 
 export default function AccommodationSection() {
-  const { locale } = useLocale();
+  const { locale, dictionary: dict } = useLocale();
+  const reduced = useReducedMotion();
+  const [selectedHotel, setSelectedHotel] = useState<HotelApiItem | null>(null);
+
+  const backendLanguage = useMemo(
+    () => localeToBackendLanguage(locale),
+    [locale]
+  );
+
+  const {
+    data: hotels,
+    isLoading,
+    isError,
+  } = useHotelsQuery({ Language: backendLanguage });
+
+  // Show only first 3 hotels for homepage
+  const displayHotels = useMemo(() => {
+    return hotels?.slice(0, 3) || [];
+  }, [hotels]);
+
+  const handleInquire = (hotel: HotelApiItem) => {
+    setSelectedHotel(hotel);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedHotel(null);
+  };
+
+  const headerVariant = (delay: number) => ({
+    initial: { opacity: 0, y: reduced ? 0 : 20 },
+    whileInView: { opacity: 1, y: 0 },
+    viewport: { once: true, margin: "-60px" },
+    transition: {
+      duration: reduced ? 0.15 : 0.6,
+      delay: reduced ? 0 : delay,
+      ease: EASE,
+    },
+  });
 
   return (
     <section id="accommodation" className="w-full bg-[#013E51] py-16 sm:py-20 lg:py-24">
       <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
-        {/* Section Header: Left details & Right Inquiry button (desktop only) */}
+        {/* Section Header: Left details & Right View All button */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-10 sm:mb-14">
           <div>
-            <span className="block font-[family-name:var(--font-lato)] text-xs sm:text-sm font-semibold tracking-[0.2em] uppercase text-[#E8B34A] mb-2 sm:mb-3">
-              Stay With Us
-            </span>
-            <h2 className="font-[family-name:var(--font-cormorant)] text-3xl sm:text-4xl lg:text-[50px] font-bold text-white tracking-wide leading-tight mb-2 sm:mb-3">
-              Accommodation in Egypt
-            </h2>
-            <p className="font-[family-name:var(--font-lato)] text-sm sm:text-base text-white/80 font-normal max-w-xl">
-              Handpicked hotels & resorts, from the Red Sea to the Nile.
-            </p>
+            <motion.span
+              {...headerVariant(0)}
+              className="block font-[family-name:var(--font-lato)] text-xs sm:text-sm font-semibold tracking-[0.2em] uppercase text-[#E8B34A] mb-2 sm:mb-3"
+            >
+              {dict.homePage?.accommodation?.eyebrow || "Stay With Us"}
+            </motion.span>
+            <motion.h2
+              {...headerVariant(0.1)}
+              className="font-[family-name:var(--font-cormorant)] text-3xl sm:text-4xl lg:text-[50px] font-bold text-white tracking-wide leading-tight mb-2 sm:mb-3"
+            >
+              {dict.homePage?.accommodation?.heading || "Accommodation in Egypt"}
+            </motion.h2>
+            <motion.p
+              {...headerVariant(0.2)}
+              className="font-[family-name:var(--font-lato)] text-sm sm:text-base text-white/80 font-normal max-w-xl"
+            >
+              {dict.homePage?.accommodation?.subtitle || "Handpicked hotels & resorts, from the Red Sea to the Nile."}
+            </motion.p>
           </div>
 
-          <Link
-            href={`/${locale}/contact`}
-            className="hidden sm:inline-flex self-start sm:self-auto px-7 sm:px-8 py-2.5 sm:py-3 rounded-full border border-white/90 text-white font-[family-name:var(--font-lato)] text-sm sm:text-base font-medium hover:bg-white hover:text-[#013E51] transition-all duration-300 shadow-sm"
+          <motion.div
+            {...headerVariant(0.3)}
+            className="hidden sm:block"
           >
-            Inquiry Service
-          </Link>
+            <Link
+              href={`/${locale}/accommodation`}
+              className="inline-flex self-start sm:self-auto px-7 sm:px-8 py-2.5 sm:py-3 rounded-full border border-white/90 text-white font-[family-name:var(--font-lato)] text-sm sm:text-base font-medium hover:bg-white hover:text-[#013E51] transition-all duration-300 shadow-sm"
+            >
+              {dict.homePage?.accommodation?.viewAll || "View All"}
+            </Link>
+          </motion.div>
         </div>
+
+        {/* Loading Skeletons */}
+        {isLoading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7 lg:gap-8">
+            <AccommodationCardSkeleton index={0} />
+            <AccommodationCardSkeleton index={1} />
+            <AccommodationCardSkeleton index={2} />
+          </div>
+        )}
+
+        {/* Error State */}
+        {!isLoading && isError && (
+          <div className="bg-white/10 backdrop-blur-sm rounded-[24px] p-8 sm:p-12 text-center border border-white/20">
+            <p className="font-[family-name:var(--font-lato)] text-base text-white/90 mb-4">
+              {dict.homePage?.accommodation?.errorLoading || "Unable to load accommodations at this time."}
+            </p>
+            <Link
+              href={`/${locale}/accommodation`}
+              className="inline-flex px-6 py-2.5 rounded-full bg-white text-[#013E51] font-[family-name:var(--font-lato)] text-sm font-semibold hover:bg-white/90 transition-colors"
+            >
+              {dict.homePage?.accommodation?.browseAll || "Browse All Hotels"}
+            </Link>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!isLoading && !isError && displayHotels.length === 0 && (
+          <div className="bg-white/10 backdrop-blur-sm rounded-[24px] p-8 sm:p-12 text-center border border-white/20">
+            <p className="font-[family-name:var(--font-lato)] text-base text-white/90">
+              {dict.homePage?.accommodation?.noHotels || "No accommodations available at the moment."}
+            </p>
+          </div>
+        )}
 
         {/* 3 Accommodation Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7 lg:gap-8">
-          {ACCOMMODATIONS.map((hotel) => (
-            <div
-              key={hotel.id}
-              className="group bg-white rounded-[28px] p-4 sm:p-5 flex flex-col justify-between shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
-            >
-              <div>
-                {/* Framed Image Container */}
-                <div className="relative w-full aspect-[16/10.5] rounded-[20px] overflow-hidden shadow-inner">
-                  <Image
-                    src={hotel.image}
-                    alt={hotel.name}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                </div>
+        {!isLoading && !isError && displayHotels.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7 lg:gap-8">
+            {displayHotels.map((hotel, index) => (
+              <AccommodationCard
+                key={hotel.id}
+                hotel={hotel}
+                index={index}
+                onInquire={handleInquire}
+              />
+            ))}
+          </div>
+        )}
 
-                {/* Stars Rating Row */}
-                <div className="flex items-center gap-1 mt-4 sm:mt-5 mb-2">
-                  {Array.from({ length: hotel.rating }).map((_, index) => (
-                    <FaStar key={index} className="w-3.5 h-3.5 text-[#E8B34A]" />
-                  ))}
-                  <span className="font-[family-name:var(--font-lato)] text-xs sm:text-sm font-semibold text-[#013E51] ml-2">
-                    {hotel.rating} Stars
-                  </span>
-                </div>
-
-                {/* Hotel Title */}
-                <h3 className="font-[family-name:var(--font-cormorant)] text-2xl sm:text-[26px] font-bold text-[#013E51] tracking-wide leading-tight mb-1">
-                  {hotel.name}
-                </h3>
-
-                {/* Location & Key Feature */}
-                <p className="font-[family-name:var(--font-lato)] text-xs sm:text-sm text-[#777777] font-normal mb-6">
-                  {hotel.location} <span className="text-[#E8B34A]">•</span> {hotel.feature}
-                </p>
-              </div>
-
-              {/* Action Button */}
-              <Link
-                href={`/${locale}${hotel.href}`}
-                className="w-full py-3 sm:py-3.5 rounded-full bg-[#F5EAD9] hover:bg-[#ebd8bf] text-[#013E51] font-[family-name:var(--font-lato)] font-semibold text-sm sm:text-base text-center transition-colors duration-200 block shadow-xs"
-              >
-                Inquire Now
-              </Link>
-            </div>
-          ))}
-        </div>
-
-        {/* Mobile Inquiry Service Button */}
-        <div className="mt-8 text-center block sm:hidden">
+        {/* Mobile View All Button */}
+        <motion.div
+          {...headerVariant(0.4)}
+          className="mt-8 text-center block sm:hidden"
+        >
           <Link
-            href={`/${locale}/contact`}
+            href={`/${locale}/accommodation`}
             className="w-full inline-flex items-center justify-center py-3.5 px-8 rounded-full border border-white text-white font-[family-name:var(--font-lato)] font-bold text-sm hover:bg-white/10 transition-colors shadow-sm"
           >
-            Inquiry Service
+            {dict.homePage?.accommodation?.viewAll || "View All"}
           </Link>
-        </div>
+        </motion.div>
       </div>
+
+      {/* Inquiry Modal */}
+      <HotelInquiryModal
+        hotel={selectedHotel}
+        isOpen={Boolean(selectedHotel)}
+        onClose={handleCloseModal}
+      />
     </section>
   );
 }

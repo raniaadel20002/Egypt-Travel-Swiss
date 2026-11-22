@@ -21,6 +21,7 @@ export default function AdminBlogsPage() {
   const [hasImageFilter, setHasImageFilter] = useState<
     "all" | "with-image" | "no-image"
   >("all");
+  const [selectedLanguage, setSelectedLanguage] = useState("en");
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -40,9 +41,13 @@ export default function AdminBlogsPage() {
   } = useBlogsQuery({
     PageNumber: pageNumber,
     PageSize: pageSize,
+    language: selectedLanguage,
   });
 
-  const { data: allBlogs = [] } = useBlogsQuery({ PageSize: 100 });
+  const { data: allBlogs = [] } = useBlogsQuery({
+    PageSize: 100,
+    language: selectedLanguage,
+  });
   const deleteMutation = useDeleteBlogMutation();
 
   // Client-side search and media filtering
@@ -92,6 +97,7 @@ export default function AdminBlogsPage() {
   const handleResetFilters = () => {
     setSearchQuery("");
     setHasImageFilter("all");
+    setSelectedLanguage("en");
     setPageNumber(1);
   };
 
@@ -111,7 +117,7 @@ export default function AdminBlogsPage() {
     <AdminShell
       eyebrow="Content Management"
       title="Articles & Travel Blogs"
-      subtitle="Publish, edit, and organize destination travel guides, sections, and tourist insights."
+      subtitle="Publish, edit, and organize destination travel guides, sections, and tourist insights across 5 languages."
       action={
         <button
           type="button"
@@ -138,6 +144,11 @@ export default function AdminBlogsPage() {
           hasImageFilter={hasImageFilter}
           onHasImageChange={(val) => {
             setHasImageFilter(val);
+            setPageNumber(1);
+          }}
+          selectedLanguage={selectedLanguage}
+          onLanguageChange={(val) => {
+            setSelectedLanguage(val);
             setPageNumber(1);
           }}
           pageSize={pageSize}

@@ -167,3 +167,76 @@ export interface DivingCourseMultiLangDetails {
   description: DivingCourseLocalizedText;
   facilities: UpdateDivingCourseFacilityInput[];
 }
+
+export interface DivingCourseHighlightPreset {
+  key: "duration" | "depth" | "certification" | "dives";
+  label: string;
+  icon: string;
+  placeholderValue: string;
+  name: DivingCourseLocalizedText;
+}
+
+export const DIVING_COURSE_HIGHLIGHT_PRESETS: DivingCourseHighlightPreset[] = [
+  {
+    key: "duration",
+    label: "Duration",
+    icon: "clock",
+    placeholderValue: "2-3 Days",
+    name: {
+      en: "Duration",
+      fr: "Durée",
+      ru: "Продолжительность",
+      ro: "Durată",
+      it: "Durata",
+    },
+  },
+  {
+    key: "depth",
+    label: "Max Depth",
+    icon: "compass",
+    placeholderValue: "30 meters (100 feet)",
+    name: {
+      en: "Max Depth",
+      fr: "Profondeur Max",
+      ru: "Максимальная глубина",
+      ro: "Adâncime Maximă",
+      it: "Profondità Max",
+    },
+  },
+  {
+    key: "certification",
+    label: "Certification",
+    icon: "award",
+    placeholderValue: "PADI Advanced Open Water Card",
+    name: {
+      en: "Certification",
+      fr: "Certification",
+      ru: "Сертификация",
+      ro: "Certificare",
+      it: "Certificazione",
+    },
+  },
+  {
+    key: "dives",
+    label: "Required Dives",
+    icon: "check-circle",
+    placeholderValue: "5 Adventure Dives",
+    name: {
+      en: "Required Dives",
+      fr: "Plongées Requises",
+      ru: "Обязательные погружения",
+      ro: "Scufundări Necesare",
+      it: "Immersioni Richieste",
+    },
+  },
+];
+
+export function createDefaultDivingCourseFacilities(): CreateDivingCourseFacilityInput[] {
+  return DIVING_COURSE_HIGHLIGHT_PRESETS.map((preset, index) => ({
+    icon: preset.icon,
+    order: index,
+    name: { ...preset.name },
+    values: { en: "", fr: "", ru: "", ro: "", it: "" },
+  }));
+}
+

@@ -1,5 +1,6 @@
 import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from "axios";
 import { apiClient, API_BASE_URL } from "./apiConfig";
+import { isJwtExpired } from "@/shared/utils/jwt";
 import { ApiResponse } from "@/models/api";
 import {
   AuthTokenData,
@@ -124,8 +125,53 @@ export function attachAuthInterceptors(
   instance: AxiosInstance,
   options: AuthInterceptorOptions
 ): void {
-  instance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-    const token = options.getAccessToken();
+  instance.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
+    const isAuthEndpoint =
+      config.url?.includes("/api/Auth/login") ||
+      config.url?.includes("/api/Auth/refresh") ||
+      config.url?.includes("/api/Auth/logout") ||
+      config.url?.includes("/api/Auth/forgot-password") ||
+      config.url?.includes("/api/Auth/reset-password");
+
+    if (isAuthEndpoint) {
+      return config;
+    }
+
+    const isAdminRoute =
+      typeof window !== "undefined"
+        ? window.location.pathname.startsWith("/admin")
+        : false;
+
+    // Do not attach admin tokens or block public client requests
+    if (typeof window !== "undefined" && !isAdminRoute && !config.headers?.Authorization) {
+      return config;
+    }
+
+    let token = options.getAccessToken();
+    const refreshToken = options.getRefreshToken();
+
+    // Check if access token is expired before sending to avoid CORS 401 network errors
+    if (token && isJwtExpired(token)) {
+      if (refreshToken && !isJwtExpired(refreshToken)) {
+        try {
+          const newToken = await refreshAdminToken({ refreshToken });
+          if (newToken) {
+            options.onTokenRefreshed(newToken);
+            token = newToken;
+          } else {
+            options.onAuthFailed();
+            return Promise.reject(new AxiosError("Session expired", "ERR_UNAUTHORIZED", config));
+          }
+        } catch {
+          options.onAuthFailed();
+          return Promise.reject(new AxiosError("Session expired", "ERR_UNAUTHORIZED", config));
+        }
+      } else {
+        options.onAuthFailed();
+        return Promise.reject(new AxiosError("Session expired", "ERR_UNAUTHORIZED", config));
+      }
+    }
+
     if (token && config.headers && !config.headers.Authorization) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -147,14 +193,35 @@ export function attachAuthInterceptors(
         requestUrl.includes("/api/Auth/forgot-password") ||
         requestUrl.includes("/api/Auth/reset-password");
 
+      const isAdminRoute =
+        typeof window !== "undefined"
+          ? window.location.pathname.startsWith("/admin")
+          : false;
+
+      const hasAuthHeader = Boolean(
+        originalRequest?.headers?.Authorization ||
+        originalRequest?.headers?.authorization
+      );
+
+      // Never attempt admin auth refresh or trigger auth failure for public client requests
+      if (!isAdminRoute && !hasAuthHeader) {
+        return Promise.reject(error);
+      }
+
+      const is401 = error.response?.status === 401;
+      const isCorsAuthNetworkError =
+        !error.response &&
+        error.message === "Network Error" &&
+        (hasAuthHeader || isAdminRoute);
+
       if (
-        error.response?.status === 401 &&
+        (is401 || isCorsAuthNetworkError) &&
         originalRequest &&
         !originalRequest._retry &&
         !isAuthEndpoint
       ) {
         const refreshToken = options.getRefreshToken();
-        if (!refreshToken) {
+        if (!refreshToken || isJwtExpired(refreshToken)) {
           options.onAuthFailed();
           return Promise.reject(error);
         }

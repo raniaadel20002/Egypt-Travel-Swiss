@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { FiMenu } from "react-icons/fi";
-import { useAuthStore } from "@/features/auth/useAuthStore";
+import { useAuthStore, isJwtExpired } from "@/features/auth/useAuthStore";
 import AdminSidebar from "./AdminSidebar";
 
 interface AdminShellProps {
@@ -23,17 +23,19 @@ export default function AdminShell({
 }: AdminShellProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { accessToken, hasHydrated } = useAuthStore();
+  const { accessToken, hasHydrated, clearAuth } = useAuthStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (hasHydrated && !accessToken) {
-      if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
+    if (hasHydrated) {
+      const isExpired = !accessToken || isJwtExpired(accessToken);
+      if (isExpired && pathname.startsWith("/admin") && pathname !== "/admin/login") {
+        clearAuth();
         router.replace("/admin/login");
       }
     }
-  }, [hasHydrated, accessToken, pathname, router]);
+  }, [hasHydrated, accessToken, pathname, router, clearAuth]);
 
   useEffect(() => {
     if (scrollContainerRef.current) {
@@ -62,7 +64,7 @@ export default function AdminShell({
             <FiMenu className="w-5 h-5" />
           </button>
           <span className="font-[family-name:var(--font-cormorant)] text-lg font-bold text-[#013E51] uppercase tracking-wider">
-            Egypt Dreams Admin
+            Egypt Travel Swiss Admin
           </span>
           <div className="w-9" />
         </header>

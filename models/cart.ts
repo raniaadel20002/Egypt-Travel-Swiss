@@ -1,3 +1,11 @@
+export interface CartTripServiceItem {
+  id: number;
+  name: string;
+  adultPrice: number;
+  childPrice: number;
+  infPrice: number;
+}
+
 export interface CartTripItem {
   tripId: number;
   name: string;
@@ -13,6 +21,8 @@ export interface CartTripItem {
   noChild: number;
   noInf: number;
   leaveDate: string;
+  serviceIds?: number[];
+  selectedServices?: CartTripServiceItem[];
 }
 
 export interface CartPricingSummary {

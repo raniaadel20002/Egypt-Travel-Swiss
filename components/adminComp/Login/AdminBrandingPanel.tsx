@@ -9,7 +9,7 @@ export default function AdminBrandingPanel() {
       {/* Background Visual Photograph */}
       <Image
         src="/home/hero/Hero.png"
-        alt="Egypt Dreams Red Sea Coastline"
+        alt="Egypt Travel Swiss Red Sea Coastline"
         fill
         priority
         sizes="(max-width: 1024px) 100vw, 55vw"
@@ -35,11 +35,11 @@ export default function AdminBrandingPanel() {
           </svg>
 
           <span className="font-[family-name:var(--font-cormorant)] text-xs sm:text-sm font-bold tracking-[0.1em] text-[#013E51] uppercase leading-none text-center">
-            Egypt Dreams
+            Egypt Travel
           </span>
 
           <span className="font-[family-name:var(--font-lato)] text-[8px] sm:text-[9px] font-semibold tracking-[0.25em] text-[#E8B34A] uppercase leading-none text-center mt-0.5">
-            Travel
+            Swiss
           </span>
         </Link>
       </div>

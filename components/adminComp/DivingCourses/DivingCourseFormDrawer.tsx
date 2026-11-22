@@ -8,6 +8,7 @@ import {
   DivingCourseLocalizedText,
   UpdateDivingCourseFacilityInput,
   UpdateDivingCoursePayload,
+  createDefaultDivingCourseFacilities,
 } from "@/models/divingCourse";
 import { useModalDismiss } from "@/shared/utils/useModalDismiss";
 import {
@@ -62,7 +63,7 @@ export default function DivingCourseFormDrawer({
       setPrice(0);
       setName(emptyLocalized());
       setDescription(emptyLocalized());
-      setFacilities([]);
+      setFacilities(createDefaultDivingCourseFacilities());
     }
   }, [isEdit, multiLangData, isOpen]);
 

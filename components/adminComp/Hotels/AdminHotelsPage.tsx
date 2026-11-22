@@ -13,70 +13,46 @@ import HotelsTable from "./HotelsTable";
 import HotelFormDrawer from "./HotelFormDrawer";
 import HotelFacilitiesReorderDrawer from "./HotelFacilitiesReorderDrawer";
 import HotelImagesDrawer from "./HotelImagesDrawer";
+import HotelRatePlansDrawer from "./HotelRatePlansDrawer";
 import HotelDeleteModal from "./HotelDeleteModal";
 import { extractErrorMessage } from "@/shared/utils/errorHandler";
 
 export default function AdminHotelsPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [ratingFilter, setRatingFilter] = useState("all");
 
   const [formDrawer, setFormDrawer] = useState<{
     isOpen: boolean;
     mode: "create" | "edit";
     item: HotelApiItem | null;
-  }>({
-    isOpen: false,
-    mode: "create",
-    item: null,
-  });
+  }>({ isOpen: false, mode: "create", item: null });
 
   const [reorderDrawer, setReorderDrawer] = useState<{
     isOpen: boolean;
     hotel: HotelApiItem | null;
-  }>({
-    isOpen: false,
-    hotel: null,
-  });
+  }>({ isOpen: false, hotel: null });
 
   const [imagesDrawer, setImagesDrawer] = useState<{
     isOpen: boolean;
     hotel: HotelApiItem | null;
-  }>({
-    isOpen: false,
-    hotel: null,
-  });
+  }>({ isOpen: false, hotel: null });
+
+  const [ratePlansDrawer, setRatePlansDrawer] = useState<{
+    isOpen: boolean;
+    hotel: HotelApiItem | null;
+  }>({ isOpen: false, hotel: null });
 
   const [deleteModal, setDeleteModal] = useState<{
     isOpen: boolean;
     item: HotelApiItem | null;
-  }>({
-    isOpen: false,
-    item: null,
-  });
+  }>({ isOpen: false, item: null });
 
   const hotelsQuery = useHotelsQuery({ Language: "EN" });
   const deleteMutation = useDeleteHotelMutation();
 
   const hotels = hotelsQuery.data || [];
 
-  const filterTabs = [
-    { id: "all", label: "All Hotels" },
-    { id: "5", label: "5 Stars" },
-    { id: "4", label: "4 Stars" },
-    { id: "3", label: "3 Stars & Below" },
-  ];
-
   const filteredItems = useMemo(() => {
     let result = hotels;
-
-    if (ratingFilter !== "all") {
-      const star = Number(ratingFilter);
-      if (star === 3) {
-        result = result.filter((h) => h.rate <= 3);
-      } else {
-        result = result.filter((h) => h.rate === star);
-      }
-    }
 
     const q = searchQuery.trim().toLowerCase();
     if (q) {
@@ -90,7 +66,7 @@ export default function AdminHotelsPage() {
     }
 
     return result;
-  }, [hotels, searchQuery, ratingFilter]);
+  }, [hotels, searchQuery]);
 
   const handleCreate = () => {
     setFormDrawer({
@@ -117,6 +93,13 @@ export default function AdminHotelsPage() {
 
   const handleManageImages = (item: HotelApiItem) => {
     setImagesDrawer({
+      isOpen: true,
+      hotel: item,
+    });
+  };
+
+  const handleManageRatePlans = (item: HotelApiItem) => {
+    setRatePlansDrawer({
       isOpen: true,
       hotel: item,
     });
@@ -171,23 +154,6 @@ export default function AdminHotelsPage() {
             <FiSearch className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           </div>
 
-          <div className="flex flex-wrap items-center gap-1.5 w-full sm:w-auto">
-            {filterTabs.map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setRatingFilter(tab.id)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
-                  ratingFilter === tab.id
-                    ? "bg-[#013E51] text-white"
-                    : "text-[#013E51]/70 hover:bg-[#FAF7F2]"
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
           <div className="text-xs font-semibold text-[#013E51] bg-[#FAF7F2] px-3.5 py-2 rounded-xl border border-[#013E51]/10 self-start sm:self-auto shrink-0">
             Total Hotels: <span className="font-bold">{hotels.length}</span>
           </div>
@@ -208,6 +174,7 @@ export default function AdminHotelsPage() {
           items={filteredItems}
           isLoading={hotelsQuery.isLoading}
           onEdit={handleEdit}
+          onManageRatePlans={handleManageRatePlans}
           onReorderFacilities={handleReorderFacilities}
           onManageImages={handleManageImages}
           onDelete={handleDeletePrompt}
@@ -219,6 +186,21 @@ export default function AdminHotelsPage() {
           mode={formDrawer.mode}
           item={formDrawer.item}
           onClose={() => setFormDrawer((prev) => ({ ...prev, isOpen: false }))}
+        />
+
+        {/* Rate Plans Drawer */}
+        <HotelRatePlansDrawer
+          isOpen={ratePlansDrawer.isOpen}
+          hotel={
+            hotels.find((h) => h.id === ratePlansDrawer.hotel?.id) ||
+            ratePlansDrawer.hotel
+          }
+          onClose={() =>
+            setRatePlansDrawer({
+              isOpen: false,
+              hotel: null,
+            })
+          }
         />
 
         {/* Reorder Facilities Drawer */}

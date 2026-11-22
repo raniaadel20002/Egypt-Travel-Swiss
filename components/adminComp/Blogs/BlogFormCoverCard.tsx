@@ -1,12 +1,16 @@
 import Image from "next/image";
 import { FiUpload, FiImage, FiTrash2 } from "react-icons/fi";
-import { resolveBlogImageUrl } from "./blogHelpers";
+import { BlogLocalizedText } from "@/models/blog";
+import LanguageFlag from "@/components/adminComp/Common/LanguageFlag";
+import { BLOG_LANGUAGES, resolveBlogImageUrl } from "./blogHelpers";
 
 interface BlogFormCoverCardProps {
-  title: string;
-  setTitle: (val: string) => void;
-  content: string;
-  setContent: (val: string) => void;
+  activeLang: keyof BlogLocalizedText;
+  onActiveLangChange: (lang: keyof BlogLocalizedText) => void;
+  title: BlogLocalizedText;
+  setTitle: (val: BlogLocalizedText) => void;
+  content: BlogLocalizedText;
+  setContent: (val: BlogLocalizedText) => void;
   existingImageUrl?: string | null;
   coverImageFile: File | null;
   setCoverImageFile: (file: File | null) => void;
@@ -14,6 +18,8 @@ interface BlogFormCoverCardProps {
 }
 
 export default function BlogFormCoverCard({
+  activeLang,
+  onActiveLangChange,
   title,
   setTitle,
   content,
@@ -27,6 +33,10 @@ export default function BlogFormCoverCard({
   const previewUrl = coverImageFile
     ? URL.createObjectURL(coverImageFile)
     : existingUrl;
+
+  const currentLangMeta =
+    BLOG_LANGUAGES.find((l) => l.key === activeLang) || BLOG_LANGUAGES[0];
+  const isEn = activeLang === "en";
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -44,7 +54,7 @@ export default function BlogFormCoverCard({
           {previewUrl ? (
             <Image
               src={previewUrl}
-              alt={title || "Cover preview"}
+              alt={title.en || "Cover preview"}
               fill
               sizes="600px"
               className="object-cover"
@@ -62,7 +72,9 @@ export default function BlogFormCoverCard({
         <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
           <label className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#013E51]/5 hover:bg-[#013E51]/10 text-xs font-bold text-[#013E51] cursor-pointer transition-colors">
             <FiUpload className="w-3.5 h-3.5 text-[#E8B34A]" />
-            <span>{previewUrl ? "Change Cover Image" : "Select Cover Image"}</span>
+            <span>
+              {previewUrl ? "Change Cover Image" : "Select Cover Image"}
+            </span>
             <input
               type="file"
               accept="image/*"
@@ -94,32 +106,103 @@ export default function BlogFormCoverCard({
         </div>
       </div>
 
-      {/* Main Headline */}
+      {/* Multi-Language Tab Bar */}
+      <div className="pt-2 border-t border-gray-100 space-y-2">
+        <div className="flex items-center justify-between">
+          <label className="block text-xs font-bold uppercase tracking-wider text-[#013E51]">
+            Article Language Translations
+          </label>
+          <span className="text-[11px] text-gray-400">
+            English required; others auto-fallback to EN
+          </span>
+        </div>
+
+        <div className="flex flex-wrap gap-1.5 bg-[#F8F9FA] p-1.5 rounded-2xl border border-gray-200">
+          {BLOG_LANGUAGES.map((lang) => {
+            const isActive = activeLang === lang.key;
+            const hasContent = Boolean(
+              title[lang.key]?.trim() && content[lang.key]?.trim()
+            );
+            return (
+              <button
+                key={lang.key}
+                type="button"
+                onClick={() => onActiveLangChange(lang.key)}
+                className={`flex-1 min-w-[92px] inline-flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  isActive
+                    ? "bg-[#013E51] text-white shadow-xs"
+                    : "bg-transparent text-[#013E51] hover:bg-white"
+                }`}
+              >
+                <LanguageFlag code={lang.code} size="sm" />
+                <span>{lang.code}</span>
+                <span
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    hasContent
+                      ? "bg-emerald-400"
+                      : lang.key === "en"
+                      ? "bg-rose-400"
+                      : "bg-gray-300"
+                  }`}
+                />
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Main Headline for Active Language */}
       <div className="space-y-1.5">
-        <label className="block text-xs font-bold uppercase tracking-wider text-[#013E51]">
-          Article Title *
-        </label>
+        <div className="flex items-center justify-between">
+          <label className="block text-xs font-bold uppercase tracking-wider text-[#013E51]">
+            Article Title ({currentLangMeta.label}) {isEn && "*"}
+          </label>
+          {!isEn && !title[activeLang]?.trim() && title.en?.trim() && (
+            <span className="text-[11px] text-amber-600 font-medium">
+              Will fallback to EN title
+            </span>
+          )}
+        </div>
         <input
           type="text"
-          required
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="e.g. Red Sea Diving: The Ultimate Guide for Travelers"
+          required={isEn}
+          value={title[activeLang] || ""}
+          onChange={(e) =>
+            setTitle({ ...title, [activeLang]: e.target.value })
+          }
+          placeholder={
+            isEn
+              ? "e.g. Red Sea Diving: The Ultimate Guide for Travelers"
+              : `Translated title in ${currentLangMeta.label} (optional)...`
+          }
           className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-xs sm:text-sm text-[#013E51] font-bold focus:outline-hidden focus:border-[#013E51]"
         />
       </div>
 
-      {/* Main Excerpt */}
+      {/* Main Content for Active Language */}
       <div className="space-y-1.5">
-        <label className="block text-xs font-bold uppercase tracking-wider text-[#013E51]">
-          Article Overview / Content *
-        </label>
+        <div className="flex items-center justify-between">
+          <label className="block text-xs font-bold uppercase tracking-wider text-[#013E51]">
+            Article Overview / Content ({currentLangMeta.label}) {isEn && "*"}
+          </label>
+          {!isEn && !content[activeLang]?.trim() && content.en?.trim() && (
+            <span className="text-[11px] text-amber-600 font-medium">
+              Will fallback to EN content
+            </span>
+          )}
+        </div>
         <textarea
           rows={4}
-          required
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Introduction and core body of the travel article..."
+          required={isEn}
+          value={content[activeLang] || ""}
+          onChange={(e) =>
+            setContent({ ...content, [activeLang]: e.target.value })
+          }
+          placeholder={
+            isEn
+              ? "Introduction and core body of the travel article..."
+              : `Translated overview/content in ${currentLangMeta.label} (optional)...`
+          }
           className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-xs sm:text-sm text-[#013E51] leading-relaxed focus:outline-hidden focus:border-[#013E51]"
         />
       </div>

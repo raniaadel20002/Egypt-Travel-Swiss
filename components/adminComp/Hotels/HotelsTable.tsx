@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { FiEdit2, FiImage, FiList, FiStar, FiTrash2 } from "react-icons/fi";
+import { FiEdit2, FiImage, FiList, FiPackage, FiStar, FiTrash2 } from "react-icons/fi";
 import { HotelApiItem } from "@/models/hotel";
 import { resolveApiImageUrl } from "@/shared/utils/imageUrl";
 
@@ -10,6 +10,7 @@ interface HotelsTableProps {
   isLoading: boolean;
   onEdit: (item: HotelApiItem) => void;
   onManageImages: (item: HotelApiItem) => void;
+  onManageRatePlans: (item: HotelApiItem) => void;
   onReorderFacilities: (item: HotelApiItem) => void;
   onDelete: (item: HotelApiItem) => void;
 }
@@ -19,6 +20,7 @@ export default function HotelsTable({
   isLoading,
   onEdit,
   onManageImages,
+  onManageRatePlans,
   onReorderFacilities,
   onDelete,
 }: HotelsTableProps) {
@@ -149,6 +151,15 @@ export default function HotelsTable({
                   {/* Actions */}
                   <td className="py-4 px-5 text-right">
                     <div className="inline-flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => onManageRatePlans(hotel)}
+                        title="Manage Rate Plans & Board Packages"
+                        className="p-2 rounded-xl text-xs font-bold text-[#013E51] bg-[#FAF7F2] hover:bg-[#013E51] hover:text-white transition cursor-pointer flex items-center gap-1"
+                      >
+                        <FiPackage className="w-3.5 h-3.5 text-[#E8B34A]" />
+                        <span className="hidden md:inline">Plans</span>
+                      </button>
                       <button
                         type="button"
                         onClick={() => onManageImages(hotel)}

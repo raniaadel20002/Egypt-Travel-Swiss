@@ -9,7 +9,7 @@ import { useLocale } from "@/shared/providers/LocaleProvider";
 import { localeToBackendLanguage } from "@/shared/utils/localeToBackendLanguage";
 
 export default function DestinationsPage() {
-  const { locale } = useLocale();
+  const { locale, dictionary: dict } = useLocale();
   const backendLanguage = useMemo(
     () => localeToBackendLanguage(locale),
     [locale]
@@ -43,7 +43,7 @@ export default function DestinationsPage() {
         {!isLoading && destinations.length === 0 && (
           <div className="text-center py-16">
             <p className="font-[family-name:var(--font-lato)] text-lg text-[#013E51]/70">
-              No destinations available at the moment.
+              {dict.destinations.states.empty}
             </p>
           </div>
         )}
@@ -51,8 +51,8 @@ export default function DestinationsPage() {
         {/* Backend Destinations Grid */}
         {!isLoading && destinations.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 lg:gap-8">
-            {destinations.map((dest) => (
-              <DestinationCard key={dest.id} destination={dest} />
+            {destinations.map((dest, index) => (
+              <DestinationCard key={dest.id} destination={dest} index={index} />
             ))}
           </div>
         )}

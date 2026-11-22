@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { FiX, FiCalendar, FiUsers, FiCheck } from "react-icons/fi";
 import { toast } from "sonner";
+import { useLocale } from "@/shared/providers/LocaleProvider";
 import { useCreateHotelBookingMutation } from "@/features/hotels/useHotelBookings";
 import { HotelApiItem } from "@/models/hotel";
 import { resolveApiImageUrl } from "@/shared/utils/imageUrl";
@@ -22,6 +24,8 @@ export default function HotelInquiryModal({
   isOpen,
   onClose,
 }: HotelInquiryModalProps) {
+  const router = useRouter();
+  const { locale } = useLocale();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [whatsApp, setWhatsApp] = useState("");
@@ -59,7 +63,7 @@ export default function HotelInquiryModal({
     }
 
     try {
-      await createBookingMutation.mutateAsync({
+      const created = await createBookingMutation.mutateAsync({
         hotelId: hotel.id,
         name: name.trim(),
         email: email.trim(),
@@ -83,9 +87,23 @@ export default function HotelInquiryModal({
       });
 
       toast.success(
-        "Inquiry submitted successfully! Our concierge team will reach out to you shortly."
+        "Inquiry submitted successfully! Redirecting to confirmation voucher..."
       );
       onClose();
+
+      const params = new URLSearchParams({
+        type: "hotel",
+        id: String(created?.id || ""),
+        hotel: hotel.name,
+        location: hotel.location,
+        checkIn: bookingDate,
+        nights: String(nightsCount),
+        rooms: "1",
+        adults: String(adults),
+        children: String(children),
+        name: name.trim(),
+      });
+      router.push(`/${locale}/booking-success?${params.toString()}`);
     } catch {
       toast.error("Failed to submit inquiry. Please try again or contact us directly.");
     }
