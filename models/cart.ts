@@ -1,3 +1,5 @@
+import { PromoCodeItem } from "@/models/promoCode";
+
 export interface CartTripServiceItem {
   id: number;
   name: string;
@@ -23,10 +25,15 @@ export interface CartTripItem {
   leaveDate: string;
   serviceIds?: number[];
   selectedServices?: CartTripServiceItem[];
+  transferPrice?: number;
+  transferVehicleName?: string;
 }
 
 export interface CartPricingSummary {
   itemCount: number;
   totalTravelers: number;
   subtotal: number;
+  discountAmount: number;
+  finalTotal: number;
+  hasOnContactTrip: boolean;
 }

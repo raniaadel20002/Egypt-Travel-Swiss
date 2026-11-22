@@ -12,7 +12,7 @@ export function useTripReviewSummary(tripId: number): TripReviewSummary {
   const totalReviews = data?.data?.totalReviews ?? 0;
 
   const rating =
-    totalReviews > 0 && averageRate > 0 ? averageRate.toFixed(1) : "5.0";
+    totalReviews > 0 && averageRate > 0 ? averageRate.toFixed(1) : "0.0";
 
   return {
     rating,

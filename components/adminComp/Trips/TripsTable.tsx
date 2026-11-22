@@ -177,14 +177,25 @@ export default function TripsTable({
 
                   {/* Pricing */}
                   <td className="py-4 px-5">
-                    {item.categoryName?.toLowerCase() === "private" ? (
-                      <div className="space-y-0.5">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#E8B34A]/15 text-[#976D17] border border-[#E8B34A]/30">
-                          Services + Transfer
+                    {Number(item.adultPrice) <= 0 ? (
+                      <div className="space-y-1">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#E8B34A]/15 text-[#976D17] border border-[#E8B34A]/30">
+                          Price on contact
                         </span>
-                        <span className="block text-[11px] text-gray-400">
-                          Base: €0
-                        </span>
+                        {item.categoryName?.toLowerCase() === "private" && (
+                          <span className="block text-[10px] text-gray-500 font-medium">
+                            Transfer + Services
+                          </span>
+                        )}
+                      </div>
+                    ) : item.categoryName?.toLowerCase() === "private" ? (
+                      <div className="text-xs space-y-0.5">
+                        <div className="font-bold text-[#013E51]">
+                          Adult: €{item.adultPrice} + Transfer
+                        </div>
+                        <div className="text-gray-500 text-[11px]">
+                          Child: €{item.childPrice} | Inf: €{item.infPrice}
+                        </div>
                       </div>
                     ) : (
                       <div className="text-xs space-y-0.5">

@@ -140,7 +140,7 @@ export default function FlightLocationEndpointCard({
               value={customCountry}
               onChange={(e) => handleManualCountryType(e.target.value)}
               placeholder={t.customCountryPlaceholder}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E5DDD0] text-xs font-semibold text-[#013E51] placeholder:text-[#013E51]/35 focus:outline-hidden focus:ring-2 focus:ring-[#E8B34A]"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E5DDD0] text-xs font-semibold text-[#013E51] placeholder:text-[#013E51]/35 focus:outline-hidden focus:ring-2 focus:ring-[#E8B34A] [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:opacity-0"
             />
             <datalist id={`${datalistId}-country-list`}>
               {countries.map((c) => (
@@ -189,7 +189,7 @@ export default function FlightLocationEndpointCard({
               value={customCity}
               onChange={(e) => handleManualCityType(e.target.value)}
               placeholder={t.customCityPlaceholder}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E5DDD0] text-xs font-semibold text-[#013E51] placeholder:text-[#013E51]/35 focus:outline-hidden focus:ring-2 focus:ring-[#E8B34A]"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E5DDD0] text-xs font-semibold text-[#013E51] placeholder:text-[#013E51]/35 focus:outline-hidden focus:ring-2 focus:ring-[#E8B34A] [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:opacity-0"
             />
             <datalist id={`${datalistId}-city-list`}>
               {cities.map((ct) => (
@@ -229,7 +229,7 @@ export default function FlightLocationEndpointCard({
           value={airport}
           onChange={(e) => onAirportChange(e.target.value)}
           placeholder={t.airportPlaceholder}
-          className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E5DDD0] text-xs font-semibold text-[#013E51] placeholder:text-[#013E51]/35 focus:outline-hidden focus:ring-2 focus:ring-[#E8B34A]"
+          className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E5DDD0] text-xs font-semibold text-[#013E51] placeholder:text-[#013E51]/35 focus:outline-hidden focus:ring-2 focus:ring-[#E8B34A] [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:opacity-0"
         />
       </div>
     </div>

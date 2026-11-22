@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { useLocale } from "@/shared/providers/LocaleProvider";
 import { useTransferLocationsQuery } from "@/features/transfers/useTransferLocations";
@@ -26,6 +26,7 @@ function getTomorrowDateString(): string {
 
 export function useTransferPageForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { locale } = useLocale();
 
   const { data: fromLocationsRes } = useTransferLocationsQuery("from", { language: locale });
@@ -61,14 +62,26 @@ export function useTransferPageForm() {
   const [notes, setNotes] = useState<string>("");
 
   useEffect(() => {
-    if (!selectedFromId && fromLocations.length > 0) {
-      setSelectedFromId(fromLocations[0].id);
-    }
-    if (!selectedToId && toLocations.length > 0) {
+    const qFrom = searchParams.get("fromId");
+    const qTo = searchParams.get("toId");
+    const qDate = searchParams.get("date");
+    const qAdults = searchParams.get("adults");
+
+    if (qFrom) setSelectedFromId(qFrom);
+    else if (!selectedFromId && fromLocations.length > 0) setSelectedFromId(fromLocations[0].id);
+
+    if (qTo) setSelectedToId(qTo);
+    else if (!selectedToId && toLocations.length > 0) {
       const defaultTo = toLocations.find((l) => l.id !== fromLocations[0]?.id) || toLocations[0];
       setSelectedToId(defaultTo.id);
     }
-  }, [fromLocations, toLocations, selectedFromId, selectedToId]);
+
+    if (qDate) setTripDate(qDate);
+    if (qAdults) {
+      const parsed = parseInt(qAdults, 10);
+      if (!isNaN(parsed) && parsed >= 1) setAdults(parsed);
+    }
+  }, [searchParams, fromLocations, toLocations, selectedFromId, selectedToId]);
 
   useEffect(() => {
     if (countryTransferId === 0 && countries.length > 0) {
@@ -199,6 +212,7 @@ export function useTransferPageForm() {
       });
 
       toast.success("Transfer booking confirmed! Redirecting to voucher...");
+      const finalPrice = res?.pricing?.finalPriceConverted ?? res?.pricing?.finalPriceUsd ?? previewData?.pricing?.finalPrice ?? 0;
       const params = new URLSearchParams({
         type: "transfer",
         id: String(res?.id || ""),
@@ -210,12 +224,7 @@ export function useTransferPageForm() {
         adults: String(res?.adults ?? adults),
         children: String(res?.children ?? childrenCount),
         passengers: String(res?.totalPersons ?? (adults + childrenCount)),
-        price: String(
-          res?.pricing?.finalPriceConverted ??
-          res?.pricing?.finalPriceUsd ??
-          previewData?.pricing?.finalPrice ??
-          0
-        ),
+        price: String(finalPrice),
         currency: res?.pricing?.currency || "EUR",
         status: String(res?.status || "Pending"),
         tripType: String(res?.tripType || (isRoundTrip ? "RoundTrip" : "OneWay")),
@@ -223,11 +232,8 @@ export function useTransferPageForm() {
         phone: res?.phoneNumber || formattedPhone.replace(/\s+/g, ""),
         email: res?.email || email.trim(),
       });
-      if (res?.notes?.trim()) {
-        params.set("notes", res.notes.trim());
-      } else if (notes.trim()) {
-        params.set("notes", notes.trim());
-      }
+      const noteVal = res?.notes?.trim() || notes.trim();
+      if (noteVal) params.set("notes", noteVal);
       if (isRoundTrip && returnDate) {
         params.set("returnDate", returnDate);
         params.set("returnTime", returnTime);

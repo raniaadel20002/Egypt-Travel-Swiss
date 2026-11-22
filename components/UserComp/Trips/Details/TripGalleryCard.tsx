@@ -22,7 +22,8 @@ export default function TripGalleryCard({
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
-  const validImages = images.length > 0 ? images : [{ id: 0, imageUrl: FALLBACK_IMAGE, isPrimary: true }];
+  const hasImages = images.length > 0;
+  const validImages = hasImages ? images : [{ id: 0, imageUrl: FALLBACK_IMAGE, isPrimary: true }];
   const activeImage = validImages[selectedIndex] || validImages[0];
   const activeSrc = resolveApiImageUrl(activeImage?.imageUrl) || FALLBACK_IMAGE;
 
@@ -50,6 +51,12 @@ export default function TripGalleryCard({
           priority
           sizes="(max-width: 1024px) 100vw, 65vw"
           className="object-cover object-center transition-transform duration-500 group-hover:scale-102"
+          onError={(e) => {
+            const target = e.currentTarget;
+            if (!target.src.includes("heroTrips")) {
+              target.src = FALLBACK_IMAGE;
+            }
+          }}
         />
 
         {/* Category / Featured Ribbon */}
@@ -63,7 +70,7 @@ export default function TripGalleryCard({
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 px-3 py-1 rounded-full bg-black/60 backdrop-blur-xs text-white text-xs font-semibold flex items-center gap-1.5">
           <FiCamera className="w-3.5 h-3.5 text-[#E8B34A]" />
           <span>
-            {selectedIndex + 1} / {validImages.length}
+            {hasImages ? `${selectedIndex + 1} / ${validImages.length}` : "Default photo"}
           </span>
         </div>
 

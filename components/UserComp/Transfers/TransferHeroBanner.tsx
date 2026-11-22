@@ -12,7 +12,7 @@ export default function TransferHeroBanner() {
   const t = dict.transfers.hero;
 
   return (
-    <section className="relative w-full min-h-[380px] sm:min-h-[440px] lg:min-h-[480px] flex items-center overflow-hidden">
+    <section className="relative w-full h-[250px] sm:h-[300px] lg:h-[350px] xl:h-[360px] flex items-center overflow-hidden">
       {/* Background Photograph */}
       <Image
         src="/Transfers/transfer-person.jpg"
@@ -30,7 +30,7 @@ export default function TransferHeroBanner() {
       />
 
       {/* Hero Content Area */}
-      <div className="relative z-10 w-full max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 py-16 sm:py-20 text-center sm:text-left">
+      <div className="relative z-10 w-full max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 py-4 sm:py-6 text-center sm:text-left">
         <motion.div
           initial={shouldReduce ? undefined : { opacity: 0, y: 16 }}
           animate={shouldReduce ? undefined : { opacity: 1, y: 0 }}
@@ -38,17 +38,17 @@ export default function TransferHeroBanner() {
           className="max-w-2xl"
         >
           {/* Eyebrow */}
-          <span className="font-[family-name:var(--font-lato)] text-xs sm:text-sm font-bold tracking-[0.25em] text-[#E8B34A] uppercase block mb-3">
+          <span className="font-[family-name:var(--font-lato)] text-xs sm:text-sm font-bold tracking-[0.22em] text-[#E8B34A] uppercase block mb-1.5 sm:mb-2">
             {t.eyebrow}
           </span>
 
           {/* Title */}
-          <h1 className="font-[family-name:var(--font-cormorant)] text-3xl sm:text-5xl lg:text-6xl font-bold text-white leading-[1.12] mb-4">
+          <h1 className="font-[family-name:var(--font-cormorant)] text-2xl sm:text-4xl lg:text-[44px] font-bold text-white leading-tight mb-2">
             {t.title}
           </h1>
 
           {/* Subtitle */}
-          <p className="font-[family-name:var(--font-lato)] text-sm sm:text-base lg:text-lg text-white/90 font-normal leading-relaxed max-w-xl">
+          <p className="font-[family-name:var(--font-lato)] text-xs sm:text-sm lg:text-base text-white/90 font-normal leading-relaxed max-w-xl">
             {t.description}
           </p>
         </motion.div>

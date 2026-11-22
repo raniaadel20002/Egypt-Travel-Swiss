@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { motion, useReducedMotion } from "framer-motion";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { FiShoppingCart } from "react-icons/fi";
 import { toast } from "sonner";
@@ -15,11 +16,25 @@ import TripRatingBadge from "./TripRatingBadge";
 
 interface TripCardProps {
   trip: TripApiItem;
+  index?: number;
 }
 
-export default function TripCard({ trip }: TripCardProps) {
-  const { locale } = useLocale();
+const BRAND_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+export default function TripCard({ trip, index = 0 }: TripCardProps) {
+  const { locale, dictionary } = useLocale();
+  const t = dictionary.tripsPage?.card || {
+    perPerson: "EUR / person",
+    bookNow: "Book Now",
+    addToCart: "Add to Cart",
+    addedToCart: '"{title}" added to cart.',
+    viewCart: "View Cart",
+    categoryPrivate: "Private",
+    categoryGroup: "Group",
+  };
+
   const router = useRouter();
+  const shouldReduce = useReducedMotion();
   const addTrip = useCartStore((state) => state.addTrip);
 
   const primaryImageRaw =
@@ -36,38 +51,52 @@ export default function TripCard({ trip }: TripCardProps) {
   const tripTypeName = trip.tripTypeName || "Trip";
 
   const rawCat = trip.categoryName?.trim().toLowerCase() || "";
-  const categoryLabel = rawCat.includes("private") ? "Private" : "Group";
+  const categoryLabel = rawCat.includes("private")
+    ? t.categoryPrivate
+    : t.categoryGroup;
+
+  const isPriceOnContact = Number(trip.adultPrice) <= 0;
 
   const detailsPath = buildTripDetailsPath(locale, trip.id, trip.name);
 
-  const handleAddToCart = () => {
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Navigate unless clicking an action button directly
+    const target = e.target as HTMLElement;
+    if (target.closest("button") || target.closest("a")) return;
+    router.push(detailsPath);
+  };
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     const res = addTrip(trip);
-    if (res.isNew) {
-      toast.success(`"${trip.name}" added to cart.`, {
-        action: {
-          label: "View Cart",
-          onClick: () => router.push(`/${locale}/cart`),
-        },
-      });
-    } else {
-      toast.success(
-        `Added another adult to "${trip.name}" (${res.quantity} total).`,
-        {
-          action: {
-            label: "View Cart",
-            onClick: () => router.push(`/${locale}/cart`),
-          },
-        }
-      );
-    }
+    const toastMessage = t.addedToCart.replace("{title}", trip.name);
+    toast.success(toastMessage, {
+      action: {
+        label: t.viewCart,
+        onClick: () => router.push(`/${locale}/cart`),
+      },
+    });
   };
 
   return (
-    <div className="group bg-white rounded-[28px] overflow-hidden shadow-[0px_12px_32px_0px_#013E511A] flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+    <motion.div
+      initial={shouldReduce ? undefined : { opacity: 0, y: 24 }}
+      whileInView={shouldReduce ? undefined : { opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{
+        duration: shouldReduce ? 0.15 : 0.45,
+        delay: shouldReduce ? 0 : (index % 6) * 0.08,
+        ease: BRAND_EASE,
+      }}
+      whileHover={shouldReduce ? undefined : { y: -6 }}
+      onClick={handleCardClick}
+      className="group bg-white rounded-[28px] overflow-hidden shadow-[0px_12px_32px_0px_#013E511A] flex flex-col justify-between transition-shadow duration-300 hover:shadow-2xl cursor-pointer"
+    >
       <div>
-        {/* Image & Trip Type Ribbon on Top Left */}
-        <div className="relative w-full h-56 sm:h-64 lg:h-72 overflow-hidden bg-slate-100">
-          <span className="absolute top-4 left-4 z-10 px-4 py-1.5 rounded-full bg-[#013E51]/95 text-white text-xs font-semibold backdrop-blur-xs">
+        {/* Clickable Image & Trip Type Ribbon */}
+        <Link href={detailsPath} className="block relative w-full h-56 sm:h-64 lg:h-72 overflow-hidden bg-slate-100">
+          <span className="absolute top-4 left-4 z-10 px-4 py-1.5 rounded-full bg-[#013E51]/95 text-white text-xs font-semibold backdrop-blur-xs shadow-xs">
             {tripTypeName}
           </span>
 
@@ -76,9 +105,15 @@ export default function TripCard({ trip }: TripCardProps) {
             alt={trip.name}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-106"
+            onError={(e) => {
+              const target = e.currentTarget;
+              if (!target.src.includes("heroTrips")) {
+                target.src = "/Trips/heroTrips.png";
+              }
+            }}
           />
-        </div>
+        </Link>
 
         {/* Card Information */}
         <div className="p-5 sm:p-6 space-y-3 sm:space-y-4">
@@ -106,12 +141,18 @@ export default function TripCard({ trip }: TripCardProps) {
 
           {/* Price & Reviews Row */}
           <div className="flex items-center justify-between gap-2 pt-1 font-[family-name:var(--font-lato)]">
-            <div className="flex items-baseline gap-1 sm:gap-1.5 whitespace-nowrap shrink-0">
-              <span className="font-bold text-xl sm:text-2xl text-[#013E51] whitespace-nowrap">
-                {Number(trip.adultPrice).toFixed(2)}&nbsp;&euro;
+            {isPriceOnContact ? (
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-[#E8B34A]/15 text-[#013E51] font-bold text-xs sm:text-[13px] border border-[#E8B34A]/30">
+                {t.priceOnContact || "Price available on contact"}
               </span>
-              <span className="text-xs text-[#888888] whitespace-nowrap">EUR / person</span>
-            </div>
+            ) : (
+              <div className="flex items-baseline gap-1 sm:gap-1.5 whitespace-nowrap shrink-0">
+                <span className="font-bold text-xl sm:text-2xl text-[#013E51] whitespace-nowrap">
+                  {Number(trip.adultPrice).toFixed(2)}&nbsp;&euro;
+                </span>
+                <span className="text-xs text-[#888888] whitespace-nowrap">{t.perPerson}</span>
+              </div>
+            )}
 
             <TripRatingBadge tripId={trip.id} />
           </div>
@@ -124,7 +165,7 @@ export default function TripCard({ trip }: TripCardProps) {
           href={detailsPath}
           className="w-full py-3 sm:py-3.5 px-2.5 sm:px-4 rounded-xl bg-[#013E51] hover:bg-[#024f67] text-white text-xs sm:text-sm font-semibold transition-colors flex items-center justify-center text-center shadow-xs cursor-pointer whitespace-nowrap"
         >
-          Book Now
+          {t.bookNow}
         </Link>
 
         <button
@@ -133,9 +174,9 @@ export default function TripCard({ trip }: TripCardProps) {
           className="w-full py-3 sm:py-3.5 px-2 sm:px-3 rounded-xl border border-[#013E51] hover:bg-[#013E51]/5 text-[#013E51] text-xs sm:text-sm font-semibold transition-colors flex items-center justify-center gap-1.5 sm:gap-2 text-center cursor-pointer whitespace-nowrap"
         >
           <FiShoppingCart className="w-3.5 sm:w-4 h-3.5 sm:h-4 shrink-0" />
-          <span>Add to Cart</span>
+          <span>{t.addToCart}</span>
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 }

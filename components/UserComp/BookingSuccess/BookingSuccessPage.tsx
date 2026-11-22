@@ -67,6 +67,9 @@ export default function BookingSuccessPage({ locale: _locale }: BookingSuccessPa
   const travelDate = searchParams.get("travelDate") || undefined;
   const travelersCount = searchParams.get("travelers") || 2;
   const pickupLocation = searchParams.get("pickup") || undefined;
+  const tripsCount = searchParams.get("trips") || "1";
+  const totalAmount = searchParams.get("total") || undefined;
+  const onContact = searchParams.get("onContact") === "1";
 
   // Transfer params (All mapped from backend TransferBookingApiItem)
   const fromLocation = searchParams.get("from") || "";
@@ -139,6 +142,9 @@ export default function BookingSuccessPage({ locale: _locale }: BookingSuccessPa
             travelDate={travelDate}
             travelersCount={travelersCount}
             pickupLocation={pickupLocation}
+            tripsCount={tripsCount}
+            totalAmount={totalAmount}
+            onContact={onContact}
           />
         )}
 

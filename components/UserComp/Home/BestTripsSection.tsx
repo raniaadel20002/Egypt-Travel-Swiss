@@ -3,31 +3,20 @@
 import { useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FaMapMarkerAlt, FaStar } from "react-icons/fa";
-import { FiShoppingCart } from "react-icons/fi";
 import { motion, useReducedMotion } from "framer-motion";
 import { useLocale } from "@/shared/providers/LocaleProvider";
 import { useTripsQuery } from "@/features/trips/useTrips";
 import { localeToBackendLanguage } from "@/shared/utils/localeToBackendLanguage";
 import { resolveApiImageUrl } from "@/shared/utils/imageUrl";
-
-interface BestTripItem {
-  id: string;
-  badge: string;
-  title: string;
-  location: string;
-  rating: number;
-  reviewsCount: number;
-  price: string;
-  image: string;
-  href: string;
-}
+import BestTripCard, { BestTripItemData } from "./BestTripCard";
 
 const EASING = [0.22, 1, 0.36, 1] as const;
 
 export default function BestTripsSection() {
   const { locale, dictionary: dict } = useLocale();
   const shouldReduceMotion = useReducedMotion();
+  const t = dict.homePage.bestTrips;
+
   const backendLanguage = useMemo(
     () => localeToBackendLanguage(locale),
     [locale]
@@ -38,7 +27,7 @@ export default function BestTripsSection() {
     language: backendLanguage,
   });
 
-  const bestTrips = useMemo(() => {
+  const bestTrips = useMemo<BestTripItemData[]>(() => {
     return trips.slice(0, 3).map((trip) => {
       const primaryImage = trip.images.find((img) => img.isPrimary);
       const imageUrl = primaryImage?.imageUrl || trip.images[0]?.imageUrl;
@@ -60,12 +49,12 @@ export default function BestTripsSection() {
   }, [trips]);
 
   return (
-    <section className="relative w-full bg-[#013E51] overflow-hidden py-16 sm:py-20 lg:py-20">
-      {/* Background Watermark Outlines */}
+    <section className="relative w-full bg-[#013E51] overflow-hidden py-16 sm:py-20 lg:py-24">
+      {/* Decorative Subtle Aquatic Background Icons */}
       <motion.div
-        className="absolute top-6 left-6 w-24 h-24 sm:w-32 sm:h-32 opacity-50 pointer-events-none"
+        className="absolute top-6 left-6 w-24 h-24 sm:w-32 sm:h-32 opacity-40 pointer-events-none"
         initial={shouldReduceMotion ? undefined : { opacity: 0, x: -20 }}
-        whileInView={shouldReduceMotion ? undefined : { opacity: 0.5, x: 0 }}
+        whileInView={shouldReduceMotion ? undefined : { opacity: 0.4, x: 0 }}
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.8, ease: EASING }}
       >
@@ -79,9 +68,9 @@ export default function BestTripsSection() {
       </motion.div>
 
       <motion.div
-        className="absolute top-8 right-6 w-24 h-24 sm:w-32 sm:h-32 opacity-50 pointer-events-none scale-x-[-1]"
+        className="absolute top-8 right-6 w-24 h-24 sm:w-32 sm:h-32 opacity-40 pointer-events-none scale-x-[-1]"
         initial={shouldReduceMotion ? undefined : { opacity: 0, x: 20 }}
-        whileInView={shouldReduceMotion ? undefined : { opacity: 0.5, x: 0 }}
+        whileInView={shouldReduceMotion ? undefined : { opacity: 0.4, x: 0 }}
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.8, ease: EASING }}
       >
@@ -95,27 +84,11 @@ export default function BestTripsSection() {
       </motion.div>
 
       <motion.div
-        className="absolute bottom-170 left-1/2 -translate-x-1/2 w-20 h-20 sm:w-28 sm:h-28 opacity-50 pointer-events-none"
+        className="absolute bottom-20 left-1/4 w-20 h-20 sm:w-24 sm:h-24 opacity-35 pointer-events-none -rotate-12 hidden sm:block"
         initial={shouldReduceMotion ? undefined : { opacity: 0, y: 20 }}
-        whileInView={shouldReduceMotion ? undefined : { opacity: 0.5, y: 0 }}
+        whileInView={shouldReduceMotion ? undefined : { opacity: 0.35, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.8, delay: 0.2, ease: EASING }}
-      >
-        <Image
-          src="/home/BestTrips/fish.svg"
-          alt=""
-          width={110}
-          height={110}
-          className="w-full h-full object-contain"
-        />
-      </motion.div>
-
-      <motion.div
-        className="absolute bottom-39 left-1/4 w-20 h-20 sm:w-24 sm:h-24 opacity-50 pointer-events-none -rotate-12 hidden sm:block"
-        initial={shouldReduceMotion ? undefined : { opacity: 0, y: 20 }}
-        whileInView={shouldReduceMotion ? undefined : { opacity: 0.5, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.8, delay: 0.3, ease: EASING }}
       >
         <Image
           src="/home/BestTrips/fish.svg"
@@ -126,25 +99,9 @@ export default function BestTripsSection() {
         />
       </motion.div>
 
-      <motion.div
-        className="absolute bottom-29 right-10 w-24 h-24 sm:w-28 sm:h-28 opacity-50 pointer-events-none hidden sm:block"
-        initial={shouldReduceMotion ? undefined : { opacity: 0, y: 20 }}
-        whileInView={shouldReduceMotion ? undefined : { opacity: 0.5, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.8, delay: 0.4, ease: EASING }}
-      >
-        <Image
-          src="/home/BestTrips/fish.svg"
-          alt=""
-          width={100}
-          height={100}
-          className="w-full h-full object-contain"
-        />
-      </motion.div>
-
       {/* Main Content Container */}
       <div className="relative z-10 max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
-        {/* Section Title with Golden Fading Gradient Lines */}
+        {/* Section Title with Animated Golden Gradient Lines */}
         <div className="text-center mb-2">
           <div className="inline-flex flex-nowrap items-center justify-center gap-2 sm:gap-4 lg:gap-6">
             <motion.span
@@ -167,8 +124,8 @@ export default function BestTripsSection() {
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.6, ease: EASING }}
             >
-              <span className="text-white">BEST </span>
-              <span className="text-[#E8B34A] italic">TRIPS</span>
+              <span className="text-white">{t.titlePart1 || "BEST"} </span>
+              <span className="text-[#E8B34A] italic">{t.titlePart2 || "TRIPS"}</span>
             </motion.h2>
 
             <motion.span
@@ -194,10 +151,10 @@ export default function BestTripsSection() {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6, delay: 0.1, ease: EASING }}
         >
-          {dict.homePage.bestTrips.subtitle}
+          {t.subtitle}
         </motion.p>
 
-        {/* Loading Skeleton */}
+        {/* Loading Skeletons */}
         {isLoading && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[1, 2, 3].map((idx) => (
@@ -205,15 +162,15 @@ export default function BestTripsSection() {
                 key={idx}
                 className="bg-white rounded-[28px] overflow-hidden shadow-xl animate-pulse"
               >
-                <div className="w-full h-64 sm:h-72 bg-gray-300" />
+                <div className="w-full h-64 sm:h-72 bg-gray-200" />
                 <div className="p-6 space-y-4">
-                  <div className="h-4 bg-gray-300 rounded w-3/4" />
-                  <div className="h-6 bg-gray-300 rounded w-full" />
-                  <div className="h-4 bg-gray-300 rounded w-1/2" />
+                  <div className="h-4 bg-gray-200 rounded w-3/4" />
+                  <div className="h-6 bg-gray-200 rounded w-full" />
+                  <div className="h-4 bg-gray-200 rounded w-1/2" />
                 </div>
                 <div className="px-6 pb-6 pt-2 grid grid-cols-2 gap-3">
-                  <div className="h-12 bg-gray-300 rounded-xl" />
-                  <div className="h-12 bg-gray-300 rounded-xl" />
+                  <div className="h-12 bg-gray-200 rounded-xl" />
+                  <div className="h-12 bg-gray-200 rounded-xl" />
                 </div>
               </div>
             ))}
@@ -230,7 +187,7 @@ export default function BestTripsSection() {
             transition={{ duration: 0.5, ease: EASING }}
           >
             <p className="font-[family-name:var(--font-lato)] text-base text-white/70">
-              {dict.homePage.bestTrips.noTrips}
+              {t.noTrips}
             </p>
           </motion.div>
         )}
@@ -239,92 +196,19 @@ export default function BestTripsSection() {
         {!isLoading && bestTrips.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {bestTrips.map((trip, index) => (
-              <motion.div
+              <BestTripCard
                 key={trip.id}
-                className="group bg-white rounded-[28px] overflow-hidden shadow-xl flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
-                initial={shouldReduceMotion ? undefined : { opacity: 0, y: 30 }}
-                whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{
-                  duration: 0.5,
-                  delay: index * 0.15,
-                  ease: EASING,
-                }}
-              >
-                <div>
-                  {/* Image & Badge Container */}
-                  <div className="relative w-full h-64 sm:h-72 overflow-hidden">
-                    <span className="absolute top-4 left-4 z-10 px-4 py-1.5 rounded-full bg-[#013E51]/95 text-white text-xs font-semibold backdrop-blur-xs">
-                      {trip.categoryName}
-                    </span>
-
-                    {trip.imageUrl ? (
-                      <Image
-                        src={trip.imageUrl}
-                        alt={trip.name}
-                        fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-[#013E51] to-[#025a75] flex items-center justify-center">
-                        <span className="text-white/50 text-sm">{dict.homePage.bestTrips.noImage}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Card Information */}
-                  <div className="p-6 space-y-4">
-                    {/* Location & Duration Row */}
-                    <div className="flex items-center justify-between text-xs font-[family-name:var(--font-lato)]">
-                      <span className="flex items-center gap-1.5 text-[#888888] font-medium">
-                        <FaMapMarkerAlt className="w-3.5 h-3.5 text-[#888888]" />
-                        <span>{trip.location}</span>
-                      </span>
-
-                      <span className="text-[#888888] font-medium">
-                        {trip.durationValue} {trip.durationTypeName}
-                      </span>
-                    </div>
-
-                    {/* Trip Title */}
-                    <h3 className="font-[family-name:var(--font-cormorant)] text-2xl lg:text-[26px] font-bold text-[#013E51] leading-tight line-clamp-2">
-                      {trip.name}
-                    </h3>
-
-                    {/* Price */}
-                    <div className="flex items-baseline gap-2 pt-1 font-[family-name:var(--font-lato)]">
-                      <span className="font-bold text-2xl text-[#013E51]">
-                        {trip.adultPrice.toFixed(2)} {trip.currencyName}
-                      </span>
-                      <span className="text-xs text-[#888888]">{dict.homePage.bestTrips.perPerson}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Action Buttons Row */}
-                <div className="px-6 pb-6 pt-2 grid grid-cols-2 gap-3 font-[family-name:var(--font-lato)]">
-                  <Link
-                    href={`/${locale}/trips/${trip.markerID}`}
-                    className="w-full py-3 px-4 rounded-xl bg-[#013E51] hover:bg-[#024f67] text-white text-sm font-semibold transition-colors flex items-center justify-center text-center shadow-xs"
-                  >
-                    {dict.homePage.bestTrips.bookNow}
-                  </Link>
-
-                  <Link
-                    href={`/${locale}/trips/${trip.markerID}`}
-                    className="w-full py-3 px-4 rounded-xl border border-[#013E51] hover:bg-[#013E51]/5 text-[#013E51] text-sm font-semibold transition-colors flex items-center justify-center gap-2 text-center"
-                  >
-                    <FiShoppingCart className="w-4 h-4 shrink-0" />
-                    <span>{dict.homePage.bestTrips.addToCart}</span>
-                  </Link>
-                </div>
-              </motion.div>
+                trip={trip}
+                index={index}
+                locale={locale}
+                dict={dict}
+                shouldReduceMotion={shouldReduceMotion}
+              />
             ))}
           </div>
         )}
 
-        {/* View More Button */}
+        {/* View More Button with Smooth Hover Motion */}
         <motion.div
           className="text-center mt-12 sm:mt-16"
           initial={shouldReduceMotion ? undefined : { opacity: 0, y: 20 }}
@@ -334,10 +218,12 @@ export default function BestTripsSection() {
         >
           <Link
             href={`/${locale}/trips`}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-9 py-3.5 rounded-full border border-white text-white font-[family-name:var(--font-lato)] font-semibold text-sm sm:text-base hover:bg-white/10 transition-colors shadow-sm"
+            className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-9 py-3.5 rounded-full border border-white text-white font-[family-name:var(--font-lato)] font-semibold text-sm sm:text-base hover:bg-white/10 transition-all shadow-sm active:scale-[0.98]"
           >
-            <span>{dict.homePage.bestTrips.viewMore}</span>
-            <span>&rarr;</span>
+            <span>{t.viewMore}</span>
+            <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">
+              &rarr;
+            </span>
           </Link>
         </motion.div>
       </div>

@@ -20,7 +20,7 @@ interface TripReviewsSectionProps {
 export const TripReviewsSection: React.FC<TripReviewsSectionProps> = ({
   tripId,
   tripTitle,
-  averageRating = 4.9,
+  averageRating = 0,
   totalReviews = 0,
   reviews = [],
   isLoading = false,
@@ -28,15 +28,15 @@ export const TripReviewsSection: React.FC<TripReviewsSectionProps> = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const displayRating = averageRating > 0 ? averageRating.toFixed(1) : "5.0";
+  const displayRating = averageRating > 0 ? averageRating.toFixed(1) : "0.0";
   const displayTotal = totalReviews > 0 ? totalReviews : reviews.length;
 
   const distribution = useMemo(() => {
     if (reviews.length === 0) {
       return [
-        { star: 5, pct: 88, count: 28 },
-        { star: 4, pct: 9, count: 3 },
-        { star: 3, pct: 3, count: 1 },
+        { star: 5, pct: 0, count: 0 },
+        { star: 4, pct: 0, count: 0 },
+        { star: 3, pct: 0, count: 0 },
         { star: 2, pct: 0, count: 0 },
         { star: 1, pct: 0, count: 0 },
       ];
@@ -77,7 +77,7 @@ export const TripReviewsSection: React.FC<TripReviewsSectionProps> = ({
                 <FiStar
                   key={s}
                   className={`text-base ${
-                    s <= Math.round(Number(displayRating))
+                    displayTotal > 0 && s <= Math.round(Number(displayRating))
                       ? "fill-[#E8B34A]"
                       : "text-slate-200"
                   }`}

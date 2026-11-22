@@ -7,12 +7,16 @@ import { useCartStore } from "@/features/cart/useCartStore";
 import { calculateCartSummary } from "@/shared/utils/cartPricing";
 import CartItemCard from "./CartItemCard";
 import CartOrderSummary from "./CartOrderSummary";
+import CartCheckoutForm from "./CartCheckoutForm";
 import CartEmptyState from "./CartEmptyState";
 
 export default function CartPage() {
-  const { locale } = useLocale();
+  const { locale, dictionary } = useLocale();
+  const t = dictionary.cartPage;
+
   const {
     items,
+    promoCode,
     hasHydrated,
     removeTrip,
     updateTravelers,
@@ -20,7 +24,7 @@ export default function CartPage() {
     clearCart,
   } = useCartStore();
 
-  const summary = calculateCartSummary(items);
+  const summary = calculateCartSummary(items, promoCode);
 
   if (!hasHydrated) {
     return (
@@ -43,25 +47,27 @@ export default function CartPage() {
               href={`/${locale}`}
               className="hover:text-[#013E51] transition-colors"
             >
-              Home
+              {t?.breadcrumbHome || "Home"}
             </Link>
             <FiChevronRight className="w-3.5 h-3.5" />
             <Link
               href={`/${locale}/trips`}
               className="hover:text-[#013E51] transition-colors"
             >
-              Trips
+              {t?.breadcrumbTrips || "Trips"}
             </Link>
             <FiChevronRight className="w-3.5 h-3.5" />
-            <span className="font-bold text-[#013E51]">Cart</span>
+            <span className="font-bold text-[#013E51]">
+              {t?.breadcrumbCart || "Cart"}
+            </span>
           </nav>
 
           <h1 className="font-[family-name:var(--font-cormorant)] text-3xl sm:text-4xl lg:text-5xl font-bold text-[#013E51]">
-            Trip Cart
+            {t?.title || "Trip Cart & Booking"}
           </h1>
           <p className="text-sm sm:text-base text-[#013E51]/75 max-w-xl mt-1">
-            Review your selected excursions, choose departure dates, and adjust
-            traveler counts.
+            {t?.description ||
+              "Review your selected excursions, choose departure dates, and complete your multi-trip booking in one seamless step."}
           </p>
         </div>
 
@@ -70,21 +76,26 @@ export default function CartPage() {
           <CartEmptyState />
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* Left Column: Cart Items List */}
-            <div className="lg:col-span-8 space-y-5">
-              {items.map((item) => (
-                <CartItemCard
-                  key={item.tripId}
-                  item={item}
-                  onUpdateTravelers={(counts) =>
-                    updateTravelers(item.tripId, counts)
-                  }
-                  onUpdateLeaveDate={(date) =>
-                    updateLeaveDate(item.tripId, date)
-                  }
-                  onRemove={() => removeTrip(item.tripId)}
-                />
-              ))}
+            {/* Left Column: Cart Items List + Checkout Form */}
+            <div className="lg:col-span-8 space-y-8">
+              <div className="space-y-5">
+                {items.map((item) => (
+                  <CartItemCard
+                    key={item.tripId}
+                    item={item}
+                    onUpdateTravelers={(counts) =>
+                      updateTravelers(item.tripId, counts)
+                    }
+                    onUpdateLeaveDate={(date) =>
+                      updateLeaveDate(item.tripId, date)
+                    }
+                    onRemove={() => removeTrip(item.tripId)}
+                  />
+                ))}
+              </div>
+
+              {/* Checkout Form */}
+              <CartCheckoutForm summary={summary} />
             </div>
 
             {/* Right Column: Order Summary */}

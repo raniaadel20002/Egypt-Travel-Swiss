@@ -2,19 +2,36 @@
 
 import { FaStar } from "react-icons/fa";
 import { useTripReviewSummary } from "@/features/trips/useTripReviewSummary";
+import { useLocale } from "@/shared/providers/LocaleProvider";
 
 interface TripRatingBadgeProps {
   tripId: number;
 }
 
 export default function TripRatingBadge({ tripId }: TripRatingBadgeProps) {
+  const { dictionary } = useLocale();
   const { rating, count, isLoading } = useTripReviewSummary(tripId);
+
+  const t = dictionary.tripsPage?.card;
+  const noReviewsText = t?.noReviewsYet || "No reviews yet";
+  const reviewLabel =
+    count === 1
+      ? t?.reviewsSingular || "Review"
+      : t?.reviewsPlural || "Reviews";
 
   if (isLoading) {
     return (
       <span className="flex items-center gap-1.5 animate-pulse whitespace-nowrap shrink-0">
         <span className="w-4 h-4 bg-gray-200 rounded-full shrink-0" />
         <span className="w-14 h-4 bg-gray-200 rounded-sm" />
+      </span>
+    );
+  }
+
+  if (count === 0) {
+    return (
+      <span className="inline-flex items-center text-xs text-[#888888] font-medium whitespace-nowrap shrink-0">
+        {noReviewsText}
       </span>
     );
   }
@@ -26,7 +43,7 @@ export default function TripRatingBadge({ tripId }: TripRatingBadgeProps) {
         {rating}
       </span>
       <span className="text-[#666666] text-xs sm:text-sm font-medium leading-none whitespace-nowrap">
-        ({count} Reviews)
+        ({count} {reviewLabel})
       </span>
     </span>
   );

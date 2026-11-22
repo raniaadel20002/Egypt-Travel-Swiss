@@ -42,7 +42,7 @@ export const TripGuestStepper: React.FC<TripGuestStepperProps> = ({
             {dict.adultsLabel}
           </div>
           <div className="text-xs text-slate-500">
-            ${adultPrice} {dict.person}
+            {adultPrice > 0 ? `${adultPrice} € ${dict.person}` : (dict.onContact || "On contact")}
           </div>
         </div>
         <div className="flex items-center gap-2.5">
@@ -74,7 +74,7 @@ export const TripGuestStepper: React.FC<TripGuestStepperProps> = ({
             {dict.childrenLabel}
           </div>
           <div className="text-xs text-slate-500">
-            ${childPrice} {dict.person}
+            {childPrice > 0 ? `${childPrice} € ${dict.person}` : adultPrice > 0 ? dict.free : (dict.onContact || "On contact")}
           </div>
         </div>
         <div className="flex items-center gap-2.5">
@@ -106,7 +106,7 @@ export const TripGuestStepper: React.FC<TripGuestStepperProps> = ({
             {dict.infantsLabel}
           </div>
           <div className="text-xs text-slate-500">
-            {infantPrice > 0 ? `$${infantPrice} ${dict.person}` : dict.free}
+            {infantPrice > 0 ? `${infantPrice} € ${dict.person}` : dict.free}
           </div>
         </div>
         <div className="flex items-center gap-2.5">

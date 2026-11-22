@@ -1,19 +1,42 @@
 import { API_BASE_URL } from "@/clientApi/apiConfig";
 
+export const DEFAULT_TRIP_IMAGE = "/Trips/heroTrips.png";
+export const DEFAULT_SERVICE_IMAGE =
+  "/home/Categories/5af697b0125109949149af917bc7716385d9cf04.png";
+
 export function resolveApiImageUrl(imageUrl?: string | null): string {
-  if (!imageUrl) return "";
+  if (!imageUrl || imageUrl.trim() === "") return "";
+
+  const trimmed = imageUrl.trim();
 
   if (
-    imageUrl.startsWith("http://") ||
-    imageUrl.startsWith("https://") ||
-    imageUrl.startsWith("data:") ||
-    imageUrl.startsWith("blob:")
+    trimmed.startsWith("http://") ||
+    trimmed.startsWith("https://") ||
+    trimmed.startsWith("data:") ||
+    trimmed.startsWith("blob:")
   ) {
-    return imageUrl;
+    return trimmed;
+  }
+
+  // Local Next.js public assets
+  if (
+    trimmed.startsWith("/Trips/") ||
+    trimmed.startsWith("/home/") ||
+    trimmed.startsWith("/Blog/") ||
+    trimmed.startsWith("/Destinations/") ||
+    trimmed.startsWith("/Accommodation/") ||
+    trimmed.startsWith("/DivingCourses/") ||
+    trimmed.startsWith("/Transfers/") ||
+    trimmed.startsWith("/Contact/") ||
+    trimmed.startsWith("/images/") ||
+    trimmed.startsWith("/icons/") ||
+    trimmed.startsWith("/logo")
+  ) {
+    return trimmed;
   }
 
   const cleanBase = API_BASE_URL.replace(/\/+$/, "");
-  const cleanPath = imageUrl.replace(/^\/+/, "");
+  const cleanPath = trimmed.replace(/^\/+/, "");
   return `${cleanBase}/${cleanPath}`;
 }
 

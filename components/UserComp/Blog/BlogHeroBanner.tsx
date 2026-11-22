@@ -31,7 +31,7 @@ export default function BlogHeroBanner() {
   });
 
   return (
-    <section className="relative w-full min-h-[360px] sm:min-h-[420px] lg:min-h-[460px] flex items-center overflow-hidden">
+    <section className="relative w-full h-[250px] sm:h-[300px] lg:h-[350px] xl:h-[360px] flex items-center overflow-hidden">
       {/* Background Travel Photograph */}
       <motion.div
         {...heroImageVariant}
@@ -54,12 +54,12 @@ export default function BlogHeroBanner() {
       />
 
       {/* Hero Content Area */}
-      <div className="relative z-10 w-full max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 py-16 sm:py-20">
+      <div className="relative z-10 w-full max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 py-4 sm:py-6">
         <div className="max-w-2xl">
           {/* Eyebrow */}
           <motion.span
             {...fadeUp(0)}
-            className="font-[family-name:var(--font-lato)] text-xs sm:text-sm font-bold tracking-[0.25em] text-[#E8B34A] uppercase block mb-3 sm:mb-4"
+            className="font-[family-name:var(--font-lato)] text-xs sm:text-sm font-bold tracking-[0.22em] text-[#E8B34A] uppercase block mb-1.5 sm:mb-2"
           >
             {hero.eyebrow}
           </motion.span>
@@ -67,7 +67,7 @@ export default function BlogHeroBanner() {
           {/* Title */}
           <motion.h1
             {...fadeUp(0.15)}
-            className="font-[family-name:var(--font-cormorant)] text-3xl sm:text-5xl lg:text-6xl font-normal text-white leading-[1.12] mb-4 sm:mb-5"
+            className="font-[family-name:var(--font-cormorant)] text-2xl sm:text-4xl lg:text-[44px] font-normal text-white leading-tight mb-2"
           >
             {hero.heading}
           </motion.h1>
@@ -75,7 +75,7 @@ export default function BlogHeroBanner() {
           {/* Subtitle */}
           <motion.p
             {...fadeUp(0.3)}
-            className="font-[family-name:var(--font-lato)] text-sm sm:text-base lg:text-lg text-white/90 font-normal leading-relaxed max-w-xl"
+            className="font-[family-name:var(--font-lato)] text-xs sm:text-sm lg:text-base text-white/90 font-normal leading-relaxed max-w-xl"
           >
             {hero.description}
           </motion.p>

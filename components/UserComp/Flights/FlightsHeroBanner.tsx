@@ -24,20 +24,20 @@ export default function FlightsHeroBanner() {
           </div>
         </div>
 
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 py-12 sm:py-16 relative z-10">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 py-8 sm:py-10 lg:py-12 relative z-10">
           <div className="max-w-2xl">
-            <div className="flex items-center gap-2.5 mb-3">
+            <div className="flex items-center gap-2.5 mb-2.5">
               <span className="w-6 h-[1.5px] bg-[#E8B34A]" />
               <span className="font-[family-name:var(--font-lato)] text-[11px] font-bold tracking-[0.22em] uppercase text-[#E8B34A]">
                 {t.heroEyebrow}
               </span>
             </div>
 
-            <h1 className="font-[family-name:var(--font-cormorant)] text-3xl sm:text-4xl lg:text-[48px] font-bold leading-[1.12] text-white mb-4">
+            <h1 className="font-[family-name:var(--font-cormorant)] text-2xl sm:text-3xl lg:text-[42px] font-bold leading-[1.15] text-white mb-2.5">
               {t.heroTitle}
             </h1>
 
-            <p className="font-[family-name:var(--font-lato)] text-sm sm:text-base text-white/80 leading-relaxed">
+            <p className="font-[family-name:var(--font-lato)] text-xs sm:text-sm lg:text-base text-white/80 leading-relaxed">
               {t.heroSubtitle}
             </p>
           </div>

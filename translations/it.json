@@ -269,6 +269,80 @@
     }
   },
   "homePage": {
+    "hero": {
+      "titlePart1": "Scopri la",
+      "titlePart2": "Bellezza dell'",
+      "titleHighlight": "Egitto",
+      "subheading": "Il tuo viaggio, oltre l'ordinario",
+      "description": "Dalle meraviglie eterne delle antiche civilta alla bellezza mozzafiato del Mar Rosso, vivi l'Egitto con itinerari straordinari curati nei minimi dettagli.",
+      "exploreTrips": "Esplora i viaggi",
+      "exploreDestinations": "Esplora le destinazioni"
+    },
+    "heroSearch": {
+      "tabs": {
+        "activities": "Attivita & Tour",
+        "accommodation": "Alloggi",
+        "flights": "Voli",
+        "transfer": "Trasferimenti"
+      },
+      "activities": {
+        "destinationLabel": "Destinazione",
+        "allDestinations": "Tutte le destinazioni",
+        "tripTypeLabel": "Tipo di viaggio",
+        "allTripTypes": "Tutti i tipi",
+        "categoryLabel": "Categoria",
+        "allCategories": "Tutte le categorie",
+        "categories": {
+          "adventure": "Avventura",
+          "cultural": "Culturale",
+          "relaxation": "Relax",
+          "family": "Famiglia",
+          "romantic": "Romantico"
+        },
+        "searchLabel": "Parola chiave",
+        "searchPlaceholder": "es. Safari, Il Cairo, Snorkeling...",
+        "submit": "Cerca Tour"
+      },
+      "accommodation": {
+        "destinationLabel": "Destinazione / Hotel",
+        "destinationPlaceholder": "es. Hurghada, Il Cairo...",
+        "rateLabel": "Classificazione",
+        "allRates": "Tutte le stelle",
+        "fiveStars": "5 Stelle Lusso",
+        "fourStars": "4 Stelle Superiore",
+        "threeStars": "3 Stelle Comfort",
+        "checkInLabel": "Data di check-in",
+        "guestsLabel": "Ospiti",
+        "oneGuest": "1 Ospite",
+        "twoGuests": "2 Ospiti",
+        "familyGuests": "Famiglia (3+ Ospiti)",
+        "submit": "Cerca Hotel"
+      },
+      "flights": {
+        "fromLabel": "Aeroporto di partenza",
+        "fromPlaceholder": "es. Milano (MXP), Roma...",
+        "toLabel": "Aeroporto di arrivo",
+        "toPlaceholder": "es. Hurghada (HRG), Il Cairo...",
+        "departureDateLabel": "Data di partenza",
+        "passengersLabel": "Passeggeri",
+        "onePassenger": "1 Passeggero",
+        "twoPassengers": "2 Passeggeri",
+        "threePassengers": "3 Passeggeri",
+        "fourPlusPassengers": "4+ Passeggeri",
+        "submit": "Trova Voli"
+      },
+      "transfer": {
+        "fromLabel": "Punto di partenza",
+        "selectFrom": "Seleziona partenza",
+        "toLabel": "Punto di arrivo",
+        "selectTo": "Seleziona arrivo",
+        "dateLabel": "Data del transfer",
+        "passengersLabel": "Passeggeri",
+        "passengerSingular": "Passeggero",
+        "passengersPlural": "Passeggeri",
+        "submit": "Cerca Transfer"
+      }
+    },
     "topDestinations": {
       "heading": "Migliori Destinazioni",
       "subtitle": "Mare, deserto e storia in perfetta armonia",
@@ -292,6 +366,35 @@
       "errorLoading": "Impossibile caricare gli alloggi in questo momento.",
       "browseAll": "Sfoglia Tutti gli Hotel",
       "noHotels": "Nessun alloggio disponibile al momento."
+    },
+    "flightInquiry": {
+      "title": "Richiesta Prenotazione Volo",
+      "subtitle": "Richiedi la tua offerta di volo per l'Egitto – ti forniremo le migliori opzioni e tariffe.",
+      "fromLabel": "Da",
+      "fromPlaceholder": "Seleziona aeroporto di partenza",
+      "toLabel": "A",
+      "toPlaceholder": "Seleziona aeroporto in Egitto",
+      "departureLabel": "Partenza",
+      "returnLabel": "Ritorno (Opzionale)",
+      "passengersLabel": "Passeggeri",
+      "selectDatePlaceholder": "Seleziona data",
+      "passengerSingular": "Passeggero",
+      "passengersPlural": "Passeggeri",
+      "submit": "Richiedi Offerta Volo"
+    },
+    "transfers": {
+      "eyebrow": "TRANSFER",
+      "heading": "Trasferimenti Aeroportuali & Privati Confortevoli",
+      "description": "Viaggia in totale relax. Autisti con licenza, veicoli moderni con aria condizionata e prezzi fissi – dai trasferimenti aeroportuali ai viaggi interurbani.",
+      "bookTransfer": "Prenota un Transfer",
+      "vehicles": {
+        "car": "Auto",
+        "carCapacity": "1–3 passeggeri",
+        "minibus": "Minibus",
+        "minibusCapacity": "4–7 passeggeri",
+        "bus": "Autobus",
+        "busCapacity": "8–18 passeggeri"
+      }
     },
     "faq": {
       "eyebrow": "FAQ",
@@ -322,11 +425,14 @@
       "emptyTitle": "Nessuna categoria disponibile al momento."
     },
     "bestTrips": {
+      "titlePart1": "I MIGLIORI",
+      "titlePart2": "VIAGGI",
       "subtitle": "Le nostre esperienze più amate in tutto l'Egitto, dalle barriere coralline del Mar Rosso alle meraviglie senza tempo del Nilo.",
       "bookNow": "Prenota Ora",
       "addToCart": "Aggiungi al Carrello",
       "viewMore": "Visualizza Altri",
       "perPerson": "/ persona",
+      "priceOnContact": "Prezzo disponibile su contatto",
       "noTrips": "Nessun viaggio disponibile al momento.",
       "noImage": "Nessuna immagine"
     }
@@ -715,11 +821,54 @@
     "retry": "Riprova"
   },
   "tripTypesPage": {
-    "title": "Esplora i Tipi di Viaggio",
-    "subtitle": "Scopri diversi modi per vivere le meraviglie dell'Egitto.",
+    "title": "Trova la Tua Strada Verso la Meraviglia",
+    "subtitle": "Cinque modi per vivere lo straordinario.",
     "emptyTitle": "Nessun tipo di viaggio disponibile al momento.",
     "errorTitle": "Impossibile caricare i tipi di viaggio.",
     "retry": "Riprova"
+  },
+  "tripsPage": {
+    "hero": {
+      "breadcrumbHome": "Home",
+      "breadcrumbTrips": "Viaggi",
+      "heading": "Il Tuo Prossimo Viaggio Inizia Qui",
+      "subtitle": "Scopri escursioni indimenticabili, destinazioni mozzafiato ed esperienze memorabili sul Mar Rosso e oltre."
+    },
+    "filters": {
+      "searchPlaceholder": "Cerca viaggi...",
+      "allTypes": "Tutti i tipi",
+      "allDestinations": "Tutte le destinazioni",
+      "allCategories": "Tutte le categorie",
+      "categoryPrivate": "Tour Privato",
+      "categoryGroup": "Tour di Gruppo",
+      "minPrice": "Prezzo Min",
+      "maxPrice": "Prezzo Max",
+      "priceRange": "Fascia di Prezzo",
+      "clearFilters": "Cancella Filtri"
+    },
+    "card": {
+      "perPerson": "EUR / persona",
+      "bookNow": "Prenota Ora",
+      "addToCart": "Aggiungi al Carrello",
+      "addedToCart": "\"{title}\" aggiunto al carrello.",
+      "viewCart": "Vedi Carrello",
+      "categoryPrivate": "Privato",
+      "categoryGroup": "Gruppo",
+      "priceOnContact": "Prezzo disponibile su contatto",
+      "noReviewsYet": "Nessuna recensione",
+      "reviewsSingular": "Recensione",
+      "reviewsPlural": "Recensioni"
+    },
+    "grid": {
+      "noTrips": "Nessun viaggio trovato",
+      "noTripsDesc": "Non abbiamo trovato viaggi corrispondenti ai tuoi criteri di ricerca. Prova a modificare i filtri.",
+      "resetFilters": "Reimposta tutti i filtri"
+    },
+    "pagination": {
+      "previous": "Precedente",
+      "next": "Successivo",
+      "page": "Pagina"
+    }
   },
   "tripDetails": {
     "breadcrumbExperiences": "Esperienze & Viaggi",
@@ -788,7 +937,21 @@
     "reviewError": "Impossibile inviare la recensione. Riprova piu tardi.",
     "stars": "Stelle",
     "noReviewsYet": "Nessuna recensione ancora",
-    "beFirstReview": "Hai vissuto questa esperienza? Condividi le tue opinioni con altri viaggiatori."
+    "beFirstReview": "Hai vissuto questa esperienza? Condividi le tue opinioni con altri viaggiatori.",
+    "priceOnContact": "Prezzo disponibile su contatto",
+    "onContact": "Su richiesta",
+    "hideGallery": "Nascondi galleria",
+    "noExtraImages": "Nessuna immagine aggiuntiva disponibile",
+    "privateTransfer": "Trasferimento privato",
+    "promoCode": "Codice promo",
+    "promoCodePlaceholder": "Inserisci codice promo",
+    "apply": "Applica",
+    "promoApplied": "Codice promozionale applicato con successo",
+    "promoInvalid": "Codice promo non valido o scaduto",
+    "promoNotForTrip": "Questo codice promo non è applicabile a questo viaggio",
+    "discount": "Sconto",
+    "whatsappFullPriceNotice": "Contattaci su WhatsApp per conoscere il prezzo completo.",
+    "contactOnWhatsapp": "Contatta su WhatsApp"
   },
   "whyChooseUs": {
     "eyebrow": "LA NOSTRA PROMESSA",
@@ -911,5 +1074,53 @@
     "validationPassengers": "Inserisci nome completo e passaporto per tutti i passeggeri.",
     "successToast": "La tua richiesta di volo e stata inviata con successo!",
     "errorToast": "Impossibile inviare la richiesta. Controlla i dati."
+  },
+  "cartPage": {
+    "breadcrumbHome": "Home",
+    "breadcrumbTrips": "Escursioni",
+    "breadcrumbCart": "Carrello",
+    "title": "Carrello & Prenotazione",
+    "description": "Rivedi le escursioni selezionate, scegli le date di partenza e prenota tutti i tour in un unico passaggio.",
+    "emptyTitle": "Il carrello e vuoto",
+    "emptyDesc": "Non hai ancora aggiunto escursioni al tuo carrello. Esplora le nostre meravigliose avventure in Egitto.",
+    "exploreTrips": "Esplora le escursioni",
+    "departureDate": "Data di partenza",
+    "adults": "Adulti",
+    "children": "Bambini",
+    "infants": "Neonati",
+    "each": "ciascuno",
+    "priceOnContact": "Prezzo su richiesta",
+    "onContactShort": "Su richiesta",
+    "remove": "Rimuovi",
+    "subtotal": "Subtotale",
+    "privateTransfer": "Trasferimento privato",
+    "summaryTitle": "Riepilogo Ordine",
+    "selectedExcursions": "Escursioni Selezionate",
+    "totalTravelers": "Totale Viaggiatori",
+    "estimatedTotal": "Totale Stimato",
+    "includesOnContact": "Prezzo parziale (escluse escursioni su richiesta)",
+    "onContactAlert": "Puoi comunque procedere con la prenotazione qui sotto! Il prezzo mostrato non e il totale finale poiche alcune escursioni sono su richiesta. Contattaci su WhatsApp per avere il prezzo completo.",
+    "inquireWhatsApp": "Contattaci su WhatsApp per il prezzo completo",
+    "addMoreTrips": "Aggiungi altre escursioni",
+    "clearCart": "Svuota carrello",
+    "promoCode": "Codice Promozionale",
+    "enterPromoCode": "Inserisci codice promozionale",
+    "apply": "Applica",
+    "promoApplied": "Codice promozionale applicato con successo!",
+    "promoInvalid": "Codice promozionale non valido o scaduto",
+    "promoDiscount": "Sconto Promozionale",
+    "checkoutEyebrow": "Ultimo passaggio",
+    "checkoutTitle": "Ospite principale & Dettagli Hotel",
+    "checkoutDesc": "Questi dati sono necessari per organizzare i trasferimenti dall'hotel e rilasciare il voucher.",
+    "firstName": "Nome",
+    "lastName": "Cognome",
+    "email": "Indirizzo Email",
+    "phone": "Telefono / WhatsApp",
+    "nationality": "Nazionalita",
+    "hotelName": "Nome Hotel / Resort (Luogo di prelievo)",
+    "roomNo": "Numero di camera (Opzionale)",
+    "confirmAndBook": "Conferma e Prenota",
+    "tripsCount": "{count} Escursione/i",
+    "noPrepayment": "Nessun pagamento anticipato richiesto. Conferma sicura tramite concierge WhatsApp."
   }
 }

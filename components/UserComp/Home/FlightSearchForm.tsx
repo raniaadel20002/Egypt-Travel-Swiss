@@ -1,9 +1,8 @@
-
 "use client";
 
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   FiMapPin,
   FiCalendar,
@@ -11,42 +10,58 @@ import {
   FiChevronDown,
   FiArrowRight,
 } from "react-icons/fi";
+import { motion, useReducedMotion } from "framer-motion";
 import { useLocale } from "@/shared/providers/LocaleProvider";
+import { getTomorrowIsoDate } from "@/shared/utils/cartPricing";
 
 const FROM_AIRPORTS = [
   "Zurich (ZRH)",
   "Geneva (GVA)",
+  "Basel (BSL)",
   "Frankfurt (FRA)",
   "Munich (MUC)",
   "Berlin (BER)",
   "Vienna (VIE)",
   "London (LHR)",
+  "Paris (CDG)",
+  "Milan (MXP)",
+  "Rome (FCO)",
+  "Bucharest (OTP)",
 ];
 
 const TO_AIRPORTS = [
-  "Egypt (HRG)",
+  "Hurghada (HRG)",
   "Cairo (CAI)",
+  "Sharm El Sheikh (SSH)",
   "Marsa Alam (RMF)",
   "Luxor (LXR)",
-  "Sharm El Sheikh (SSH)",
-];
-
-const PASSENGER_OPTIONS = [
-  "1 Passenger",
-  "2 Passengers",
-  "3 Passengers",
-  "4 Passengers",
-  "5+ Passengers",
 ];
 
 export default function FlightSearchForm() {
-  const { locale } = useLocale();
+  const router = useRouter();
+  const { locale, dictionary } = useLocale();
+  const shouldReduceMotion = useReducedMotion();
 
-  const [fromAirport, setFromAirport] = useState("");
-  const [toAirport, setToAirport] = useState("");
-  const [departureDate, setDepartureDate] = useState("");
+  const t = dictionary.homePage?.flightInquiry || {
+    fromLabel: "From",
+    fromPlaceholder: "Select Departure Airport",
+    toLabel: "To",
+    toPlaceholder: "Select Egyptian Airport",
+    departureLabel: "Departure",
+    returnLabel: "Return (Optional)",
+    passengersLabel: "Passengers",
+    selectDatePlaceholder: "Select date",
+    passengerSingular: "Passenger",
+    passengersPlural: "Passengers",
+    submit: "Request Flight Offer",
+  };
+
+  const todayIso = new Date().toISOString().split("T")[0];
+  const [fromAirport, setFromAirport] = useState("Zurich (ZRH)");
+  const [toAirport, setToAirport] = useState("Hurghada (HRG)");
+  const [departureDate, setDepartureDate] = useState(getTomorrowIsoDate());
   const [returnDate, setReturnDate] = useState("");
-  const [passengers, setPassengers] = useState("");
+  const [passengers, setPassengers] = useState("1");
 
   const [departureFocused, setDepartureFocused] = useState(false);
   const [returnFocused, setReturnFocused] = useState(false);
@@ -54,27 +69,37 @@ export default function FlightSearchForm() {
   const departureRef = useRef<HTMLInputElement>(null);
   const returnRef = useRef<HTMLInputElement>(null);
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (fromAirport) params.set("from", fromAirport);
+    if (toAirport) params.set("to", toAirport);
+    if (departureDate) params.set("dep", departureDate);
+    if (returnDate) params.set("ret", returnDate);
+    if (passengers) params.set("pax", passengers);
+
+    router.push(`/${locale}/flights?${params.toString()}`);
+  };
+
   return (
     <form
-      onSubmit={(e) => e.preventDefault()}
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-[minmax(140px,1.15fr)_minmax(140px,1.15fr)_minmax(120px,0.95fr)_minmax(120px,0.95fr)_minmax(130px,1fr)_auto] gap-2.5 sm:gap-3 xl:gap-2.5 2xl:gap-3 items-end"
+      onSubmit={handleSubmit}
+      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-[minmax(148px,1.2fr)_minmax(158px,1.25fr)_minmax(130px,1fr)_minmax(130px,1fr)_minmax(118px,0.85fr)_auto] gap-2 sm:gap-2.5 xl:gap-2.5 items-end"
     >
       {/* From Airport */}
       <div className="min-w-0">
-        <label className="block font-[family-name:var(--font-lato)] text-xs sm:text-sm font-bold text-[#013E51] mb-1.5 truncate">
-          From
+        <label className="block font-[family-name:var(--font-lato)] text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#013E51]/80 mb-1">
+          {t.fromLabel}
         </label>
         <div className="relative">
-          <FiMapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-[#013E51] text-base pointer-events-none" />
+          <FiMapPin className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#013E51] text-sm pointer-events-none" />
           <select
             value={fromAirport}
             onChange={(e) => setFromAirport(e.target.value)}
-            className={`w-full h-[50px] appearance-none bg-white rounded-2xl pl-8.5 pr-7 py-3 font-[family-name:var(--font-lato)] text-xs xl:text-[13px] 2xl:text-sm font-semibold shadow-xs border border-black/5 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 cursor-pointer truncate ${
-              fromAirport ? "text-[#013E51]" : "text-gray-400"
-            }`}
+            className="w-full h-[48px] appearance-none bg-white rounded-xl pl-7.5 pr-6 font-[family-name:var(--font-lato)] text-xs sm:text-[12.5px] xl:text-[13px] font-semibold text-[#013E51] shadow-xs border border-[#013E51]/10 focus:outline-hidden focus:ring-2 focus:ring-[#E8B34A]/50 focus:border-[#E8B34A] cursor-pointer truncate"
           >
             <option value="" disabled>
-              Departure
+              {t.fromPlaceholder}
             </option>
             {FROM_AIRPORTS.map((airport) => (
               <option key={airport} value={airport} className="text-[#013E51]">
@@ -82,14 +107,14 @@ export default function FlightSearchForm() {
               </option>
             ))}
           </select>
-          <FiChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#013E51] text-sm pointer-events-none" />
+          <FiChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-[#013E51]/70 text-sm pointer-events-none" />
         </div>
       </div>
 
       {/* To Airport */}
       <div className="min-w-0">
-        <label className="block font-[family-name:var(--font-lato)] text-xs sm:text-sm font-bold text-[#013E51] mb-1.5 truncate">
-          To
+        <label className="block font-[family-name:var(--font-lato)] text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#013E51]/80 mb-1">
+          {t.toLabel}
         </label>
         <div className="relative">
           <Image
@@ -97,17 +122,15 @@ export default function FlightSearchForm() {
             alt=""
             width={16}
             height={16}
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 object-contain pointer-events-none"
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 object-contain pointer-events-none"
           />
           <select
             value={toAirport}
             onChange={(e) => setToAirport(e.target.value)}
-            className={`w-full h-[50px] appearance-none bg-white rounded-2xl pl-8.5 pr-7 py-3 font-[family-name:var(--font-lato)] text-xs xl:text-[13px] 2xl:text-sm font-semibold shadow-xs border border-black/5 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 cursor-pointer truncate ${
-              toAirport ? "text-[#013E51]" : "text-gray-400"
-            }`}
+            className="w-full h-[48px] appearance-none bg-white rounded-xl pl-7.5 pr-6 font-[family-name:var(--font-lato)] text-xs sm:text-[12.5px] xl:text-[13px] font-semibold text-[#013E51] shadow-xs border border-[#013E51]/10 focus:outline-hidden focus:ring-2 focus:ring-[#E8B34A]/50 focus:border-[#E8B34A] cursor-pointer truncate"
           >
             <option value="" disabled>
-             Destination
+              {t.toPlaceholder}
             </option>
             {TO_AIRPORTS.map((airport) => (
               <option key={airport} value={airport} className="text-[#013E51]">
@@ -115,22 +138,23 @@ export default function FlightSearchForm() {
               </option>
             ))}
           </select>
-          <FiChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#013E51] text-sm pointer-events-none" />
+          <FiChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-[#013E51]/70 text-sm pointer-events-none" />
         </div>
       </div>
 
       {/* Departure Date */}
       <div className="min-w-0">
-        <label className="block font-[family-name:var(--font-lato)] text-xs sm:text-sm font-bold text-[#013E51] mb-1.5 truncate">
-          Departure
+        <label className="block font-[family-name:var(--font-lato)] text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#013E51]/80 mb-1">
+          {t.departureLabel}
         </label>
         <div className="relative">
-          <FiCalendar className="absolute left-3 top-1/2 -translate-y-1/2 text-[#013E51] text-base pointer-events-none z-10" />
+          <FiCalendar className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#013E51] text-sm pointer-events-none z-10" />
           <input
             ref={departureRef}
             type={departureFocused || departureDate ? "date" : "text"}
             value={departureDate}
-            placeholder="Select date"
+            min={todayIso}
+            placeholder={t.selectDatePlaceholder}
             onFocus={() => {
               setDepartureFocused(true);
               try {
@@ -149,23 +173,24 @@ export default function FlightSearchForm() {
               }
             }}
             onChange={(e) => setDepartureDate(e.target.value)}
-            className="w-full h-[50px] bg-white rounded-2xl pl-8.5 pr-3 py-3 font-[family-name:var(--font-lato)] text-xs xl:text-[13px] 2xl:text-sm font-semibold text-[#013E51] placeholder:text-[#013E51]/55 placeholder:font-normal shadow-xs border border-black/5 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 cursor-pointer"
+            className="w-full h-[48px] bg-white rounded-xl pl-7.5 pr-2 font-[family-name:var(--font-lato)] text-xs sm:text-[12.5px] xl:text-[13px] font-semibold text-[#013E51] placeholder:text-[#013E51]/55 shadow-xs border border-[#013E51]/10 focus:outline-hidden focus:ring-2 focus:ring-[#E8B34A]/50 focus:border-[#E8B34A] cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
           />
         </div>
       </div>
 
       {/* Return Date */}
       <div className="min-w-0">
-        <label className="block font-[family-name:var(--font-lato)] text-xs sm:text-sm font-bold text-[#013E51] mb-1.5 truncate">
-          Return
+        <label className="block font-[family-name:var(--font-lato)] text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#013E51]/80 mb-1">
+          {t.returnLabel}
         </label>
         <div className="relative">
-          <FiCalendar className="absolute left-3 top-1/2 -translate-y-1/2 text-[#013E51] text-base pointer-events-none z-10" />
+          <FiCalendar className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#013E51] text-sm pointer-events-none z-10" />
           <input
             ref={returnRef}
             type={returnFocused || returnDate ? "date" : "text"}
             value={returnDate}
-            placeholder="Select date"
+            min={departureDate || todayIso}
+            placeholder={t.selectDatePlaceholder}
             onFocus={() => {
               setReturnFocused(true);
               try {
@@ -184,55 +209,44 @@ export default function FlightSearchForm() {
               }
             }}
             onChange={(e) => setReturnDate(e.target.value)}
-            className="w-full h-[50px] bg-white rounded-2xl pl-8.5 pr-3 py-3 font-[family-name:var(--font-lato)] text-xs xl:text-[13px] 2xl:text-sm font-semibold text-[#013E51] placeholder:text-[#013E51]/55 placeholder:font-normal shadow-xs border border-black/5 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 cursor-pointer"
+            className="w-full h-[48px] bg-white rounded-xl pl-7.5 pr-2 font-[family-name:var(--font-lato)] text-xs sm:text-[12.5px] xl:text-[13px] font-semibold text-[#013E51] placeholder:text-[#013E51]/55 shadow-xs border border-[#013E51]/10 focus:outline-hidden focus:ring-2 focus:ring-[#E8B34A]/50 focus:border-[#E8B34A] cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
           />
         </div>
       </div>
 
       {/* Passengers */}
       <div className="min-w-0">
-        <label className="block font-[family-name:var(--font-lato)] text-xs sm:text-sm font-bold text-[#013E51] mb-1.5 truncate">
-          Passengers
+        <label className="block font-[family-name:var(--font-lato)] text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#013E51]/80 mb-1">
+          {t.passengersLabel}
         </label>
         <div className="relative">
-          <FiUser className="absolute left-3 top-1/2 -translate-y-1/2 text-[#013E51] text-base pointer-events-none" />
+          <FiUser className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#013E51] text-sm pointer-events-none" />
           <select
             value={passengers}
             onChange={(e) => setPassengers(e.target.value)}
-            className={`w-full h-[50px] appearance-none bg-white rounded-2xl pl-8.5 pr-7 py-3 font-[family-name:var(--font-lato)] text-xs xl:text-[13px] 2xl:text-sm font-semibold shadow-xs border border-black/5 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 cursor-pointer truncate ${
-              passengers ? "text-[#013E51]" : "text-gray-400"
-            }`}
+            className="w-full h-[48px] appearance-none bg-white rounded-xl pl-7.5 pr-6 font-[family-name:var(--font-lato)] text-xs sm:text-[12.5px] xl:text-[13px] font-semibold text-[#013E51] shadow-xs border border-[#013E51]/10 focus:outline-hidden focus:ring-2 focus:ring-[#E8B34A]/50 focus:border-[#E8B34A] cursor-pointer truncate"
           >
-            <option value="" disabled>
-              Passengers
-            </option>
-            {PASSENGER_OPTIONS.map((opt) => (
-              <option key={opt} value={opt} className="text-[#013E51]">
-                {opt}
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((count) => (
+              <option key={count} value={String(count)} className="text-[#013E51]">
+                {count} {count === 1 ? t.passengerSingular : t.passengersPlural}
               </option>
             ))}
           </select>
-          <FiChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#013E51] text-sm pointer-events-none" />
+          <FiChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-[#013E51]/70 text-sm pointer-events-none" />
         </div>
       </div>
 
       {/* Submit Button */}
       <div className="shrink-0">
-        <Link
-          href={`/${locale}/flights?from=${encodeURIComponent(
-            fromAirport
-          )}&to=${encodeURIComponent(
-            toAirport
-          )}&dep=${encodeURIComponent(
-            departureDate
-          )}&ret=${encodeURIComponent(
-            returnDate
-          )}&pax=${encodeURIComponent(passengers)}`}
-          className="inline-flex items-center justify-center gap-2 w-full xl:w-auto h-[50px] px-5 sm:px-6 xl:px-6 2xl:px-7 rounded-2xl bg-[#E8B34A] text-[#013E51] font-[family-name:var(--font-lato)] font-bold text-xs sm:text-sm xl:text-sm whitespace-nowrap shadow-md hover:bg-[#d8a33a] hover:shadow-lg transition-all"
+        <motion.button
+          type="submit"
+          whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
+          whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
+          className="group inline-flex items-center justify-center gap-1.5 sm:gap-2 w-full xl:w-auto h-[48px] px-4 sm:px-5 xl:px-5.5 rounded-xl bg-[#E8B34A] text-[#013E51] font-[family-name:var(--font-lato)] font-bold text-xs sm:text-sm whitespace-nowrap shadow-md hover:bg-[#d8a33a] hover:shadow-lg transition-colors cursor-pointer"
         >
-          <span>Request Flight Offer</span>
-          <FiArrowRight className="text-base shrink-0" />
-        </Link>
+          <span>{t.submit}</span>
+          <FiArrowRight className="text-base shrink-0 transition-transform group-hover:translate-x-0.5" />
+        </motion.button>
       </div>
     </form>
   );

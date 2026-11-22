@@ -18,7 +18,7 @@ export default function ContactHero() {
   });
 
   return (
-    <section className="relative w-full bg-[#013E51] overflow-hidden py-14 sm:py-16 lg:py-20">
+    <section className="relative w-full bg-[#013E51] overflow-hidden py-10 sm:py-12 lg:py-14">
       <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-10 lg:gap-12">
 

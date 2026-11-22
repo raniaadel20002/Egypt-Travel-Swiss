@@ -49,6 +49,19 @@ export default function TripsPage() {
   const [currentPage, setCurrentPage] = useState(initialPage);
 
   useEffect(() => {
+    const qSearch = searchParams.get("q") || "";
+    setFilters({
+      typeId: searchParams.get("type") ? Number(searchParams.get("type")) : undefined,
+      destinationId: searchParams.get("dest") ? Number(searchParams.get("dest")) : undefined,
+      category: searchParams.get("cat") ? Number(searchParams.get("cat")) : undefined,
+      minPrice: searchParams.get("minPrice") ? Number(searchParams.get("minPrice")) : undefined,
+      maxPrice: searchParams.get("maxPrice") ? Number(searchParams.get("maxPrice")) : undefined,
+      search: qSearch,
+    });
+    setDebouncedSearch(qSearch);
+  }, [searchParams]);
+
+  useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(filters.search);
     }, 350);

@@ -269,6 +269,80 @@
     }
   },
   "homePage": {
+    "hero": {
+      "titlePart1": "Decouvrez la",
+      "titlePart2": "Beaute de",
+      "titleHighlight": "l'Egypte",
+      "subheading": "Votre voyage, bien au-dela de l'ordinaire",
+      "description": "Des merveilles intemporelles des civilisations anciennes a la beaute fascinante de la mer Rouge, explorez l'Egypte a travers des voyages sur mesure concus pour vos reves.",
+      "exploreTrips": "Explorer les voyages",
+      "exploreDestinations": "Explorer les destinations"
+    },
+    "heroSearch": {
+      "tabs": {
+        "activities": "Activites & Circuits",
+        "accommodation": "Hebergements",
+        "flights": "Vols",
+        "transfer": "Transferts"
+      },
+      "activities": {
+        "destinationLabel": "Destination",
+        "allDestinations": "Toutes les destinations",
+        "tripTypeLabel": "Type de voyage",
+        "allTripTypes": "Tous les types",
+        "categoryLabel": "Categorie",
+        "allCategories": "Toutes categories",
+        "categories": {
+          "adventure": "Aventure",
+          "cultural": "Culturel",
+          "relaxation": "Detente",
+          "family": "Famille",
+          "romantic": "Romantique"
+        },
+        "searchLabel": "Mot-cle de recherche",
+        "searchPlaceholder": "ex. Safari, Le Caire, Plongee...",
+        "submit": "Rechercher des circuits"
+      },
+      "accommodation": {
+        "destinationLabel": "Destination / Hotel",
+        "destinationPlaceholder": "ex. Hurghada, Le Caire...",
+        "rateLabel": "Nombre d'etoiles",
+        "allRates": "Toutes les etoiles",
+        "fiveStars": "5 Etoiles Luxe",
+        "fourStars": "4 Etoiles Superieur",
+        "threeStars": "3 Etoiles Confort",
+        "checkInLabel": "Date d'arrivee",
+        "guestsLabel": "Voyageurs",
+        "oneGuest": "1 Personne",
+        "twoGuests": "2 Personnes",
+        "familyGuests": "Famille (3+ Personnes)",
+        "submit": "Rechercher des hotels"
+      },
+      "flights": {
+        "fromLabel": "Aeroport de depart",
+        "fromPlaceholder": "ex. Paris (CDG), Geneve...",
+        "toLabel": "Aeroport d'arrivee",
+        "toPlaceholder": "ex. Hurghada (HRG), Le Caire...",
+        "departureDateLabel": "Date de depart",
+        "passengersLabel": "Passagers",
+        "onePassenger": "1 Passager",
+        "twoPassengers": "2 Passagers",
+        "threePassengers": "3 Passagers",
+        "fourPlusPassengers": "4+ Passagers",
+        "submit": "Trouver des vols"
+      },
+      "transfer": {
+        "fromLabel": "Lieu de prise en charge",
+        "selectFrom": "Selectionner le depart",
+        "toLabel": "Lieu de depot",
+        "selectTo": "Selectionner l'arrivee",
+        "dateLabel": "Date de transfert",
+        "passengersLabel": "Passagers",
+        "passengerSingular": "Passager",
+        "passengersPlural": "Passagers",
+        "submit": "Rechercher des transferts"
+      }
+    },
     "topDestinations": {
       "heading": "Destinations Populaires",
       "subtitle": "Mer, désert et histoire en parfaite harmonie",
@@ -292,6 +366,35 @@
       "errorLoading": "Impossible de charger les hébergements pour le moment.",
       "browseAll": "Parcourir Tous les Hôtels",
       "noHotels": "Aucun hébergement disponible pour le moment."
+    },
+    "flightInquiry": {
+      "title": "Demande de Réservation de Vol",
+      "subtitle": "Demandez votre offre de vol pour l'Égypte – nous vous proposerons les meilleurs tarifs et options.",
+      "fromLabel": "De",
+      "fromPlaceholder": "Sélectionner l'aéroport de départ",
+      "toLabel": "Vers",
+      "toPlaceholder": "Sélectionner l'aéroport en Égypte",
+      "departureLabel": "Départ",
+      "returnLabel": "Retour (Optionnel)",
+      "passengersLabel": "Passagers",
+      "selectDatePlaceholder": "Choisir une date",
+      "passengerSingular": "Passager",
+      "passengersPlural": "Passagers",
+      "submit": "Demander une Offre de Vol"
+    },
+    "transfers": {
+      "eyebrow": "TRANSFERTS",
+      "heading": "Transferts Privés & Aéroport Confortables",
+      "description": "Voyagez en toute sérénité. Chauffeurs agréés, véhicules modernes climatisés et prix fixes – des navettes aéroport aux trajets interurbains.",
+      "bookTransfer": "Réserver un Transfert",
+      "vehicles": {
+        "car": "Voiture",
+        "carCapacity": "1–3 passagers",
+        "minibus": "Minibus",
+        "minibusCapacity": "4–7 passagers",
+        "bus": "Bus",
+        "busCapacity": "8–18 passagers"
+      }
     },
     "faq": {
       "eyebrow": "FAQ",
@@ -322,11 +425,14 @@
       "emptyTitle": "Aucune catégorie disponible pour le moment."
     },
     "bestTrips": {
+      "titlePart1": "MEILLEURS",
+      "titlePart2": "VOYAGES",
       "subtitle": "Nos expériences les plus appréciées à travers l'Égypte, des récifs de la mer Rouge aux merveilles intemporelles du Nil.",
       "bookNow": "Réserver Maintenant",
       "addToCart": "Ajouter au Panier",
       "viewMore": "Voir Plus",
       "perPerson": "/ personne",
+      "priceOnContact": "Prix disponible sur contact",
       "noTrips": "Aucun voyage disponible pour le moment.",
       "noImage": "Pas d'image"
     }
@@ -704,22 +810,65 @@
     }
   },
   "categoriesPage": {
-    "title": "Trouvez Votre Chemin vers l'Emerveillement",
-    "subtitle": "Cinq facons de vivre l'extraordinaire.",
-    "homeHeading": "Categories",
-    "homeSubtitle": "Tout pour votre aventure egyptienne",
-    "viewAll": "Voir Toutes les Categories",
+    "title": "Trouvez Votre Chemin vers l'Émerveillement",
+    "subtitle": "Cinq façons de vivre l'extraordinaire.",
+    "homeHeading": "Catégories",
+    "homeSubtitle": "Tout pour votre aventure égyptienne",
+    "viewAll": "Voir Toutes les Catégories",
     "exploreTrips": "Explorer les Excursions",
-    "emptyTitle": "Aucune categorie disponible pour le moment.",
-    "errorTitle": "Impossible de charger les categories.",
-    "retry": "Reessayer"
+    "emptyTitle": "Aucune catégorie disponible pour le moment.",
+    "errorTitle": "Impossible de charger les catégories.",
+    "retry": "Réessayer"
   },
   "tripTypesPage": {
-    "title": "Explorer les Types de Voyages",
-    "subtitle": "Decouvrez differentes facons de decouvrir les merveilles de l'Egypte.",
+    "title": "Trouvez Votre Chemin vers l'Émerveillement",
+    "subtitle": "Cinq façons de vivre l'extraordinaire.",
     "emptyTitle": "Aucun type de voyage disponible pour le moment.",
     "errorTitle": "Impossible de charger les types de voyages.",
-    "retry": "Reessayer"
+    "retry": "Réessayer"
+  },
+  "tripsPage": {
+    "hero": {
+      "breadcrumbHome": "Accueil",
+      "breadcrumbTrips": "Voyages",
+      "heading": "Votre Prochain Voyage Commence Ici",
+      "subtitle": "Découvrez des excursions inoubliables, des destinations à couper le souffle et des moments mémorables sur la mer Rouge et au-delà."
+    },
+    "filters": {
+      "searchPlaceholder": "Rechercher des voyages...",
+      "allTypes": "Tous les types",
+      "allDestinations": "Toutes les destinations",
+      "allCategories": "Toutes les catégories",
+      "categoryPrivate": "Visite Privée",
+      "categoryGroup": "Visite en Groupe",
+      "minPrice": "Prix Min",
+      "maxPrice": "Prix Max",
+      "priceRange": "Fourchette de Prix",
+      "clearFilters": "Effacer les Filtres"
+    },
+    "card": {
+      "perPerson": "EUR / personne",
+      "bookNow": "Réserver",
+      "addToCart": "Ajouter au Panier",
+      "addedToCart": "\"{title}\" ajouté au panier.",
+      "viewCart": "Voir le Panier",
+      "categoryPrivate": "Privé",
+      "categoryGroup": "Groupe",
+      "priceOnContact": "Prix disponible sur contact",
+      "noReviewsYet": "Aucun avis pour l'instant",
+      "reviewsSingular": "Avis",
+      "reviewsPlural": "Avis"
+    },
+    "grid": {
+      "noTrips": "Aucun voyage trouvé",
+      "noTripsDesc": "Nous n'avons trouvé aucun voyage correspondant à vos critères de recherche. Essayez de modifier vos filtres.",
+      "resetFilters": "Réinitialiser tous les filtres"
+    },
+    "pagination": {
+      "previous": "Précédent",
+      "next": "Suivant",
+      "page": "Page"
+    }
   },
   "tripDetails": {
     "breadcrumbExperiences": "Experiences & Excursions",
@@ -788,7 +937,21 @@
     "reviewError": "Impossible d'envoyer votre avis. Veuillez reessayer.",
     "stars": "Etoiles",
     "noReviewsYet": "Aucun avis pour le moment",
-    "beFirstReview": "Avez-vous vecu cette experience? Partagez vos impressions avec d'autres voyageurs."
+    "beFirstReview": "Avez-vous vecu cette experience? Partagez vos impressions avec d'autres voyageurs.",
+    "priceOnContact": "Prix disponible sur contact",
+    "onContact": "Sur demande",
+    "hideGallery": "Masquer la galerie",
+    "noExtraImages": "Aucune image supplémentaire disponible",
+    "privateTransfer": "Transfert privé",
+    "promoCode": "Code promo",
+    "promoCodePlaceholder": "Entrez le code promo",
+    "apply": "Appliquer",
+    "promoApplied": "Code promo appliqué avec succès",
+    "promoInvalid": "Code promo invalide ou expiré",
+    "promoNotForTrip": "Ce code promo n'est pas valable pour ce voyage",
+    "discount": "Remise",
+    "whatsappFullPriceNotice": "Veuillez nous contacter sur WhatsApp pour connaître le tarif complet.",
+    "contactOnWhatsapp": "Contacter sur WhatsApp"
   },
   "whyChooseUs": {
     "eyebrow": "NOTRE ENGAGEMENT",
@@ -911,5 +1074,53 @@
     "validationPassengers": "Veuillez renseigner le nom et le passeport de chaque passager.",
     "successToast": "Votre demande de vol a ete envoyee avec succes!",
     "errorToast": "Impossible d'envoyer la demande. Verifiez vos informations."
+  },
+  "cartPage": {
+    "breadcrumbHome": "Accueil",
+    "breadcrumbTrips": "Excursions",
+    "breadcrumbCart": "Panier",
+    "title": "Panier & Reservation",
+    "description": "Consultez vos excursions selectionnees, choisissez vos dates et confirmez votre reservation en une etape simple.",
+    "emptyTitle": "Votre panier est vide",
+    "emptyDesc": "Vous n'avez pas encore ajoute d'excursions a votre panier. Decouvrez notre selection d'aventures a travers l'Egypte.",
+    "exploreTrips": "Decouvrir les excursions",
+    "departureDate": "Date de depart",
+    "adults": "Adultes",
+    "children": "Enfants",
+    "infants": "Bebes",
+    "each": "chacun",
+    "priceOnContact": "Prix disponible sur contact",
+    "onContactShort": "Sur contact",
+    "remove": "Supprimer",
+    "subtotal": "Sous-total",
+    "privateTransfer": "Transfert prive",
+    "summaryTitle": "Recapitulatif",
+    "selectedExcursions": "Excursions selectionnees",
+    "totalTravelers": "Nombre de voyageurs",
+    "estimatedTotal": "Total estime",
+    "includesOnContact": "Prix partiel (exclut les elements sur contact)",
+    "onContactAlert": "Vous pouvez toujours reserver directement ci-dessous ! Le montant indique n'est pas le prix total car certaines excursions sont sur contact. Veuillez nous contacter sur WhatsApp pour obtenir le prix total.",
+    "inquireWhatsApp": "Contacter sur WhatsApp pour le prix total",
+    "addMoreTrips": "Ajouter d'autres excursions",
+    "clearCart": "Vider le panier",
+    "promoCode": "Code Promo",
+    "enterPromoCode": "Entrer le code promo",
+    "apply": "Appliquer",
+    "promoApplied": "Code promo applique avec succes!",
+    "promoInvalid": "Code promo invalide ou expire",
+    "promoDiscount": "Remise Promo",
+    "checkoutEyebrow": "Derniere etape",
+    "checkoutTitle": "Client principal & Lieu de prise en charge",
+    "checkoutDesc": "Ces informations nous permettent d'organiser vos transferts et de vous transmettre vos bons de reservation.",
+    "firstName": "Prenom",
+    "lastName": "Nom",
+    "email": "Adresse email",
+    "phone": "Telephone / WhatsApp",
+    "nationality": "Nationalite",
+    "hotelName": "Nom de l'hotel (Lieu de prise en charge)",
+    "roomNo": "Numero de chambre (Optionnel)",
+    "confirmAndBook": "Confirmer & Reserver",
+    "tripsCount": "{count} Excursion(s)",
+    "noPrepayment": "Aucun pre-paiement requis. Confirmation securisee via notre conciergerie WhatsApp."
   }
 }

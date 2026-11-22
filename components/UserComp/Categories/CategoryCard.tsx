@@ -31,20 +31,23 @@ export default function CategoryCard({
 
   return (
     <motion.div
-      initial={shouldReduce ? undefined : { opacity: 0, y: 24 }}
+      initial={shouldReduce ? undefined : { opacity: 0, y: 28 }}
       whileInView={shouldReduce ? undefined : { opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{
-        duration: shouldReduce ? 0.15 : 0.45,
-        delay: shouldReduce ? 0 : (index % 6) * 0.07,
+        duration: shouldReduce ? 0.15 : 0.55,
+        delay: shouldReduce ? 0 : (index % 6) * 0.08,
         ease: BRAND_EASE,
       }}
-      whileHover={shouldReduce ? undefined : { y: -5 }}
+      whileHover={shouldReduce ? undefined : { y: -8 }}
       className="w-full"
     >
       <Link
         href={`/${locale}/trips?type=${category.id}`}
-        className="group relative block w-full aspect-[1/1.14] rounded-[20px] sm:rounded-[24px] overflow-hidden border-[2px] sm:border-[2.5px] border-[#E8B34A] shadow-[0px_8px_24px_rgba(1,62,81,0.12)] hover:shadow-[0px_16px_36px_rgba(1,62,81,0.22)] transition-shadow duration-300 bg-[#013E51]"
+        style={{
+          background: "linear-gradient(180deg, #FFFFFF 0%, #013E51 90%)",
+        }}
+        className="group relative block w-full aspect-[1/1.15] min-h-[420px] sm:min-h-[460px] xl:min-h-[520px] rounded-[22px] sm:rounded-[28px] overflow-hidden border-[2.5px] sm:border-[3px] border-[#E8B34A] shadow-[0px_10px_30px_rgba(1,62,81,0.14)] hover:shadow-[0px_20px_45px_rgba(1,62,81,0.25)] transition-all duration-300"
       >
         {/* Background Category Image */}
         <Image
@@ -55,25 +58,29 @@ export default function CategoryCard({
           className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-106"
         />
 
-        {/* Ambient Overlay for High Contrast */}
+        {/* Deep Teal Gradient Overlay matching Figma specification */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-t from-[#013E51]/95 via-[#013E51]/30 to-transparent pointer-events-none"
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(1, 62, 81, 0) 35%, rgba(1, 62, 81, 0.92) 100%)",
+          }}
         />
 
-        {/* Card Bottom Row: Title on left, circular button on right */}
-        <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6 lg:p-7 flex items-end justify-between gap-3 z-10">
-          <div className="pr-2">
-            <h3 className="font-[family-name:var(--font-cormorant)] text-2xl sm:text-[28px] lg:text-[32px] font-semibold text-white tracking-wide leading-tight group-hover:text-[#E8B34A] transition-colors">
+        {/* Card Bottom: Big Title & Circular Action Button */}
+        <div className="absolute inset-x-0 bottom-0 p-6 sm:p-7 lg:p-8 xl:p-9 flex items-end justify-between gap-4 z-10">
+          <div className="pr-2 min-w-0 flex-1">
+            <h3 className="font-[family-name:var(--font-cormorant)] text-3xl sm:text-[36px] lg:text-[42px] xl:text-[46px] font-medium text-white tracking-normal leading-[1.12] group-hover:text-[#E8B34A] transition-colors">
               {category.name}
             </h3>
           </div>
 
           <div
             aria-hidden="true"
-            className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-white/80 flex items-center justify-center text-white transition-all duration-300 group-hover:bg-[#E8B34A] group-hover:border-[#E8B34A] group-hover:text-[#013E51] shadow-xs"
+            className="shrink-0 w-11 h-11 sm:w-12 sm:h-12 lg:w-[48px] lg:h-[48px] rounded-full border-[1.5px] border-white/85 flex items-center justify-center text-white transition-all duration-300 group-hover:bg-[#E8B34A] group-hover:border-[#E8B34A] group-hover:text-[#013E51] shadow-xs"
           >
-            <FiArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 transition-transform duration-300 group-hover:translate-x-0.5" />
+            <FiArrowRight className="w-4.5 h-4.5 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:translate-x-1" />
           </div>
         </div>
       </Link>

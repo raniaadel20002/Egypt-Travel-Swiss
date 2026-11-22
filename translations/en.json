@@ -269,6 +269,80 @@
     }
   },
   "homePage": {
+    "hero": {
+      "titlePart1": "Discover the",
+      "titlePart2": "Beauty of",
+      "titleHighlight": "Egypt",
+      "subheading": "Your Journey, Beyond Ordinary",
+      "description": "From the timeless wonders of ancient civilizations to the breathtaking beauty of the Red Sea, discover Egypt through exceptional journeys crafted around your dreams.",
+      "exploreTrips": "Explore Trips",
+      "exploreDestinations": "Explore Destinations"
+    },
+    "heroSearch": {
+      "tabs": {
+        "activities": "Activities & Tours",
+        "accommodation": "Accommodation",
+        "flights": "Flights",
+        "transfer": "Transfer"
+      },
+      "activities": {
+        "destinationLabel": "Destination",
+        "allDestinations": "All Destinations",
+        "tripTypeLabel": "Trip Type",
+        "allTripTypes": "All Trip Types",
+        "categoryLabel": "Category",
+        "allCategories": "All Categories",
+        "categories": {
+          "adventure": "Adventure",
+          "cultural": "Cultural",
+          "relaxation": "Relaxation",
+          "family": "Family",
+          "romantic": "Romantic"
+        },
+        "searchLabel": "Search Keyword",
+        "searchPlaceholder": "e.g. Safari, Cairo, Snorkeling...",
+        "submit": "Search Tours"
+      },
+      "accommodation": {
+        "destinationLabel": "Destination / Hotel",
+        "destinationPlaceholder": "e.g. Hurghada, Cairo...",
+        "rateLabel": "Star Rating",
+        "allRates": "All Star Ratings",
+        "fiveStars": "5 Stars Luxury",
+        "fourStars": "4 Stars Superior",
+        "threeStars": "3 Stars Comfort",
+        "checkInLabel": "Check-in Date",
+        "guestsLabel": "Guests",
+        "oneGuest": "1 Guest",
+        "twoGuests": "2 Guests",
+        "familyGuests": "Family (3+ Guests)",
+        "submit": "Search Hotels"
+      },
+      "flights": {
+        "fromLabel": "From Airport",
+        "fromPlaceholder": "e.g. Frankfurt (FRA), Zurich...",
+        "toLabel": "To Airport",
+        "toPlaceholder": "e.g. Hurghada (HRG), Cairo...",
+        "departureDateLabel": "Departure Date",
+        "passengersLabel": "Passengers",
+        "onePassenger": "1 Passenger",
+        "twoPassengers": "2 Passengers",
+        "threePassengers": "3 Passengers",
+        "fourPlusPassengers": "4+ Passengers",
+        "submit": "Find Flights"
+      },
+      "transfer": {
+        "fromLabel": "Pickup Location",
+        "selectFrom": "Select Pickup",
+        "toLabel": "Dropoff Location",
+        "selectTo": "Select Dropoff",
+        "dateLabel": "Pickup Date",
+        "passengersLabel": "Passengers",
+        "passengerSingular": "Passenger",
+        "passengersPlural": "Passengers",
+        "submit": "Search Transfers"
+      }
+    },
     "topDestinations": {
       "heading": "Top Destinations",
       "subtitle": "Sea, desert and history in perfect harmony",
@@ -292,6 +366,35 @@
       "errorLoading": "Unable to load accommodations at this time.",
       "browseAll": "Browse All Hotels",
       "noHotels": "No accommodations available at the moment."
+    },
+    "flightInquiry": {
+      "title": "Flight Booking Inquiry",
+      "subtitle": "Request your flight offer to Egypt – we will provide you with the best options and prices.",
+      "fromLabel": "From",
+      "fromPlaceholder": "Select Departure Airport",
+      "toLabel": "To",
+      "toPlaceholder": "Select Egyptian Airport",
+      "departureLabel": "Departure",
+      "returnLabel": "Return (Optional)",
+      "passengersLabel": "Passengers",
+      "selectDatePlaceholder": "Select date",
+      "passengerSingular": "Passenger",
+      "passengersPlural": "Passengers",
+      "submit": "Request Flight Offer"
+    },
+    "transfers": {
+      "eyebrow": "TRANSFERS",
+      "heading": "Comfortable Airport & Private Transfers",
+      "description": "Arrive relaxed. Licensed drivers, modern air-conditioned vehicles and fixed prices – from airport pickups to inter-city rides.",
+      "bookTransfer": "Book a Transfer",
+      "vehicles": {
+        "car": "Car",
+        "carCapacity": "1–3 passengers",
+        "minibus": "Minibus",
+        "minibusCapacity": "4–7 passengers",
+        "bus": "Bus",
+        "busCapacity": "8–18 passengers"
+      }
     },
     "faq": {
       "eyebrow": "FAQ",
@@ -322,11 +425,14 @@
       "emptyTitle": "No categories available at the moment."
     },
     "bestTrips": {
+      "titlePart1": "BEST",
+      "titlePart2": "TRIPS",
       "subtitle": "Our most loved experiences across Egypt, from the Red Sea reefs to the timeless wonders of the Nile.",
       "bookNow": "Book Now",
       "addToCart": "Add to Cart",
       "viewMore": "View More",
       "perPerson": "/ person",
+      "priceOnContact": "Price available on contact",
       "noTrips": "No trips available at the moment.",
       "noImage": "No image"
     }
@@ -715,11 +821,54 @@
     "retry": "Try Again"
   },
   "tripTypesPage": {
-    "title": "Explore Trip Types",
-    "subtitle": "Discover different ways to experience Egypt's wonders.",
+    "title": "Find Your Way to Wonder",
+    "subtitle": "Five ways to experience the extraordinary.",
     "emptyTitle": "No trip types available at the moment.",
     "errorTitle": "Unable to load trip types.",
     "retry": "Try Again"
+  },
+  "tripsPage": {
+    "hero": {
+      "breadcrumbHome": "Home",
+      "breadcrumbTrips": "Trips",
+      "heading": "Your Next Journey Begins Here",
+      "subtitle": "Discover unforgettable trips, breathtaking destinations, and memorable experiences across the Red Sea and beyond."
+    },
+    "filters": {
+      "searchPlaceholder": "Search trips...",
+      "allTypes": "All Types",
+      "allDestinations": "All Destinations",
+      "allCategories": "All Categories",
+      "categoryPrivate": "Private Tour",
+      "categoryGroup": "Group Tour",
+      "minPrice": "Min Price",
+      "maxPrice": "Max Price",
+      "priceRange": "Price Range",
+      "clearFilters": "Clear Filters"
+    },
+    "card": {
+      "perPerson": "EUR / person",
+      "bookNow": "Book Now",
+      "addToCart": "Add to Cart",
+      "addedToCart": "\"{title}\" added to cart.",
+      "viewCart": "View Cart",
+      "categoryPrivate": "Private",
+      "categoryGroup": "Group",
+      "priceOnContact": "Price available on contact",
+      "noReviewsYet": "No reviews yet",
+      "reviewsSingular": "Review",
+      "reviewsPlural": "Reviews"
+    },
+    "grid": {
+      "noTrips": "No trips found",
+      "noTripsDesc": "We could not find any trips matching your current filter criteria. Try adjusting your price range, destination, or category.",
+      "resetFilters": "Reset all filters"
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page"
+    }
   },
   "tripDetails": {
     "breadcrumbExperiences": "Experiences & Trips",
@@ -788,7 +937,21 @@
     "reviewError": "Failed to submit your review. Please try again.",
     "stars": "Stars",
     "noReviewsYet": "No reviews yet",
-    "beFirstReview": "Have you experienced this journey? Share your thoughts with fellow travelers."
+    "beFirstReview": "Have you experienced this journey? Share your thoughts with fellow travelers.",
+    "priceOnContact": "Price available on contact",
+    "onContact": "On contact",
+    "hideGallery": "Hide Gallery",
+    "noExtraImages": "No additional images available",
+    "privateTransfer": "Private Transfer",
+    "promoCode": "Promo Code",
+    "promoCodePlaceholder": "Enter promo code",
+    "apply": "Apply",
+    "promoApplied": "Promo code applied successfully",
+    "promoInvalid": "Invalid or expired promo code",
+    "promoNotForTrip": "This promo code is not applicable to this trip",
+    "discount": "Discount",
+    "whatsappFullPriceNotice": "Please contact us on WhatsApp to know the full price.",
+    "contactOnWhatsapp": "Contact on WhatsApp"
   },
   "whyChooseUs": {
     "eyebrow": "OUR PROMISE",
@@ -911,5 +1074,53 @@
     "validationPassengers": "Please enter full name and passport number for all passengers.",
     "successToast": "Your flight inquiry has been submitted successfully!",
     "errorToast": "Unable to submit flight request. Please check your details."
+  },
+  "cartPage": {
+    "breadcrumbHome": "Home",
+    "breadcrumbTrips": "Trips",
+    "breadcrumbCart": "Cart",
+    "title": "Trip Cart & Booking",
+    "description": "Review your selected excursions, choose departure dates, and complete your multi-trip booking in one seamless step.",
+    "emptyTitle": "Your Cart is Empty",
+    "emptyDesc": "You haven't added any trips or excursions to your cart yet. Explore our collection of handpicked adventures across Egypt.",
+    "exploreTrips": "Explore Trips",
+    "departureDate": "Departure Date",
+    "adults": "Adults",
+    "children": "Children",
+    "infants": "Infants",
+    "each": "each",
+    "priceOnContact": "Price available on contact",
+    "onContactShort": "On contact",
+    "remove": "Remove",
+    "subtotal": "Subtotal",
+    "privateTransfer": "Private Transfer",
+    "summaryTitle": "Order Summary",
+    "selectedExcursions": "Selected Excursions",
+    "totalTravelers": "Total Travelers",
+    "estimatedTotal": "Estimated Total",
+    "includesOnContact": "Partial price (excludes items on contact)",
+    "onContactAlert": "You can still book directly below! Note that the price shown here is not the full total as some excursions have prices available on contact. Please contact us on WhatsApp so you have the full price.",
+    "inquireWhatsApp": "Contact on WhatsApp for Full Price",
+    "addMoreTrips": "Add More Trips",
+    "clearCart": "Clear Cart",
+    "promoCode": "Promo Code",
+    "enterPromoCode": "Enter promo code",
+    "apply": "Apply",
+    "promoApplied": "Promo code applied successfully!",
+    "promoInvalid": "Invalid or expired promo code",
+    "promoDiscount": "Promo Discount",
+    "checkoutEyebrow": "Final Step",
+    "checkoutTitle": "Lead Guest & Hotel Pickup Details",
+    "checkoutDesc": "We need this information to organize hotel transfers and dispatch your booking voucher.",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email Address",
+    "phone": "Phone / WhatsApp",
+    "nationality": "Nationality",
+    "hotelName": "Hotel / Resort Name (Pickup Location)",
+    "roomNo": "Room Number (Optional)",
+    "confirmAndBook": "Confirm & Book",
+    "tripsCount": "{count} Trip(s)",
+    "noPrepayment": "No prepayment required. Secure confirmation via WhatsApp concierge."
   }
 }

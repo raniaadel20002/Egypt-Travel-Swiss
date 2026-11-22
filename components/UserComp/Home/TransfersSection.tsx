@@ -11,8 +11,10 @@ const BRAND_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 interface VehicleOption {
   id: string;
-  name: string;
-  capacity: string;
+  nameKey: "car" | "minibus" | "bus";
+  capacityKey: "carCapacity" | "minibusCapacity" | "busCapacity";
+  defaultName: string;
+  defaultCapacity: string;
   icon: React.ComponentType<{ className?: string }>;
   href: string;
 }
@@ -20,37 +22,59 @@ interface VehicleOption {
 const VEHICLE_OPTIONS: VehicleOption[] = [
   {
     id: "car",
-    name: "Car",
-    capacity: "1–3 passengers",
+    nameKey: "car",
+    capacityKey: "carCapacity",
+    defaultName: "Car",
+    defaultCapacity: "1–3 passengers",
     icon: FaCar,
     href: "/transfers",
   },
   {
     id: "minibus",
-    name: "Minibus",
-    capacity: "4–7 passengers",
+    nameKey: "minibus",
+    capacityKey: "minibusCapacity",
+    defaultName: "Minibus",
+    defaultCapacity: "4–7 passengers",
     icon: FaVanShuttle,
     href: "/transfers",
   },
   {
     id: "bus",
-    name: "Bus",
-    capacity: "8–18 passengers",
+    nameKey: "bus",
+    capacityKey: "busCapacity",
+    defaultName: "Bus",
+    defaultCapacity: "8–18 passengers",
     icon: FaBusSimple,
     href: "/transfers",
   },
 ];
 
 export default function TransfersSection() {
-  const { locale } = useLocale();
+  const { locale, dictionary } = useLocale();
   const shouldReduce = useReducedMotion();
+
+  const t = dictionary.homePage?.transfers || {
+    eyebrow: "TRANSFERS",
+    heading: "Comfortable Airport & Private Transfers",
+    description: "Arrive relaxed. Licensed drivers, modern air-conditioned vehicles and fixed prices – from airport pickups to inter-city rides.",
+    bookTransfer: "Book a Transfer",
+    vehicles: {
+      car: "Car",
+      carCapacity: "1–3 passengers",
+      minibus: "Minibus",
+      minibusCapacity: "4–7 passengers",
+      bus: "Bus",
+      busCapacity: "8–18 passengers",
+    },
+  };
 
   return (
     <section
       id="transfers"
-      className="relative w-full py-12 sm:py-16 lg:py-20 bg-[#FAF7F2] overflow-hidden font-[family-name:var(--font-lato)]"
+      className="relative w-full py-10 sm:py-14 lg:py-16 bg-[#FAF7F2] overflow-hidden font-[family-name:var(--font-lato)]"
     >
-      <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
+      {/* Sized to match the Flight Booking Inquiry banner */}
+      <div className="relative z-10 max-w-[1560px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
         {/* Main Banner Card */}
         <motion.div
           initial={shouldReduce ? undefined : { opacity: 0, y: 20 }}
@@ -71,7 +95,7 @@ export default function TransfersSection() {
           </div>
 
           {/* Desktop Left Side Background Photo */}
-          <div className="hidden lg:block absolute left-0 top-0 bottom-0 w-[44%] overflow-hidden pointer-events-none z-0">
+          <div className="hidden lg:block absolute left-0 top-0 bottom-0 w-[42%] overflow-hidden pointer-events-none z-0">
             <Image
               src="/home/TRANSFERS/transfer-person.jpg"
               alt="Airport and private transfers in Egypt"
@@ -87,27 +111,29 @@ export default function TransfersSection() {
           </div>
 
           {/* Banner Inner Content */}
-          <div className="relative z-10 w-full p-6 sm:p-10 md:p-12 lg:p-14 lg:pl-[45%] flex flex-col justify-center">
+          <div className="relative z-10 w-full p-6 sm:p-10 md:p-12 lg:p-14 lg:pl-[44%] flex flex-col justify-center">
             {/* Eyebrow Subtitle */}
             <span className="font-[family-name:var(--font-lato)] text-xs sm:text-sm font-bold tracking-[0.22em] uppercase text-[#E8B34A] mb-2 sm:mb-2.5">
-              TRANSFERS
+              {t.eyebrow}
             </span>
 
             {/* Main Heading */}
             <h2 className="font-[family-name:var(--font-cormorant)] text-3xl sm:text-4xl lg:text-[44px] font-bold text-white leading-[1.15] mb-3 sm:mb-3.5 max-w-[620px]">
-              Comfortable Airport &amp; Private Transfers
+              {t.heading}
             </h2>
 
             {/* Paragraph Description */}
             <p className="font-[family-name:var(--font-lato)] text-xs sm:text-sm lg:text-[14px] text-white/80 font-normal leading-relaxed mb-6 sm:mb-8 max-w-[560px]">
-              Arrive relaxed. Licensed drivers, modern air-conditioned vehicles
-              and fixed prices &ndash; from airport pickups to inter-city rides.
+              {t.description}
             </p>
 
             {/* 3 Clean Vehicle Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4 mb-7 sm:mb-8 max-w-[680px]">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4 mb-7 sm:mb-8 max-w-[700px]">
               {VEHICLE_OPTIONS.map((vehicle) => {
                 const IconComponent = vehicle.icon;
+                const vehicleName = t.vehicles?.[vehicle.nameKey] || vehicle.defaultName;
+                const vehicleCapacity = t.vehicles?.[vehicle.capacityKey] || vehicle.defaultCapacity;
+
                 return (
                   <Link
                     key={vehicle.id}
@@ -119,10 +145,10 @@ export default function TransfersSection() {
                     </div>
                     <div className="flex sm:block items-baseline sm:items-start gap-2 sm:gap-0">
                       <h3 className="font-[family-name:var(--font-lato)] text-base sm:text-lg font-bold text-[#013E51] leading-tight group-hover:text-[#E8B34A] transition-colors">
-                        {vehicle.name}
+                        {vehicleName}
                       </h3>
                       <p className="font-[family-name:var(--font-lato)] text-[11px] sm:text-xs text-[#013E51]/60 font-medium sm:mt-1">
-                        {vehicle.capacity}
+                        {vehicleCapacity}
                       </p>
                     </div>
                   </Link>
@@ -130,14 +156,19 @@ export default function TransfersSection() {
               })}
             </div>
 
-            {/* Single CTA: Book a Transfer */}
-            <div>
-              <Link
-                href={`/${locale}/transfers`}
-                className="inline-flex items-center justify-center h-[48px] sm:h-[50px] px-8 rounded-full bg-[#E8B34A] text-[#013E51] font-[family-name:var(--font-lato)] font-bold text-sm sm:text-base hover:bg-[#d8a33a] transition-all shadow-md hover:shadow-lg text-center"
+            {/* Centered CTA: Book a Transfer */}
+            <div className="w-full max-w-[700px] flex justify-center mt-1">
+              <motion.div
+                whileHover={shouldReduce ? undefined : { scale: 1.04 }}
+                whileTap={shouldReduce ? undefined : { scale: 0.98 }}
               >
-                Book a Transfer
-              </Link>
+                <Link
+                  href={`/${locale}/transfers`}
+                  className="inline-flex items-center justify-center h-[48px] sm:h-[50px] px-10 rounded-full bg-[#E8B34A] text-[#013E51] font-[family-name:var(--font-lato)] font-bold text-sm sm:text-base hover:bg-[#d8a33a] transition-all shadow-md hover:shadow-lg text-center cursor-pointer"
+                >
+                  {t.bookTransfer}
+                </Link>
+              </motion.div>
             </div>
           </div>
         </motion.div>

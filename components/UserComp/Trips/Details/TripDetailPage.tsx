@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { FiChevronRight, FiArrowLeft, FiAlertCircle } from "react-icons/fi";
 import { parseNumericIdFromSlug } from "@/shared/utils/slugify";
+import { localeToBackendLanguage } from "@/shared/utils/localeToBackendLanguage";
 import { BackendLanguageCode } from "@/models/tripType";
 import { TripApiItem } from "@/models/trip";
 import { ServiceApiItem } from "@/models/service";
@@ -15,6 +16,10 @@ import {
   useTripReviewAverage,
 } from "@/features/reviews/useTripReviews";
 import { useLocale } from "@/shared/providers/LocaleProvider";
+import {
+  isDateAvailableForTrip,
+  getNextAvailableDate,
+} from "@/shared/utils/tripAvailability";
 
 import TripGalleryCard from "./TripGalleryCard";
 import TripOverviewCard from "./TripOverviewCard";
@@ -57,7 +62,7 @@ export const TripDetailPage: React.FC<TripDetailPageProps> = ({
   const dict = dictionary.tripDetails;
   const shouldReduce = useReducedMotion();
   const tripId = parseNumericIdFromSlug(slug);
-  const backendLanguage = (locale.toUpperCase() as BackendLanguageCode) || "EN";
+  const backendLanguage = localeToBackendLanguage(locale);
 
   // Tomorrow's date formatted as default
   const defaultDateStr = useMemo(() => {
@@ -92,9 +97,19 @@ export const TripDetailPage: React.FC<TripDetailPageProps> = ({
     Boolean(tripId)
   );
 
+  React.useEffect(() => {
+    if (trip?.availableDays && trip.availableDays.length > 0) {
+      setLeaveDate((curr) =>
+        isDateAvailableForTrip(curr, trip.availableDays)
+          ? curr
+          : getNextAvailableDate(new Date(), trip.availableDays)
+      );
+    }
+  }, [trip?.availableDays]);
+
   const reviews = reviewsResponse?.data || [];
-  const averageRating = averageData?.data?.averageRate || 4.9;
-  const totalReviews = averageData?.data?.totalReviews || reviews.length;
+  const averageRating = averageData?.data?.averageRate ?? 0;
+  const totalReviews = averageData?.data?.totalReviews ?? reviews.length;
 
   const handleToggleService = (service: ServiceApiItem) => {
     setSelectedServices((prev) => {
@@ -205,6 +220,8 @@ export const TripDetailPage: React.FC<TripDetailPageProps> = ({
               childPrice={trip.childPrice}
               infPrice={trip.infPrice}
               currencyName={trip.currencyName}
+              categoryName={trip.categoryName}
+              tripName={trip.name}
               dict={dict}
             />
 

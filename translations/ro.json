@@ -269,6 +269,80 @@
     }
   },
   "homePage": {
+    "hero": {
+      "titlePart1": "Descopera",
+      "titlePart2": "Frumusetea",
+      "titleHighlight": "Egiptului",
+      "subheading": "Calatoria ta, dincolo de obisnuit",
+      "description": "De la minunile eterne ale civilizatiilor stravechi la farmecul captivant al Marii Rosii, descopera Egiptul prin calatorii deosebite create in jurul viselor tale.",
+      "exploreTrips": "Exploreaza excursii",
+      "exploreDestinations": "Exploreaza destinatii"
+    },
+    "heroSearch": {
+      "tabs": {
+        "activities": "Activitati & Tururi",
+        "accommodation": "Cazare",
+        "flights": "Zboruri",
+        "transfer": "Transfer"
+      },
+      "activities": {
+        "destinationLabel": "Destinatie",
+        "allDestinations": "Toate destinatiile",
+        "tripTypeLabel": "Tip excursie",
+        "allTripTypes": "Toate tipurile",
+        "categoryLabel": "Categorie",
+        "allCategories": "Toate categoriile",
+        "categories": {
+          "adventure": "Aventura",
+          "cultural": "Cultural",
+          "relaxation": "Relaxare",
+          "family": "Familie",
+          "romantic": "Romantic"
+        },
+        "searchLabel": "Cuvant cheie",
+        "searchPlaceholder": "ex. Safari, Cairo, Snorkeling...",
+        "submit": "Cauta Tururi"
+      },
+      "accommodation": {
+        "destinationLabel": "Destinatie / Hotel",
+        "destinationPlaceholder": "ex. Hurghada, Cairo...",
+        "rateLabel": "Numar de stele",
+        "allRates": "Toate stelele",
+        "fiveStars": "5 Stele Lux",
+        "fourStars": "4 Stele Superior",
+        "threeStars": "3 Stele Confort",
+        "checkInLabel": "Data de check-in",
+        "guestsLabel": "Oaspeti",
+        "oneGuest": "1 Oaspete",
+        "twoGuests": "2 Oaspeti",
+        "familyGuests": "Familie (3+ Oaspeti)",
+        "submit": "Cauta Hoteluri"
+      },
+      "flights": {
+        "fromLabel": "Aeroport plecare",
+        "fromPlaceholder": "ex. Bucuresti (OTP), Viena...",
+        "toLabel": "Aeroport sosire",
+        "toPlaceholder": "ex. Hurghada (HRG), Cairo...",
+        "departureDateLabel": "Data plecarii",
+        "passengersLabel": "Pasageri",
+        "onePassenger": "1 Pasager",
+        "twoPassengers": "2 Pasageri",
+        "threePassengers": "3 Pasageri",
+        "fourPlusPassengers": "4+ Pasageri",
+        "submit": "Cauta Zboruri"
+      },
+      "transfer": {
+        "fromLabel": "Locatie preluare",
+        "selectFrom": "Selecteaza preluare",
+        "toLabel": "Locatie destinatie",
+        "selectTo": "Selecteaza destinatie",
+        "dateLabel": "Data transfer",
+        "passengersLabel": "Pasageri",
+        "passengerSingular": "Pasager",
+        "passengersPlural": "Pasageri",
+        "submit": "Cauta Transferuri"
+      }
+    },
     "topDestinations": {
       "heading": "Destinații de Top",
       "subtitle": "Mare, deșert și istorie în armonie perfectă",
@@ -292,6 +366,35 @@
       "errorLoading": "Nu se pot încărca opțiunile de cazare în acest moment.",
       "browseAll": "Răsfoiește Toate Hotelurile",
       "noHotels": "Nu există opțiuni de cazare disponibile momentan."
+    },
+    "flightInquiry": {
+      "title": "Cerere Rezervare Zbor",
+      "subtitle": "Solicitați o ofertă de zbor spre Egipt – vă oferim cele mai avantajoase tarife și conexiuni.",
+      "fromLabel": "De la",
+      "fromPlaceholder": "Selectați aeroportul de plecare",
+      "toLabel": "Către",
+      "toPlaceholder": "Selectați aeroportul din Egipt",
+      "departureLabel": "Plecare",
+      "returnLabel": "Întoarcere (Opțional)",
+      "passengersLabel": "Pasageri",
+      "selectDatePlaceholder": "Selectați data",
+      "passengerSingular": "Pasager",
+      "passengersPlural": "Pasageri",
+      "submit": "Solicită Ofertă de Zbor"
+    },
+    "transfers": {
+      "eyebrow": "TRANSFERURI",
+      "heading": "Transferuri Private și de la Aeroport Confortabile",
+      "description": "Călătorește fără griji. Șoferi autorizați, vehicule moderne cu aer condiționat și tarife fixe – de la preluări de la aeroport până la curse interurbane.",
+      "bookTransfer": "Rezervă un Transfer",
+      "vehicles": {
+        "car": "Mașină",
+        "carCapacity": "1–3 pasageri",
+        "minibus": "Microbuz",
+        "minibusCapacity": "4–7 pasageri",
+        "bus": "Autobuz",
+        "busCapacity": "8–18 pasageri"
+      }
     },
     "faq": {
       "eyebrow": "FAQ",
@@ -322,11 +425,14 @@
       "emptyTitle": "Nu există categorii disponibile momentan."
     },
     "bestTrips": {
+      "titlePart1": "CELE MAI BUNE",
+      "titlePart2": "EXCURSII",
       "subtitle": "Experiențele noastre cele mai iubite din Egipt, de la recifele Mării Roșii la minunile atemporale ale Nilului.",
       "bookNow": "Rezervă Acum",
       "addToCart": "Adaugă în Coș",
       "viewMore": "Vezi Mai Mult",
       "perPerson": "/ persoană",
+      "priceOnContact": "Preț disponibil la contact",
       "noTrips": "Nu există excursii disponibile momentan.",
       "noImage": "Fără imagine"
     }
@@ -704,22 +810,65 @@
     }
   },
   "categoriesPage": {
-    "title": "Gaseste-ti Calea Catre Miracol",
+    "title": "Găsește-ți Calea Către Miracol",
     "subtitle": "Cinci moduri de a experimenta extraordinarul.",
     "homeHeading": "Categorii",
-    "homeSubtitle": "Totul pentru aventura ta egipteana",
+    "homeSubtitle": "Totul pentru aventura ta egipteană",
     "viewAll": "Vezi Toate Categoriile",
-    "exploreTrips": "Exploreaza Excursiile",
-    "emptyTitle": "Nicio categorie disponibila in acest moment.",
-    "errorTitle": "Nu se pot incarca categoriile de calatorie.",
-    "retry": "Incearca Din Nou"
+    "exploreTrips": "Explorează Excursiile",
+    "emptyTitle": "Nicio categorie disponibilă în acest moment.",
+    "errorTitle": "Nu se pot încărca categoriile de călătorie.",
+    "retry": "Încearcă Din Nou"
   },
   "tripTypesPage": {
-    "title": "Exploreaza Tipurile de Calatorii",
-    "subtitle": "Descopera diferite moduri de a experimenta minunile Egiptului.",
-    "emptyTitle": "Niciun tip de calatorie disponibil in acest moment.",
-    "errorTitle": "Nu s-au putut incarca tipurile de calatorii.",
-    "retry": "Incearca Din Nou"
+    "title": "Găsește-ți Calea Către Miracol",
+    "subtitle": "Cinci moduri de a experimenta extraordinarul.",
+    "emptyTitle": "Niciun tip de călătorie disponibil în acest moment.",
+    "errorTitle": "Nu s-au putut încărca tipurile de călătorii.",
+    "retry": "Încearcă Din Nou"
+  },
+  "tripsPage": {
+    "hero": {
+      "breadcrumbHome": "Acasă",
+      "breadcrumbTrips": "Excursii",
+      "heading": "Următoarea Ta Călătorie Începe Aici",
+      "subtitle": "Descoperă excursii de neuitat, destinații uimitoare și experiențe memorabile pe Marea Roșie și nu numai."
+    },
+    "filters": {
+      "searchPlaceholder": "Caută excursii...",
+      "allTypes": "Toate tipurile",
+      "allDestinations": "Toate destinațiile",
+      "allCategories": "Toate categoriile",
+      "categoryPrivate": "Tur Privat",
+      "categoryGroup": "Tur de Grup",
+      "minPrice": "Preț Min",
+      "maxPrice": "Preț Max",
+      "priceRange": "Interval de Preț",
+      "clearFilters": "Șterge Filtrele"
+    },
+    "card": {
+      "perPerson": "EUR / persoană",
+      "bookNow": "Rezervă Acum",
+      "addToCart": "Adaugă în Coș",
+      "addedToCart": "\"{title}\" adăugat în coș.",
+      "viewCart": "Vezi Coșul",
+      "categoryPrivate": "Privat",
+      "categoryGroup": "Grup",
+      "priceOnContact": "Preț disponibil la contact",
+      "noReviewsYet": "Fără recenzii încă",
+      "reviewsSingular": "Recenzie",
+      "reviewsPlural": "Recenzii"
+    },
+    "grid": {
+      "noTrips": "Nicio excursie găsită",
+      "noTripsDesc": "Nu am găsit nicio excursie conform criteriilor selectate. Încercați să ajustați filtrele.",
+      "resetFilters": "Resetează toate filtrele"
+    },
+    "pagination": {
+      "previous": "Anterior",
+      "next": "Următor",
+      "page": "Pagina"
+    }
   },
   "tripDetails": {
     "breadcrumbExperiences": "Experiente & Calatorii",
@@ -788,7 +937,21 @@
     "reviewError": "Trimiterea recenziei a esuat. Va rugam sa incercati din nou.",
     "stars": "Stele",
     "noReviewsYet": "Nicio recenzie inca",
-    "beFirstReview": "Ai trait aceasta experienta? Impartaseste parerea ta cu alti calatori."
+    "beFirstReview": "Ai trait aceasta experienta? Impartaseste parerea ta cu alti calatori.",
+    "priceOnContact": "Preț disponibil la contact",
+    "onContact": "La cerere",
+    "hideGallery": "Ascunde galeria",
+    "noExtraImages": "Nu există imagini suplimentare disponibile",
+    "privateTransfer": "Transfer privat",
+    "promoCode": "Cod promo",
+    "promoCodePlaceholder": "Introduceți codul promo",
+    "apply": "Aplică",
+    "promoApplied": "Cod promoțional aplicat cu succes",
+    "promoInvalid": "Cod promo invalid sau expirat",
+    "promoNotForTrip": "Acest cod promo nu este valabil pentru această excursie",
+    "discount": "Reducere",
+    "whatsappFullPriceNotice": "Vă rugăm să ne contactați pe WhatsApp pentru a afla prețul complet.",
+    "contactOnWhatsapp": "Contactează pe WhatsApp"
   },
   "whyChooseUs": {
     "eyebrow": "PROMISIUNEA NOASTRA",
@@ -911,5 +1074,53 @@
     "validationPassengers": "Completati numele si numarul de pasaport pentru toti pasagerii.",
     "successToast": "Cererea de zbor a fost trimisa cu succes!",
     "errorToast": "Nu s-a putut trimite cererea. Verificati datele."
+  },
+  "cartPage": {
+    "breadcrumbHome": "Acasa",
+    "breadcrumbTrips": "Excursii",
+    "breadcrumbCart": "Cos",
+    "title": "Cos & Rezervare Excursii",
+    "description": "Verificati excursiile selectate, alegeti datele de plecare si finalizati rezervarea multipla intr-un singur pas simplu.",
+    "emptyTitle": "Cosul dumneavoastra este gol",
+    "emptyDesc": "Nu ati adaugat inca excursii in cos. Explorati colectia noastra de aventuri in Egipt.",
+    "exploreTrips": "Exploreaza excursiile",
+    "departureDate": "Data plecarii",
+    "adults": "Adulti",
+    "children": "Copii",
+    "infants": "Infanti",
+    "each": "fiecare",
+    "priceOnContact": "Pret disponibil la cerere",
+    "onContactShort": "La cerere",
+    "remove": "Sterge",
+    "subtotal": "Subtotal",
+    "privateTransfer": "Transfer privat",
+    "summaryTitle": "Sumar Comanda",
+    "selectedExcursions": "Excursii Selectate",
+    "totalTravelers": "Total Calatori",
+    "estimatedTotal": "Total Estimat",
+    "includesOnContact": "Pret partial (exclude articolele la cerere)",
+    "onContactAlert": "Puteti rezerva in continuare direct mai jos! Pretul afisat nu reprezinta totalul complet, deoarece unele excursii sunt la cerere. Va rugam sa ne contactati pe WhatsApp pentru a avea pretul complet.",
+    "inquireWhatsApp": "Contactati-ne pe WhatsApp pentru pretul complet",
+    "addMoreTrips": "Adauga alte excursii",
+    "clearCart": "Goleste cosul",
+    "promoCode": "Cod Promo",
+    "enterPromoCode": "Introduceti codul promo",
+    "apply": "Aplica",
+    "promoApplied": "Cod promo aplicat cu succes!",
+    "promoInvalid": "Cod promo invalid sau expirat",
+    "promoDiscount": "Reducere Promo",
+    "checkoutEyebrow": "Pasul final",
+    "checkoutTitle": "Oaspete Principal & Detalii Hotel",
+    "checkoutDesc": "Avem nevoie de aceste informatii pentru a organiza preluarea de la hotel si emiterea voucherului.",
+    "firstName": "Prenume",
+    "lastName": "Nume de familie",
+    "email": "Adresa de email",
+    "phone": "Telefon / WhatsApp",
+    "nationality": "Nationalitate",
+    "hotelName": "Nume Hotel / Resort (Loc de preluare)",
+    "roomNo": "Numar camera (Optional)",
+    "confirmAndBook": "Confirma si Rezerva",
+    "tripsCount": "{count} Excursie/i",
+    "noPrepayment": "Nu este necesara plata in avans. Confirmare sigura prin concierge WhatsApp."
   }
 }
