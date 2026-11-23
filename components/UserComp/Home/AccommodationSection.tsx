@@ -122,7 +122,6 @@ export default function AccommodationSection() {
                 key={hotel.id}
                 hotel={hotel}
                 index={index}
-                showInquire={false}
               />
             ))}
           </div>

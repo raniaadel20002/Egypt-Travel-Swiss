@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FiX } from "react-icons/fi";
 import { motion, useReducedMotion } from "framer-motion";
@@ -10,7 +9,6 @@ import { HotelApiItem } from "@/models/hotel";
 import { localeToBackendLanguage } from "@/shared/utils/localeToBackendLanguage";
 import AccommodationCard from "./AccommodationCard";
 import AccommodationCardSkeleton from "./AccommodationCardSkeleton";
-import HotelInquiryModal from "./HotelInquiryModal";
 import { ErrorState, EmptyState } from "./AccommodationStates";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -20,7 +18,6 @@ export default function AccommodationGridSection() {
   const searchParams = useSearchParams();
   const { locale, dictionary: dict } = useLocale();
   const reduced = useReducedMotion();
-  const [selectedHotel, setSelectedHotel] = useState<HotelApiItem | null>(null);
 
   const qParam = searchParams.get("q") || "";
   const rateParam = searchParams.get("rate")
@@ -39,14 +36,6 @@ export default function AccommodationGridSection() {
     Search: qParam || undefined,
     Rate: rateParam,
   });
-
-  const handleInquire = (hotel: HotelApiItem) => {
-    setSelectedHotel(hotel);
-  };
-
-  const handleCloseModal = () => {
-    setSelectedHotel(null);
-  };
 
   const handleClearFilters = () => {
     router.push(`/${locale}/accommodation`);
@@ -138,19 +127,11 @@ export default function AccommodationGridSection() {
                 key={hotel.id}
                 hotel={hotel}
                 index={index}
-                onInquire={handleInquire}
               />
             ))}
           </div>
         )}
       </div>
-
-      {/* Inquiry / Booking Modal */}
-      <HotelInquiryModal
-        hotel={selectedHotel}
-        isOpen={Boolean(selectedHotel)}
-        onClose={handleCloseModal}
-      />
     </section>
   );
 }

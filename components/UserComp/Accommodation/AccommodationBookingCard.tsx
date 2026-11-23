@@ -30,7 +30,7 @@ export default function AccommodationBookingCard({
   const [nationality, setNationality] = useState("");
   const [bookingDate, setBookingDate] = useState("");
   const [nightsCount, setNightsCount] = useState(3);
-  const [adults, setAdults] = useState(2);
+  const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
 
   const createBookingMutation = useCreateHotelBookingMutation();
@@ -100,7 +100,7 @@ export default function AccommodationBookingCard({
           Reserve Your Stay
         </span>
         <h3 className="font-[family-name:var(--font-cormorant)] text-2xl font-bold text-[#013E51]">
-          Inquire &amp; Book
+          Reserve Your Stay
         </h3>
         <p className="font-[family-name:var(--font-lato)] text-xs text-[#888888] mt-1">
           Best rates guaranteed directly with Egypt Travel Swiss Concierge.
@@ -229,7 +229,7 @@ export default function AccommodationBookingCard({
           className="w-full bg-[#013E51] hover:bg-[#E8B34A] hover:text-[#013E51] text-white font-[family-name:var(--font-lato)] font-bold text-xs sm:text-sm uppercase tracking-wider py-3.5 rounded-xl transition-all duration-200 text-center cursor-pointer shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
         >
           {createBookingMutation.isPending ? (
-            <span>Sending Inquiry...</span>
+            <span>Sending Request...</span>
           ) : (
             <>
               <FiCheck className="w-4 h-4" />

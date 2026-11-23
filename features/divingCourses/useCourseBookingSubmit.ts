@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { createDivingCourseBooking } from "@/clientApi/divingCourseBookingsApi";
 import { initializePayPalPayment } from "@/clientApi/paymentsApi";
 import { savePendingPaymentSession } from "@/features/payments/paymentSessionStorage";
+import { initializeOrRecoverDivingPayment } from "@/features/payments/paymentInitHelper";
 import { extractErrorMessage } from "@/shared/utils/errorHandler";
 
 interface SubmitCourseBookingInput {
@@ -72,28 +73,47 @@ export function useCourseBookingSubmit() {
       const responseData = ((res as unknown as Record<string, unknown>)?.data ||
         res) as Record<string, any>;
       const targetBookingId = String(
-        responseData?.bookingId || responseData?.booking?.id || ""
+        responseData?.bookingId ||
+          responseData?.booking?.id ||
+          responseData?.id ||
+          responseData?.data?.id ||
+          responseData?.data?.bookingId ||
+          ""
       );
-      const bookingData = responseData?.booking;
+      const bookingData = responseData?.booking || responseData?.data?.booking;
+
+      const payableAmount = Number(bookingData?.totalPrice ?? totalPrice);
+
+      if (!targetBookingId || payableAmount <= 0) {
+        throw new Error(
+          "Unable to initialize reservation for payment. Please try again."
+        );
+      }
+      const depositAmount = payableAmount * 0.5;
+      const remainingOnArrival = payableAmount - depositAmount;
+
+      const paymentInit = await initializeOrRecoverDivingPayment(
+        targetBookingId,
+        depositAmount,
+        initializePayPalPayment
+      );
 
       const successParams: Record<string, string> = {
         type: "diving",
-        id: targetBookingId || "unknown",
+        id: targetBookingId,
         name: fullName.trim(),
-        divingId: targetBookingId || "unknown",
+        divingId: targetBookingId,
         divingName: bookingData?.fullName || fullName.trim(),
         divingEmail: bookingData?.email || email.trim(),
         divingPhone: bookingData?.phone || phone.trim(),
         roomNo: bookingData?.roomNo || roomNo.trim(),
         divingHotel: bookingData?.hotelName || hotelName.trim(),
-        divingTotal: String(bookingData?.totalPrice ?? totalPrice),
-        divingDeposit: String(bookingData?.depositAmount ?? 0),
-        divingRemaining: String(
-          bookingData?.remainingAmount ?? bookingData?.totalPrice ?? totalPrice
-        ),
+        divingTotal: String(payableAmount),
+        divingDeposit: String(depositAmount),
+        divingRemaining: String(remainingOnArrival),
         divingCurrency: bookingData?.currency || currency || "EUR",
         divingStatus: bookingData?.status || "Pending",
-        divingPaymentStatus: bookingData?.paymentStatus || "Pending",
+        divingPaymentStatus: "Paid",
         divingItems: JSON.stringify(
           bookingData?.items || [
             {
@@ -107,33 +127,24 @@ export function useCourseBookingSubmit() {
         ),
       };
 
-      const payableAmount = Number(bookingData?.totalPrice ?? totalPrice);
-      if (targetBookingId && payableAmount > 0) {
-        const initialized = await initializePayPalPayment({
-          divingCourseBookingId: targetBookingId,
-        });
+      savePendingPaymentSession({
+        bookingType: "diving",
+        bookingId: targetBookingId,
+        paymentId: paymentInit.paymentId,
+        payPalOrderId: paymentInit.payPalOrderId,
+        amount: depositAmount,
+        fullTotalAmount: payableAmount,
+        depositPercentage: bookingData?.depositPercentage || 50,
+        remainingOnArrival,
+        currency: paymentInit.currency || currency || "EUR",
+        bookingReference: paymentInit.bookingReference || targetBookingId,
+        title: courseName,
+        customerName: fullName.trim(),
+        successParams,
+      });
 
-        savePendingPaymentSession({
-          bookingType: "diving",
-          bookingId: targetBookingId,
-          divingCoursePaymentId: String(
-            initialized.divingCoursePaymentId || initialized.paymentId
-          ),
-          payPalOrderId: initialized.payPalOrderId,
-          amount: Number(initialized.amount || payableAmount),
-          currency: initialized.currency || currency || "EUR",
-          bookingReference: initialized.bookingReference || targetBookingId,
-          title: courseName,
-          customerName: fullName.trim(),
-          successParams,
-        });
-
-        router.push(`/${locale}/checkout/payment?type=diving`);
-        return;
-      }
-
-      const params = new URLSearchParams(successParams);
-      router.push(`/${locale}/booking-success?${params.toString()}`);
+      router.push(`/${locale}/checkout/payment?type=diving&bookingId=${encodeURIComponent(targetBookingId)}`);
+      return;
     } catch (err) {
       toast.error(extractErrorMessage(err, errorMessage));
     } finally {

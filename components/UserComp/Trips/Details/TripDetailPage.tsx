@@ -73,7 +73,7 @@ export const TripDetailPage: React.FC<TripDetailPageProps> = ({
   }, []);
 
   const [leaveDate, setLeaveDate] = useState<string>(defaultDateStr);
-  const [noAdult, setNoAdult] = useState<number>(2);
+  const [noAdult, setNoAdult] = useState<number>(1);
   const [noChild, setNoChild] = useState<number>(0);
   const [noInf, setNoInf] = useState<number>(0);
   const [selectedServices, setSelectedServices] = useState<ServiceApiItem[]>([]);

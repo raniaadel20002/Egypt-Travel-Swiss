@@ -13,6 +13,9 @@ interface TripBookingSuccessCardProps {
   pickupLocation?: string;
   tripsCount?: number | string;
   totalAmount?: string;
+  fullTotal?: string;
+  depositPaid?: string;
+  remainingAmount?: string;
   currency?: string;
   onContact?: boolean;
   paymentStatus?: string;
@@ -30,6 +33,9 @@ export default function TripBookingSuccessCard({
   pickupLocation = "",
   tripsCount = 1,
   totalAmount,
+  fullTotal,
+  depositPaid,
+  remainingAmount,
   currency = "EUR",
   onContact = false,
   paymentStatus,
@@ -53,6 +59,16 @@ export default function TripBookingSuccessCard({
       : isPrivate
       ? t.badgePrivate
       : t.badgeGroup;
+
+  const numFullTotal = Number(fullTotal || totalAmount || 0);
+  const numDeposit =
+    depositPaid && Number(depositPaid) > 0 && Number(depositPaid) < numFullTotal
+      ? Number(depositPaid)
+      : numFullTotal * 0.5;
+  const numRemaining =
+    remainingAmount && Number(remainingAmount) > 0 && Number(remainingAmount) <= numFullTotal
+      ? Number(remainingAmount)
+      : Math.max(0, numFullTotal - numDeposit);
 
   return (
     <motion.div
@@ -119,11 +135,11 @@ export default function TripBookingSuccessCard({
             Booking Total
           </span>
           <span className="font-bold text-xs sm:text-sm text-[#013E51] block truncate">
-            {totalAmount ? (
+            {numFullTotal > 0 ? (
               onContact ? (
-                `€${totalAmount} + Contact`
+                `€${numFullTotal.toFixed(0)} + Contact`
               ) : (
-                `€${totalAmount}`
+                `€${numFullTotal.toFixed(2)}`
               )
             ) : onContact ? (
               "On Contact"
@@ -136,26 +152,42 @@ export default function TripBookingSuccessCard({
 
       {/* Online Payment Receipt Strip */}
       {paymentStatus && (
-        <div className="p-4 rounded-2xl bg-[#013E51] text-white flex flex-wrap items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-full bg-[#E8B34A] text-[#013E51] font-bold uppercase tracking-wider text-[10px]">
-              {paymentStatus}
-            </span>
-            {bookingRef && (
-              <span className="text-white/80 font-mono">Ref: {bookingRef}</span>
-            )}
-          </div>
-          <div className="flex items-center gap-4 text-white/85">
+        <div className="p-4 rounded-2xl bg-[#013E51] text-white space-y-2.5 text-xs">
+          <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-white/15">
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-1 rounded-full bg-[#E8B34A] text-[#013E51] font-bold uppercase tracking-wider text-[10px]">
+                {paymentStatus} (50% Deposit)
+              </span>
+              {bookingRef && (
+                <span className="text-white/80 font-mono">Ref: {bookingRef}</span>
+              )}
+            </div>
             {captureId && (
-              <span className="font-mono text-[11px]">
+              <span className="font-mono text-[11px] text-white/70">
                 Transaction: {captureId}
               </span>
             )}
-            {totalAmount && (
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 text-xs">
+            <div className="flex justify-between sm:flex-col">
+              <span className="text-white/60">50% Deposit Paid:</span>
               <span className="font-bold text-[#E8B34A]">
-                {totalAmount} {currency}
+                {numDeposit.toFixed(2)} {currency}
               </span>
-            )}
+            </div>
+            <div className="flex justify-between sm:flex-col">
+              <span className="text-white/60">50% Due on Arrival:</span>
+              <span className="font-bold text-white/90">
+                {numRemaining.toFixed(2)} {currency}
+              </span>
+            </div>
+            <div className="flex justify-between sm:flex-col">
+              <span className="text-white/60">Total Excursion Value:</span>
+              <span className="font-bold text-white">
+                {numFullTotal.toFixed(2)} {currency}
+              </span>
+            </div>
           </div>
         </div>
       )}

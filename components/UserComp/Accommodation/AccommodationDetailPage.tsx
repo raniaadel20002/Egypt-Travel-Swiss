@@ -149,7 +149,6 @@ export default function AccommodationDetailPage({
                 <AccommodationCard
                   key={other.id}
                   hotel={other}
-                  onInquire={() => {}}
                 />
               ))}
             </div>

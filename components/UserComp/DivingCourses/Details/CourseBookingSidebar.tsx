@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { FiArrowRight, FiCompass, FiLoader } from "react-icons/fi";
-import { getTomorrowIsoDate } from "@/shared/utils/cartPricing";
+import { getTomorrowIsoDate, formatPriceAmount } from "@/shared/utils/cartPricing";
 import { useCourseBookingSubmit } from "@/features/divingCourses/useCourseBookingSubmit";
 import CourseGuestDetailsFields from "./CourseGuestDetailsFields";
 
@@ -31,7 +31,7 @@ export default function CourseBookingSidebar({
 }: CourseBookingSidebarProps) {
   const { isSubmitting, submitCourseBooking } = useCourseBookingSubmit();
   const [date, setDate] = useState(getTomorrowIsoDate());
-  const [participants, setParticipants] = useState(2);
+  const [participants, setParticipants] = useState(1);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -203,18 +203,28 @@ export default function CourseBookingSidebar({
         </div>
 
         {/* Total Highlight Box */}
-        <div className="p-3.5 rounded-[14px] bg-[#FAF7F2] border border-[#013E51]/10 flex items-center justify-between">
-          <span className="text-xs font-bold uppercase tracking-wider text-[#013E51]">
-            {t.totalCourseFee}
-          </span>
-          <div className="text-right">
-            <span className="font-[family-name:var(--font-cormorant)] text-xl font-extrabold text-[#013E51]">
-              {symbol}
-              {totalPrice}
+        <div className="p-3.5 rounded-[14px] bg-[#FAF7F2] border border-[#013E51]/10 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#013E51]">
+              {t.totalCourseFee}
             </span>
-            <span className="text-[11px] text-[#013E51]/60 font-medium ml-1">
-              {t.total}
-            </span>
+            <div className="text-right">
+              <span className="font-[family-name:var(--font-cormorant)] text-xl font-extrabold text-[#013E51]">
+                {symbol}
+                {totalPrice}
+              </span>
+              <span className="text-[11px] text-[#013E51]/60 font-medium ml-1">
+                {t.total}
+              </span>
+            </div>
+          </div>
+          <div className="pt-2 border-t border-[#013E51]/10 flex items-center justify-between text-xs">
+            <span className="text-[#013E51] font-semibold">50% Deposit Due Online:</span>
+            <span className="font-bold text-[#E8B34A]">{symbol}{formatPriceAmount(totalPrice * 0.5)}</span>
+          </div>
+          <div className="flex items-center justify-between text-[11px] text-[#013E51]/60">
+            <span>50% Due on Arrival:</span>
+            <span className="font-semibold text-[#013E51]">{symbol}{formatPriceAmount(totalPrice * 0.5)}</span>
           </div>
         </div>
 
@@ -231,7 +241,7 @@ export default function CourseBookingSidebar({
             </>
           ) : (
             <>
-              <span>{t.confirmBooking}</span>
+              <span>Pay 50% Deposit ({symbol}{formatPriceAmount(totalPrice * 0.5)})</span>
               <FiArrowRight className="w-4 h-4" />
             </>
           )}

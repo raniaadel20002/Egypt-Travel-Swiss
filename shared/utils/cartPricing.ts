@@ -58,3 +58,7 @@ export function getTomorrowIsoDate(): string {
   d.setDate(d.getDate() + 1);
   return d.toISOString().split("T")[0];
 }
+
+export function formatPriceAmount(amount: number): string {
+  return amount % 1 === 0 ? amount.toFixed(0) : amount.toFixed(2);
+}

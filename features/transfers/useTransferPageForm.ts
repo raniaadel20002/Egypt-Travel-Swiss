@@ -41,7 +41,7 @@ export function useTransferPageForm() {
 
   const [selectedFromId, setSelectedFromId] = useState<string>("");
   const [selectedToId, setSelectedToId] = useState<string>("");
-  const [adults, setAdults] = useState<number>(2);
+  const [adults, setAdults] = useState<number>(1);
   const [childrenCount, setChildrenCount] = useState<number>(0);
   const [isRoundTrip, setIsRoundTrip] = useState<boolean>(false);
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>("");

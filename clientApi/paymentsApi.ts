@@ -45,3 +45,16 @@ export async function getPaymentsByBookingId(
   );
   return response.data?.data || [];
 }
+
+export async function getPaymentsByDivingCourseBookingId(
+  divingCourseBookingId: string
+): Promise<PaymentDetailData[]> {
+  try {
+    const response = await apiClient.get<ApiResponse<PaymentDetailData[]>>(
+      `/api/Payments/diving-course/${divingCourseBookingId}`
+    );
+    return response.data?.data || [];
+  } catch {
+    return [];
+  }
+}

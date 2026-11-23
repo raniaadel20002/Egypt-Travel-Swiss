@@ -47,7 +47,7 @@ export default function TransferBookingSuccessCard({
   tripType = "OneWay",
   tripDate = "",
   tripTime = "",
-  adults = 2,
+  adults = 1,
   children = 0,
   totalPersons = 2,
   customerName = "",

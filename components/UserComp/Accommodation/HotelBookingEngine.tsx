@@ -49,7 +49,7 @@ export default function HotelBookingEngine({ hotel }: HotelBookingEngineProps) {
               id: "room-initial-1",
               ratePlanId: first.id,
               ratePlanName: first.name,
-              adults: 2,
+              adults: 1,
               children: 0,
               infants: 0,
             },
@@ -89,7 +89,7 @@ export default function HotelBookingEngine({ hotel }: HotelBookingEngineProps) {
       id: `room-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       ratePlanId: ratePlan.id,
       ratePlanName: ratePlan.name,
-      adults: 2,
+      adults: 1,
       children: 0,
       infants: 0,
     };

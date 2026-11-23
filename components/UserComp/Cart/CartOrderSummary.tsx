@@ -5,6 +5,7 @@ import Link from "next/link";
 import { FiTrash2, FiShoppingBag, FiInfo, FiArrowRight } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
 import { CartPricingSummary } from "@/models/cart";
+import { formatPriceAmount } from "@/shared/utils/cartPricing";
 import { useLocale } from "@/shared/providers/LocaleProvider";
 import { useCartStore } from "@/features/cart/useCartStore";
 import CartPromoCodeSection from "./CartPromoCodeSection";
@@ -106,6 +107,24 @@ export default function CartOrderSummary({
             )}
           </span>
         </div>
+
+        {/* 50% Deposit & 50% On Arrival Notice */}
+        {!summary.hasOnContactTrip && summary.finalTotal > 0 && (
+          <div className="pt-3 border-t border-gray-100 space-y-2 bg-[#FAF7F2] p-3 rounded-xl border border-[#013E51]/10 text-xs">
+            <div className="flex items-center justify-between text-[#013E51]">
+              <span className="font-semibold">Deposit Due Online (50%):</span>
+              <span className="font-bold text-[#E8B34A] text-sm">
+                &euro;{formatPriceAmount(summary.finalTotal * 0.5)}
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-gray-500">
+              <span>Remaining on Arrival (50%):</span>
+              <span className="font-semibold text-gray-700">
+                &euro;{formatPriceAmount(summary.finalTotal * 0.5)}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* On-Contact WhatsApp Alert */}

@@ -55,6 +55,16 @@ export default function DivingBookingSuccessCard({
   const firstCourse = items[0];
   const totalParticipants = items.reduce((sum, item) => sum + item.numberOfParticipants, 0);
 
+  const numTotalPrice = Number(totalPrice) || 0;
+  const numDeposit =
+    Number(depositAmount) > 0 && Number(depositAmount) < numTotalPrice
+      ? Number(depositAmount)
+      : numTotalPrice * 0.5;
+  const numRemaining =
+    Number(remainingAmount) > 0 && Number(remainingAmount) <= numTotalPrice
+      ? Number(remainingAmount)
+      : Math.max(0, numTotalPrice - numDeposit);
+
   return (
     <motion.div
       initial={shouldReduce ? undefined : { opacity: 0, y: 16 }}
@@ -187,23 +197,19 @@ export default function DivingBookingSuccessCard({
         
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-white/80">{t.totalPrice}:</span>
-            <span className="font-bold">{Number(totalPrice).toFixed(2)} {currency}</span>
+            <span className="text-white/80">{t.totalPrice || "Total Course Value"}:</span>
+            <span className="font-bold">{numTotalPrice.toFixed(2)} {currency}</span>
           </div>
           
-          {Number(depositAmount) > 0 && (
-            <div className="flex justify-between">
-              <span className="text-white/80">{t.depositPaid}:</span>
-              <span className="font-bold text-[#E8B34A]">{Number(depositAmount).toFixed(2)} {currency}</span>
-            </div>
-          )}
+          <div className="flex justify-between">
+            <span className="text-white/80">50% Deposit Paid:</span>
+            <span className="font-bold text-[#E8B34A]">{numDeposit.toFixed(2)} {currency}</span>
+          </div>
           
-          {Number(remainingAmount) > 0 && (
-            <div className="flex justify-between pt-2 border-t border-white/20">
-              <span className="text-white/90 font-semibold">{t.remainingAmount}:</span>
-              <span className="font-bold text-lg">{Number(remainingAmount).toFixed(2)} {currency}</span>
-            </div>
-          )}
+          <div className="flex justify-between pt-2 border-t border-white/20">
+            <span className="text-white/90 font-semibold">50% Due on Arrival:</span>
+            <span className="font-bold text-lg">{numRemaining.toFixed(2)} {currency}</span>
+          </div>
         </div>
 
         <div className="flex items-center justify-between pt-3 border-t border-white/20">

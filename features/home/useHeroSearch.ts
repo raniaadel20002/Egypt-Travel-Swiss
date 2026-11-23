@@ -29,19 +29,19 @@ export function useHeroSearch() {
   const [hotelQuery, setHotelQuery] = useState("");
   const [hotelRate, setHotelRate] = useState<number | undefined>(undefined);
   const [hotelCheckIn, setHotelCheckIn] = useState(getTomorrowIsoDate());
-  const [hotelGuests, setHotelGuests] = useState("2");
+  const [hotelGuests, setHotelGuests] = useState("1");
 
   // Flights Tab State
-  const [flightFrom, setFlightFrom] = useState("Frankfurt (FRA)");
-  const [flightTo, setFlightTo] = useState("Hurghada (HRG)");
+  const [flightFrom, setFlightFrom] = useState("");
+  const [flightTo, setFlightTo] = useState("");
   const [flightDepDate, setFlightDepDate] = useState(getTomorrowIsoDate());
-  const [flightPax, setFlightPax] = useState("2");
+  const [flightPax, setFlightPax] = useState("1");
 
   // Transfer Tab State
   const [transferFromId, setTransferFromId] = useState("");
   const [transferToId, setTransferToId] = useState("");
   const [transferDate, setTransferDate] = useState(getTomorrowIsoDate());
-  const [transferAdults, setTransferAdults] = useState("2");
+  const [transferAdults, setTransferAdults] = useState("1");
 
   // Remote Queries
   const { data: destinations = [] } = useDestinationsQuery({

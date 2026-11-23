@@ -24,6 +24,21 @@ export default function PaymentSummaryHeader({
   const symbol =
     currency === "EUR" ? "\u20AC" : currency === "USD" ? "$" : currency === "GBP" ? "\u00A3" : `${currency} `;
 
+  const fullTotal =
+    session.fullTotalAmount && session.fullTotalAmount > 0
+      ? session.fullTotalAmount
+      : Number(session.amount || 0);
+
+  const depositDue =
+    session.fullTotalAmount && session.amount < session.fullTotalAmount
+      ? Number(session.amount || 0)
+      : fullTotal * 0.5;
+
+  const remainingOnArrival =
+    session.remainingOnArrival !== undefined && session.remainingOnArrival > 0
+      ? session.remainingOnArrival
+      : Math.max(0, fullTotal - depositDue);
+
   return (
     <div className="bg-[#013E51] text-white rounded-2xl sm:rounded-3xl p-6 sm:p-7 shadow-lg border border-[#E8B34A]/20 space-y-5 font-[family-name:var(--font-lato)]">
       <div className="pb-4 border-b border-white/10">
@@ -61,19 +76,33 @@ export default function PaymentSummaryHeader({
             </span>
           </div>
         )}
+
+        {fullTotal > 0 && (
+          <div className="flex items-center justify-between gap-3 pt-1 border-t border-white/10">
+            <span className="text-white/70">Full Booking Value:</span>
+            <span className="font-bold text-white/90">
+              {symbol}{fullTotal.toFixed(2)}
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="pt-4 border-t border-white/15 flex items-baseline justify-between">
-        <span className="text-xs font-bold uppercase tracking-wider text-white/80">
-          {labels.amountDue}
-        </span>
+        <div>
+          <span className="text-xs font-bold uppercase tracking-wider text-white/80 block">
+            50% Deposit Due Now:
+          </span>
+          <span className="text-[10px] text-white/60 block mt-0.5">
+            Remaining 50% ({symbol}{remainingOnArrival.toFixed(2)}) paid on arrival
+          </span>
+        </div>
         <div className="text-right">
           <span className="font-[family-name:var(--font-cormorant)] text-3xl sm:text-4xl font-bold text-[#E8B34A]">
             {symbol}
-            {Number(session.amount || 0).toFixed(2)}
+            {depositDue.toFixed(2)}
           </span>
           <span className="block text-[11px] text-white/60 mt-0.5">
-            {currency}
+            {currency} (50% Deposit)
           </span>
         </div>
       </div>

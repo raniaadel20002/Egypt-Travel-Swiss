@@ -1,5 +1,13 @@
 export type OnlinePaymentBookingType = "trip" | "diving";
 
+export const PaymentCaptureCategory = {
+  Trip: 0,
+  DivingCourse: 1,
+} as const;
+
+export type PaymentCaptureCategoryValue =
+  (typeof PaymentCaptureCategory)[keyof typeof PaymentCaptureCategory];
+
 export interface InitializePayPalPaymentPayload {
   bookingId?: number;
   divingCourseBookingId?: string;
@@ -19,8 +27,8 @@ export interface InitializePayPalPaymentData {
 }
 
 export interface CapturePayPalPaymentPayload {
-  paymentId?: number;
-  divingCoursePaymentId?: string;
+  category: PaymentCaptureCategoryValue;
+  paymentId: number;
   payPalOrderId: string;
 }
 
@@ -57,6 +65,9 @@ export interface PendingPaymentSession {
   divingCoursePaymentId?: string;
   payPalOrderId: string;
   amount: number;
+  fullTotalAmount?: number;
+  depositPercentage?: number;
+  remainingOnArrival?: number;
   currency: string;
   bookingReference?: string;
   title: string;

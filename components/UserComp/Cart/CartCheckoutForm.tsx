@@ -9,6 +9,7 @@ import { useCartStore } from "@/features/cart/useCartStore";
 import { useCreateBookingMutation } from "@/features/bookings/useBookings";
 import { useInitializePayPalPaymentMutation } from "@/features/payments/usePayments";
 import { savePendingPaymentSession } from "@/features/payments/paymentSessionStorage";
+import { initializeOrRecoverTripPayment } from "@/features/payments/paymentInitHelper";
 import { extractErrorMessage } from "@/shared/utils/errorHandler";
 import { CartPricingSummary } from "@/models/cart";
 import {
@@ -16,6 +17,7 @@ import {
   getAvailableDaysText,
   getDayNameForDate,
 } from "@/shared/utils/tripAvailability";
+import { formatPriceAmount } from "@/shared/utils/cartPricing";
 import CartGuestInputFields from "./CartGuestInputFields";
 import CartPromoCodeSection from "./CartPromoCodeSection";
 
@@ -134,28 +136,43 @@ export default function CartCheckoutForm({
         !summary.hasOnContactTrip && summary.finalTotal > 0 && bookingId > 0;
 
       if (requiresOnlinePayment) {
-        const initialized = await initializePaymentMutation.mutateAsync({
+        const fullTotal = summary.finalTotal;
+        const depositAmount = fullTotal * 0.5;
+        const remainingOnArrival = fullTotal - depositAmount;
+
+        const paymentInit = await initializeOrRecoverTripPayment(
           bookingId,
-        });
+          depositAmount,
+          (p) => initializePaymentMutation.mutateAsync(p)
+        );
+
         savePendingPaymentSession({
           bookingType: "trip",
           bookingId,
-          paymentId: Number(initialized.paymentId),
-          payPalOrderId: initialized.payPalOrderId,
-          amount: Number(initialized.amount || summary.finalTotal),
-          currency: initialized.currency || "EUR",
-          bookingReference: initialized.bookingReference || `#${bookingId}`,
+          paymentId: paymentInit.paymentId,
+          payPalOrderId: paymentInit.payPalOrderId,
+          amount: depositAmount,
+          fullTotalAmount: fullTotal,
+          depositPercentage: 50,
+          remainingOnArrival,
+          currency: paymentInit.currency || "EUR",
+          bookingReference: paymentInit.bookingReference || `#${bookingId}`,
           title:
             items.length > 1
               ? `${primaryTrip} (+${items.length - 1})`
               : primaryTrip,
           customerName: guestFullName,
-          successParams,
+          successParams: {
+            ...successParams,
+            fullTotal: fullTotal.toFixed(0),
+            depositAmount: depositAmount.toFixed(2),
+            remainingAmount: remainingOnArrival.toFixed(2),
+          },
         });
         setIsRedirecting(true);
         onRedirecting?.();
         router.push(
-          `/${locale}/checkout/payment?type=trip&paymentId=${initialized.paymentId}`
+          `/${locale}/checkout/payment?type=trip&paymentId=${paymentInit.paymentId}&bookingId=${bookingId}`
         );
         return;
       }
@@ -254,7 +271,7 @@ export default function CartCheckoutForm({
               <span>
                 {summary.hasOnContactTrip
                   ? `${t?.confirmAndBook || "Confirm & Book"} (${summary.itemCount} ${summary.itemCount === 1 ? "Trip" : "Trips"})`
-                  : `${t?.continueToPayment || "Continue to Card Payment"} (${summary.itemCount} ${summary.itemCount === 1 ? "Trip" : "Trips"})`}
+                  : `Pay 50% Deposit (€${formatPriceAmount(summary.finalTotal * 0.5)})`}
               </span>
             </>
           )}
@@ -272,8 +289,7 @@ export default function CartCheckoutForm({
             {summary.hasOnContactTrip
               ? t?.noPrepayment ||
                 "No prepayment required. Secure confirmation via WhatsApp concierge."
-              : t?.secureCardCheckout ||
-                "Pay securely by card on our website via PayPal."}
+              : "50% deposit paid securely online now. Remaining 50% paid on arrival."}
           </span>
         </div>
       </div>

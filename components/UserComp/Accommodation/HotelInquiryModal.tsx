@@ -32,7 +32,7 @@ export default function HotelInquiryModal({
   const [nationality, setNationality] = useState("");
   const [bookingDate, setBookingDate] = useState("");
   const [nightsCount, setNightsCount] = useState(3);
-  const [adults, setAdults] = useState(2);
+  const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
 
   const createBookingMutation = useCreateHotelBookingMutation();

@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { FiArrowLeft, FiChevronRight, FiLock } from "react-icons/fi";
+import { FiArrowLeft, FiChevronRight, FiLock, FiCheck } from "react-icons/fi";
 import { useLocale } from "@/shared/providers/LocaleProvider";
 import { isPayPalConfigured } from "@/config/paypalConfig";
 import PayPalProvider from "@/shared/providers/PayPalProvider";
@@ -18,6 +18,9 @@ export default function CheckoutPaymentPage() {
   const {
     session,
     hydrated,
+    isAlreadyPaid,
+    livePaymentDetail,
+    navigateToSuccess,
     isPaying,
     isReinitializing,
     errorMessage,
@@ -30,6 +33,16 @@ export default function CheckoutPaymentPage() {
   } = usePaypalCheckout();
 
   const configured = isPayPalConfigured();
+
+  const fullTotal =
+    session?.fullTotalAmount && session.fullTotalAmount > 0
+      ? session.fullTotalAmount
+      : Number(session?.amount || 0);
+
+  const depositAmount =
+    session?.fullTotalAmount && session.amount < session.fullTotalAmount
+      ? Number(session.amount || 0)
+      : fullTotal * 0.5;
 
   if (!hydrated) {
     return (
@@ -117,10 +130,34 @@ export default function CheckoutPaymentPage() {
                 />
               )}
 
-              {configured && (
+              {isAlreadyPaid ? (
+                <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 border border-emerald-200 bg-emerald-50/20 space-y-4">
+                  <div className="flex items-center gap-2 text-emerald-800 font-bold text-sm sm:text-base">
+                    <FiCheck className="w-5 h-5 text-emerald-600" />
+                    <span>50% Deposit Already Paid</span>
+                  </div>
+                  <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                    The 50% deposit for this booking has already been recorded and confirmed.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      navigateToSuccess(
+                        livePaymentDetail?.payPalCaptureId || undefined,
+                        livePaymentDetail?.amount,
+                        livePaymentDetail?.currency
+                      )
+                    }
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#013E51] text-white text-xs sm:text-sm font-bold hover:bg-[#022c3a] transition cursor-pointer"
+                  >
+                    <span>View Booking Voucher</span>
+                  </button>
+                </div>
+              ) : configured ? (
                 <PayPalProvider currency={session.currency} locale={locale}>
                   <PaymentCardForm
-                    amount={session.amount}
+                    key={session.payPalOrderId}
+                    amount={depositAmount}
                     currency={session.currency}
                     isPaying={isPaying}
                     setIsPaying={setIsPaying}
@@ -152,7 +189,7 @@ export default function CheckoutPaymentPage() {
                     }}
                   />
                 </PayPalProvider>
-              )}
+              ) : null}
             </div>
 
             <div className="lg:col-span-5">

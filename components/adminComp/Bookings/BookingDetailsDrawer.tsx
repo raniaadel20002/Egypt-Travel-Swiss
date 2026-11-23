@@ -2,7 +2,9 @@
 
 import { FiCalendar, FiCheck, FiCheckCircle, FiClock, FiHome, FiLoader, FiMail, FiMapPin, FiPhone, FiTrash2, FiUser } from "react-icons/fi";
 import { useBookingByIdQuery } from "@/features/bookings/useBookings";
+import { useBookingPaymentsQuery } from "@/features/payments/usePayments";
 import AdminDrawer from "@/components/adminComp/Common/AdminDrawer";
+import AdminBookingPaymentsSection from "@/components/adminComp/Common/AdminBookingPaymentsSection";
 import BookingStatusBadge from "./BookingStatusBadge";
 
 interface BookingDetailsDrawerProps {
@@ -26,6 +28,14 @@ export default function BookingDetailsDrawer({
 }: BookingDetailsDrawerProps) {
   const query = useBookingByIdQuery(bookingId, isOpen);
   const booking = query.data;
+  const paymentsQuery = useBookingPaymentsQuery(bookingId, isOpen);
+
+  const payments = paymentsQuery.data || [];
+  const hasPaidDeposit = payments.some((p) =>
+    ["completed", "paid", "captured"].includes((p.status || "").toLowerCase())
+  );
+  const depositTarget = (booking?.totalPrice || 0) * 0.5;
+  const paidOnlineTotal = hasPaidDeposit ? depositTarget : 0;
 
   const isPending = booking?.status?.toLowerCase() === "pending";
   const isConfirmed = booking?.status?.toLowerCase() === "confirmed";
@@ -169,6 +179,24 @@ export default function BookingDetailsDrawer({
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Online Payments & 50% Deposit Breakdown */}
+          <div className="p-4 rounded-2xl bg-white border border-gray-200">
+            <AdminBookingPaymentsSection
+              bookingType="trip"
+              bookingId={booking.id}
+              totalPrice={booking.totalPrice || 0}
+              currency="EUR"
+              depositPercentage={50}
+              depositAmount={(booking.totalPrice || 0) * 0.5}
+              paidAmount={paidOnlineTotal}
+              remainingAmount={Math.max(0, (booking.totalPrice || 0) - paidOnlineTotal)}
+              paymentStatus={booking.paymentStatus}
+              payments={payments}
+              isLoading={paymentsQuery.isLoading}
+              onRefresh={() => paymentsQuery.refetch()}
+            />
           </div>
 
           {/* Booked Excursions Breakdown */}

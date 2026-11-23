@@ -139,7 +139,7 @@ function SubmitCardButton({
         <>
           <FiLock className="w-4 h-4 stroke-[2.5]" />
           <span>
-            {labels.payNow} ({symbol}
+            Pay 50% Deposit ({symbol}
             {Number(amount || 0).toFixed(2)})
           </span>
         </>

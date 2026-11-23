@@ -2,6 +2,7 @@ import { FiEye, FiUser, FiPhone, FiMail, FiMapPin, FiCalendar } from "react-icon
 import { DivingCourseBookingApiItem } from "@/models/divingCourseBooking";
 import DivingCourseBookingStatusBadge from "./DivingCourseBookingStatusBadge";
 import { formatPriceEur } from "./divingCourseBookingHelpers";
+import AdminBookingPaidCell from "../Common/AdminBookingPaidCell";
 
 interface DivingCourseBookingsTableProps {
   bookings: DivingCourseBookingApiItem[];
@@ -44,7 +45,8 @@ export default function DivingCourseBookingsTable({
               <th className="py-3.5 px-4">Customer</th>
               <th className="py-3.5 px-4">Hotel & Room</th>
               <th className="py-3.5 px-4">Courses & Date</th>
-              <th className="py-3.5 px-4">Price (EUR)</th>
+              <th className="py-3.5 px-4">Total (EUR)</th>
+              <th className="py-3.5 px-4">Paid Amount</th>
               <th className="py-3.5 px-4">Status</th>
               <th className="py-3.5 px-4">Payment</th>
               <th className="py-3.5 px-4 text-right">Actions</th>
@@ -128,14 +130,21 @@ export default function DivingCourseBookingsTable({
                     </div>
                   </td>
 
-                  {/* Pricing (EUR) */}
+                  {/* Total (EUR) */}
                   <td className="py-3.5 px-4">
                     <span className="font-bold text-[#013E51] text-xs sm:text-sm block whitespace-nowrap">
                       {formatPriceEur(booking.totalPrice)}
                     </span>
-                    <span className="text-[11px] text-gray-500 block">
-                      Paid: {formatPriceEur(booking.paidAmount)}
-                    </span>
+                  </td>
+
+                  {/* Paid Amount */}
+                  <td className="py-3.5 px-4">
+                    <AdminBookingPaidCell
+                      bookingType="diving"
+                      bookingId={booking.id}
+                      totalPrice={booking.totalPrice || 0}
+                      initialPaid={booking.paidAmount}
+                    />
                   </td>
 
                   {/* Booking Status */}

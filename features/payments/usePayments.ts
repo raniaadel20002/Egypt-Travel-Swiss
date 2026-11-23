@@ -4,6 +4,7 @@ import {
   capturePayPalPayment,
   getPaymentById,
   getPaymentsByBookingId,
+  getPaymentsByDivingCourseBookingId,
 } from "@/clientApi/paymentsApi";
 import {
   InitializePayPalPaymentPayload,
@@ -13,6 +14,8 @@ import {
 export const PAYMENT_QUERY_KEYS = {
   detail: (paymentId: number | null) => ["payments", "detail", paymentId] as const,
   byBooking: (bookingId: number | null) => ["payments", "booking", bookingId] as const,
+  byDivingBooking: (divingCourseBookingId: string | null) =>
+    ["payments", "divingBooking", divingCourseBookingId] as const,
 };
 
 export function useInitializePayPalPaymentMutation() {
@@ -44,6 +47,20 @@ export function useBookingPaymentsQuery(bookingId: number | null, enabled = true
     queryKey: PAYMENT_QUERY_KEYS.byBooking(bookingId),
     queryFn: () => getPaymentsByBookingId(bookingId as number),
     enabled: Boolean(enabled && bookingId && bookingId > 0),
+    retry: 1,
+    refetchOnWindowFocus: false,
+  });
+}
+
+export function useDivingBookingPaymentsQuery(
+  divingCourseBookingId: string | null,
+  enabled = true
+) {
+  return useQuery({
+    queryKey: PAYMENT_QUERY_KEYS.byDivingBooking(divingCourseBookingId),
+    queryFn: () =>
+      getPaymentsByDivingCourseBookingId(divingCourseBookingId as string),
+    enabled: Boolean(enabled && divingCourseBookingId && divingCourseBookingId.length > 0),
     retry: 1,
     refetchOnWindowFocus: false,
   });

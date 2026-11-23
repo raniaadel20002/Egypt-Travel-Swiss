@@ -1,7 +1,9 @@
-import { FiX, FiUser, FiMapPin, FiCalendar, FiClock } from "react-icons/fi";
+import { FiX, FiUser, FiMapPin, FiCalendar, FiClock, FiCreditCard } from "react-icons/fi";
 import { useModalDismiss } from "@/shared/utils/useModalDismiss";
 import { DivingCourseBookingApiItem } from "@/models/divingCourseBooking";
 import { useDivingCourseBookingDetailQuery } from "@/features/divingCourses/useDivingCourseBookings";
+import { useDivingBookingPaymentsQuery } from "@/features/payments/usePayments";
+import AdminBookingPaymentsSection from "@/components/adminComp/Common/AdminBookingPaymentsSection";
 import DivingCourseBookingStatusBadge from "./DivingCourseBookingStatusBadge";
 import { formatPriceEur } from "./divingCourseBookingHelpers";
 
@@ -18,13 +20,39 @@ export default function DivingCourseBookingDetailsDrawer({
 }: DivingCourseBookingDetailsDrawerProps) {
   useModalDismiss({ isOpen, onClose });
 
-  const { data: freshDetail } = useDivingCourseBookingDetailQuery(
-    isOpen && booking?.id ? booking.id : undefined
-  );
+  const bookingId = isOpen && booking?.id ? booking.id : undefined;
 
-  if (!isOpen || !booking) return null;
+  const { data: freshDetail } = useDivingCourseBookingDetailQuery(bookingId);
 
   const b = freshDetail || booking;
+
+  const paymentsQuery = useDivingBookingPaymentsQuery(
+    isOpen && b?.id ? b.id : null,
+    Boolean(isOpen && b?.id)
+  );
+
+  if (!isOpen || !booking || !b) return null;
+
+  const rawPayments = paymentsQuery.data || [];
+  const payments =
+    rawPayments.length > 0
+      ? rawPayments
+      : b.payPalOrderId || b.paidAmount > 0
+      ? [
+          {
+            paymentId: 1,
+            bookingId: 0,
+            status: b.paymentStatus || "Paid",
+            amount: b.paidAmount || b.depositAmount || b.totalPrice * 0.5,
+            currency: b.currency || "EUR",
+            provider: "PayPal",
+            payPalOrderId: b.payPalOrderId || "—",
+            payPalCaptureId: b.payPalCaptureId || "—",
+            createdAt: b.createdAt,
+            paidAt: b.paidAmount > 0 ? b.createdAt : null,
+          },
+        ]
+      : [];
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden font-[family-name:var(--font-lato)]">
@@ -76,6 +104,25 @@ export default function DivingCourseBookingDetailsDrawer({
                 </div>
               </div>
             </div>
+
+            {/* Direct Pay Link for Unpaid Booking */}
+            {(b.paidAmount === 0 || b.paymentStatus === "Pending") && (
+              <div className="p-3.5 rounded-xl border border-amber-200 bg-amber-50/60 flex items-center justify-between gap-3">
+                <div className="text-xs text-amber-900">
+                  <span className="font-bold block">50% Deposit Unpaid</span>
+                  <span className="text-[11px] text-amber-800/80">Process online payment for this client.</span>
+                </div>
+                <a
+                  href={`/en/checkout/payment?type=diving&bookingId=${b.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#013E51] text-white text-xs font-bold hover:bg-[#022c3a] transition cursor-pointer"
+                >
+                  <FiCreditCard className="w-3.5 h-3.5 text-[#E8B34A]" />
+                  <span>Open Payment Gateway</span>
+                </a>
+              </div>
+            )}
 
             {/* Customer & Stay Info */}
             <div className="space-y-3">
@@ -152,42 +199,22 @@ export default function DivingCourseBookingDetailsDrawer({
               </div>
             </div>
 
-            {/* Financial Breakdown (EUR) */}
-            <div className="space-y-3">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-[#013E51] flex items-center gap-2">
-                <span className="font-bold text-[#E8B34A] text-sm">&euro;</span>
-                <span>Financial Breakdown (EUR)</span>
-              </h3>
-              <div className="bg-gray-50/70 p-4 rounded-xl border border-gray-100 text-xs space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Total Price:</span>
-                  <span className="font-semibold text-gray-700">
-                    {formatPriceEur(b.totalPrice)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">
-                    Deposit ({b.depositPercentage || 50}%):
-                  </span>
-                  <span className="font-semibold text-gray-700">
-                    {formatPriceEur(b.depositAmount)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Paid Amount:</span>
-                  <span className="font-semibold text-emerald-700">
-                    {formatPriceEur(b.paidAmount)}
-                  </span>
-                </div>
-                <div className="flex justify-between pt-2 border-t border-gray-200">
-                  <span className="text-gray-500 font-bold">
-                    Remaining Amount:
-                  </span>
-                  <span className="font-bold text-amber-700">
-                    {formatPriceEur(b.remainingAmount)}
-                  </span>
-                </div>
-              </div>
+            {/* Financial Breakdown & Online Payments (EUR) */}
+            <div className="p-4 rounded-xl border border-gray-100 bg-white">
+              <AdminBookingPaymentsSection
+                bookingType="diving"
+                bookingId={b.id}
+                totalPrice={b.totalPrice || 0}
+                currency={b.currency || "EUR"}
+                depositPercentage={b.depositPercentage || 50}
+                depositAmount={b.depositAmount || (b.totalPrice || 0) * 0.5}
+                paidAmount={b.paidAmount || 0}
+                remainingAmount={b.remainingAmount || (b.totalPrice || 0) * 0.5}
+                paymentStatus={b.paymentStatus}
+                payments={payments}
+                isLoading={paymentsQuery.isLoading}
+                onRefresh={() => paymentsQuery.refetch()}
+              />
             </div>
           </div>
         </div>

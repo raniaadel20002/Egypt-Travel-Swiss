@@ -30,6 +30,9 @@ export interface BookingApiItem {
   hotelName: string;
   roomNo: string;
   totalPrice: number;
+  paidAmount?: number;
+  depositAmount?: number;
+  remainingAmount?: number;
   status: string;
   paymentStatus?: string;
   payPalOrderId?: string;

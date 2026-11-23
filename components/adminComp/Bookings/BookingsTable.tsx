@@ -3,6 +3,7 @@
 import { FiCalendar, FiCheck, FiCheckCircle, FiEye, FiTrash2 } from "react-icons/fi";
 import { BookingApiItem } from "@/models/booking";
 import BookingStatusBadge from "./BookingStatusBadge";
+import AdminBookingPaidCell from "../Common/AdminBookingPaidCell";
 
 interface BookingsTableProps {
   items: BookingApiItem[];
@@ -62,6 +63,7 @@ export default function BookingsTable({
               <th className="py-4 px-4 sm:px-5">Excursion(s)</th>
               <th className="py-4 px-4 sm:px-5">Guests</th>
               <th className="py-4 px-4 sm:px-5">Total (EUR)</th>
+              <th className="py-4 px-4 sm:px-5">Paid Amount</th>
               <th className="py-4 px-4 sm:px-5">Status</th>
               <th className="py-4 px-4 sm:px-5 text-right">Actions</th>
             </tr>
@@ -166,9 +168,19 @@ export default function BookingsTable({
 
                   {/* Total EUR */}
                   <td className="py-4 px-4 sm:px-5">
-                    <span className="font-extrabold text-[#013E51] text-sm">
+                    <span className="font-extrabold text-[#013E51] text-sm whitespace-nowrap">
                       &euro;{booking.totalPrice?.toLocaleString() ?? 0}
                     </span>
+                  </td>
+
+                  {/* Paid Amount */}
+                  <td className="py-4 px-4 sm:px-5">
+                    <AdminBookingPaidCell
+                      bookingType="trip"
+                      bookingId={booking.id}
+                      totalPrice={booking.totalPrice || 0}
+                      initialPaid={booking.paidAmount}
+                    />
                   </td>
 
                   {/* Status */}

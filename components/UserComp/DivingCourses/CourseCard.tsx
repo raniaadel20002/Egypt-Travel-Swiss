@@ -37,7 +37,6 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps) {
     course.id,
     course.name
   );
-  const bookingPath = `/${locale}/bookings?courseId=${course.id}`;
 
   const firstImage = course.images?.[0]?.imageUrl || course.images?.[0]?.url;
   const imageSrc = firstImage ? resolveApiImageUrl(firstImage) : FALLBACK_IMAGE;
@@ -151,21 +150,14 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps) {
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="mt-5 grid grid-cols-2 gap-3">
+          {/* Action Button */}
+          <div className="mt-5">
             <Link
               href={detailsPath}
               onClick={(e) => e.stopPropagation()}
-              className="w-full text-center py-2.5 px-3 rounded-full border border-[#013E51] text-[#013E51] text-xs font-bold uppercase tracking-wider hover:bg-[#013E51] hover:text-white transition-colors duration-200"
+              className="w-full inline-flex items-center justify-center py-3 px-4 rounded-full bg-[#013E51] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#024f67] transition-colors duration-200 shadow-xs"
             >
               {cardT.details}
-            </Link>
-            <Link
-              href={bookingPath}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full text-center py-2.5 px-3 rounded-full bg-[#013E51] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#024f67] transition-colors duration-200 shadow-xs"
-            >
-              {cardT.book}
             </Link>
           </div>
         </div>

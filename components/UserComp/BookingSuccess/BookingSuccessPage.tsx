@@ -37,7 +37,7 @@ export default function BookingSuccessPage({ locale: _locale }: BookingSuccessPa
   const checkInDate = searchParams.get("checkIn") || undefined;
   const nightsCount = searchParams.get("nights") || 3;
   const roomsCount = searchParams.get("rooms") || 1;
-  const adults = searchParams.get("adults") || 2;
+  const adults = searchParams.get("adults") || 1;
   const children = searchParams.get("children") || 0;
   const infants = searchParams.get("infants") || 0;
   const ratePlanName = searchParams.get("plan") || undefined;
@@ -78,6 +78,9 @@ export default function BookingSuccessPage({ locale: _locale }: BookingSuccessPa
   const bookingRef = searchParams.get("bookingRef") || undefined;
   const paidAmount = searchParams.get("paidAmount") || undefined;
   const paidCurrency = searchParams.get("paidCurrency") || undefined;
+  const fullTotal = searchParams.get("fullTotal") || undefined;
+  const depositPaid = searchParams.get("depositPaid") || paidAmount || undefined;
+  const remainingAmount = searchParams.get("remainingAmount") || undefined;
 
   // Transfer params (All mapped from backend TransferBookingApiItem)
   const fromLocation = searchParams.get("from") || "";
@@ -152,7 +155,10 @@ export default function BookingSuccessPage({ locale: _locale }: BookingSuccessPa
             travelersCount={travelersCount}
             pickupLocation={pickupLocation}
             tripsCount={tripsCount}
-            totalAmount={paidAmount || totalAmount}
+            totalAmount={totalAmount}
+            fullTotal={fullTotal || totalAmount}
+            depositPaid={depositPaid}
+            remainingAmount={remainingAmount}
             currency={paidCurrency}
             onContact={onContact}
             paymentStatus={paymentStatus}
