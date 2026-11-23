@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import { useCartStore } from "@/features/cart/useCartStore";
 import BookingSuccessHeader from "./BookingSuccessHeader";
 import HotelBookingSuccessCard from "./HotelBookingSuccessCard";
 import DivingBookingSuccessCard from "./DivingBookingSuccessCard";
@@ -17,12 +18,14 @@ interface BookingSuccessPageProps {
 
 export default function BookingSuccessPage({ locale: _locale }: BookingSuccessPageProps) {
   const searchParams = useSearchParams();
+  const clearCart = useCartStore((s) => s.clearCart);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, left: 0, behavior: "instant" });
     }
-  }, []);
+    clearCart();
+  }, [clearCart]);
 
   const type = (searchParams.get("type") || "general").toLowerCase();
   const id = searchParams.get("id") || "";
@@ -70,6 +73,11 @@ export default function BookingSuccessPage({ locale: _locale }: BookingSuccessPa
   const tripsCount = searchParams.get("trips") || "1";
   const totalAmount = searchParams.get("total") || undefined;
   const onContact = searchParams.get("onContact") === "1";
+  const paymentStatus = searchParams.get("paymentStatus") || undefined;
+  const captureId = searchParams.get("captureId") || undefined;
+  const bookingRef = searchParams.get("bookingRef") || undefined;
+  const paidAmount = searchParams.get("paidAmount") || undefined;
+  const paidCurrency = searchParams.get("paidCurrency") || undefined;
 
   // Transfer params (All mapped from backend TransferBookingApiItem)
   const fromLocation = searchParams.get("from") || "";
@@ -131,7 +139,8 @@ export default function BookingSuccessPage({ locale: _locale }: BookingSuccessPa
             remainingAmount={divingRemainingAmount}
             currency={divingCurrency}
             status={divingStatus}
-            paymentStatus={divingPaymentStatus}
+            paymentStatus={paymentStatus || divingPaymentStatus}
+            captureId={captureId}
           />
         )}
 
@@ -143,8 +152,12 @@ export default function BookingSuccessPage({ locale: _locale }: BookingSuccessPa
             travelersCount={travelersCount}
             pickupLocation={pickupLocation}
             tripsCount={tripsCount}
-            totalAmount={totalAmount}
+            totalAmount={paidAmount || totalAmount}
+            currency={paidCurrency}
             onContact={onContact}
+            paymentStatus={paymentStatus}
+            captureId={captureId}
+            bookingRef={bookingRef}
           />
         )}
 
@@ -180,21 +193,6 @@ export default function BookingSuccessPage({ locale: _locale }: BookingSuccessPa
             departureDate={transferDate}
             returnDate={returnDate}
             passengersCount={passengers}
-          />
-        )}
-
-        {/* Fallback if type is general or unknown */}
-        {!["hotel", "diving", "trip", "transfer"].includes(type) && (
-          <HotelBookingSuccessCard
-            hotelName={hotelName}
-            location={hotelLocation}
-            checkInDate={checkInDate}
-            nightsCount={nightsCount}
-            roomsCount={roomsCount}
-            adults={adults}
-            children={children}
-            infants={infants}
-            ratePlanName={ratePlanName}
           />
         )}
 

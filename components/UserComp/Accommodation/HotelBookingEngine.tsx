@@ -75,11 +75,11 @@ export default function HotelBookingEngine({ hotel }: HotelBookingEngineProps) {
 
   const [guestDetails, setGuestDetails] = useState<GuestDetailsState>({
     checkInDate: getTomorrowDateString(),
-    nightsCount: 3,
+    nightsCount: 1,
     fullName: "",
     email: "",
     whatsApp: "",
-    nationality: "Egyptian",
+    nationality: "",
   });
 
   const createBookingMutation = useCreateHotelBookingMutation();

@@ -34,7 +34,6 @@ export default function CourseReviewModal({
   const [rating, setRating] = useState(5);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [comment, setComment] = useState("");
 
   const createReviewMutation = useCreateDivingCourseReviewMutation(courseId);
@@ -52,7 +51,6 @@ export default function CourseReviewModal({
       {
         name: name.trim(),
         email: email.trim(),
-        phone: phone.trim() || undefined,
         comment: comment.trim(),
         rating,
       },
@@ -61,7 +59,6 @@ export default function CourseReviewModal({
           toast.success(labels.reviewSuccessMessage);
           setName("");
           setEmail("");
-          setPhone("");
           setComment("");
           setRating(5);
           onClose();
@@ -132,14 +129,6 @@ export default function CourseReviewModal({
             onChange={(e) => setEmail(e.target.value)}
             className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-[#FAF7F2] text-sm text-[#013E51] focus:outline-hidden focus:ring-2 focus:ring-[#E8B34A]"
             required
-          />
-
-          <input
-            type="tel"
-            placeholder={labels.phone}
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-[#FAF7F2] text-sm text-[#013E51] focus:outline-hidden focus:ring-2 focus:ring-[#E8B34A]"
           />
 
           <textarea

@@ -4,6 +4,7 @@ import {
   ReviewProjectItem,
   CreateReviewProjectDto,
   ReviewsProjectQueryParams,
+  DUMMY_PROJECT_REVIEW_PHONE,
 } from "@/models/reviewsProject";
 
 export function isApiSuccess(res: unknown): boolean {
@@ -51,9 +52,14 @@ export async function getReviewProjectById(
 export async function createReviewProject(
   payload: CreateReviewProjectDto
 ): Promise<ApiResponse<ReviewProjectItem>> {
+  const requestBody = {
+    ...payload,
+    phone: payload.phone?.trim() || DUMMY_PROJECT_REVIEW_PHONE,
+  };
+
   const response = await apiClient.post<ApiResponse<ReviewProjectItem>>(
     "/api/ReviewsProject",
-    payload
+    requestBody
   );
   if (!isApiSuccess(response.data)) {
     throw new Error(

@@ -27,6 +27,7 @@ interface DivingBookingSuccessCardProps {
   currency?: string;
   status?: string;
   paymentStatus?: string;
+  captureId?: string;
 }
 
 const BRAND_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -45,6 +46,7 @@ export default function DivingBookingSuccessCard({
   currency = "EUR",
   status = "Pending",
   paymentStatus = "Pending",
+  captureId,
 }: DivingBookingSuccessCardProps) {
   const { dictionary: dict } = useLocale();
   const shouldReduce = useReducedMotion();
@@ -214,6 +216,15 @@ export default function DivingBookingSuccessCard({
             <span className="text-sm font-bold">{paymentStatus}</span>
           </div>
         </div>
+
+        {captureId && (
+          <div className="pt-2 border-t border-white/15 flex items-center justify-between text-xs text-white/80">
+            <span>Transaction ID</span>
+            <span className="font-mono font-semibold text-[#E8B34A]">
+              {captureId}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Note */}

@@ -1,22 +1,19 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { useLocale } from "@/shared/providers/LocaleProvider";
 import { useHotelsQuery } from "@/features/hotels/useHotels";
 import { localeToBackendLanguage } from "@/shared/utils/localeToBackendLanguage";
-import { HotelApiItem } from "@/models/hotel";
 import AccommodationCard from "../Accommodation/AccommodationCard";
 import AccommodationCardSkeleton from "../Accommodation/AccommodationCardSkeleton";
-import HotelInquiryModal from "../Accommodation/HotelInquiryModal";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 export default function AccommodationSection() {
   const { locale, dictionary: dict } = useLocale();
   const reduced = useReducedMotion();
-  const [selectedHotel, setSelectedHotel] = useState<HotelApiItem | null>(null);
 
   const backendLanguage = useMemo(
     () => localeToBackendLanguage(locale),
@@ -33,14 +30,6 @@ export default function AccommodationSection() {
   const displayHotels = useMemo(() => {
     return hotels?.slice(0, 3) || [];
   }, [hotels]);
-
-  const handleInquire = (hotel: HotelApiItem) => {
-    setSelectedHotel(hotel);
-  };
-
-  const handleCloseModal = () => {
-    setSelectedHotel(null);
-  };
 
   const headerVariant = (delay: number) => ({
     initial: { opacity: 0, y: reduced ? 0 : 20 },
@@ -133,7 +122,7 @@ export default function AccommodationSection() {
                 key={hotel.id}
                 hotel={hotel}
                 index={index}
-                onInquire={handleInquire}
+                showInquire={false}
               />
             ))}
           </div>
@@ -152,13 +141,6 @@ export default function AccommodationSection() {
           </Link>
         </motion.div>
       </div>
-
-      {/* Inquiry Modal */}
-      <HotelInquiryModal
-        hotel={selectedHotel}
-        isOpen={Boolean(selectedHotel)}
-        onClose={handleCloseModal}
-      />
     </section>
   );
 }

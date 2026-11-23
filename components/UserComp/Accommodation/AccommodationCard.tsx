@@ -16,7 +16,8 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 interface AccommodationCardProps {
   hotel: HotelApiItem;
   index?: number;
-  onInquire: (hotel: HotelApiItem) => void;
+  onInquire?: (hotel: HotelApiItem) => void;
+  showInquire?: boolean;
 }
 
 const FALLBACK_IMAGE =
@@ -26,6 +27,7 @@ export default function AccommodationCard({
   hotel,
   index = 0,
   onInquire,
+  showInquire = true,
 }: AccommodationCardProps) {
   const router = useRouter();
   const { locale, dictionary: dict } = useLocale();
@@ -163,26 +165,32 @@ export default function AccommodationCard({
         </div>
       </div>
 
-      {/* Card Action Footer: Two buttons (Details + Inquire) */}
-      <div className="p-5 sm:p-6 pt-0 grid grid-cols-2 gap-2.5">
+      {/* Card Action Footer */}
+      <div className={`p-5 sm:p-6 pt-0 ${showInquire && onInquire ? "grid grid-cols-2 gap-2.5" : "block"}`}>
         <Link
           href={detailsPath}
           onClick={(e) => e.stopPropagation()}
-          className="w-full text-center py-2.5 px-3 rounded-xl border border-[#013E51] text-[#013E51] hover:bg-[#013E51] hover:text-white transition-colors duration-200 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1"
+          className={`w-full text-center py-2.5 px-3 rounded-xl transition-all duration-200 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-xs ${
+            showInquire && onInquire
+              ? "border border-[#013E51] text-[#013E51] hover:bg-[#013E51] hover:text-white"
+              : "bg-[#013E51] hover:bg-[#E8B34A] hover:text-[#013E51] text-white"
+          }`}
         >
           <span>{dict.accommodation.card.details}</span>
           <FiArrowRight className="w-3.5 h-3.5" />
         </Link>
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onInquire(hotel);
-          }}
-          className="w-full bg-[#013E51] hover:bg-[#E8B34A] hover:text-[#013E51] text-white font-[family-name:var(--font-lato)] font-bold text-xs uppercase tracking-wider py-2.5 rounded-xl transition-all duration-200 text-center cursor-pointer shadow-sm flex items-center justify-center"
-        >
-          <span>{dict.accommodation.card.inquire}</span>
-        </button>
+        {showInquire && onInquire && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onInquire(hotel);
+            }}
+            className="w-full bg-[#013E51] hover:bg-[#E8B34A] hover:text-[#013E51] text-white font-[family-name:var(--font-lato)] font-bold text-xs uppercase tracking-wider py-2.5 rounded-xl transition-all duration-200 text-center cursor-pointer shadow-sm flex items-center justify-center"
+          >
+            <span>{dict.accommodation.card.inquire}</span>
+          </button>
+        )}
       </div>
     </motion.article>
   );

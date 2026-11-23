@@ -13,7 +13,11 @@ interface TripBookingSuccessCardProps {
   pickupLocation?: string;
   tripsCount?: number | string;
   totalAmount?: string;
+  currency?: string;
   onContact?: boolean;
+  paymentStatus?: string;
+  captureId?: string;
+  bookingRef?: string;
 }
 
 const BRAND_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -26,7 +30,11 @@ export default function TripBookingSuccessCard({
   pickupLocation = "",
   tripsCount = 1,
   totalAmount,
+  currency = "EUR",
   onContact = false,
+  paymentStatus,
+  captureId,
+  bookingRef,
 }: TripBookingSuccessCardProps) {
   const { dictionary: dict } = useLocale();
   const shouldReduce = useReducedMotion();
@@ -125,6 +133,32 @@ export default function TripBookingSuccessCard({
           </span>
         </div>
       </div>
+
+      {/* Online Payment Receipt Strip */}
+      {paymentStatus && (
+        <div className="p-4 rounded-2xl bg-[#013E51] text-white flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-1 rounded-full bg-[#E8B34A] text-[#013E51] font-bold uppercase tracking-wider text-[10px]">
+              {paymentStatus}
+            </span>
+            {bookingRef && (
+              <span className="text-white/80 font-mono">Ref: {bookingRef}</span>
+            )}
+          </div>
+          <div className="flex items-center gap-4 text-white/85">
+            {captureId && (
+              <span className="font-mono text-[11px]">
+                Transaction: {captureId}
+              </span>
+            )}
+            {totalAmount && (
+              <span className="font-bold text-[#E8B34A]">
+                {totalAmount} {currency}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Day of Trip Instructions */}
       <div className="p-4 rounded-2xl bg-[#F7EDE1]/40 border border-[#E8B34A]/30 space-y-2">

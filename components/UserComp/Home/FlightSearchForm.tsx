@@ -57,9 +57,9 @@ export default function FlightSearchForm() {
   };
 
   const todayIso = new Date().toISOString().split("T")[0];
-  const [fromAirport, setFromAirport] = useState("Zurich (ZRH)");
-  const [toAirport, setToAirport] = useState("Hurghada (HRG)");
-  const [departureDate, setDepartureDate] = useState(getTomorrowIsoDate());
+  const [fromAirport, setFromAirport] = useState("");
+  const [toAirport, setToAirport] = useState("");
+  const [departureDate, setDepartureDate] = useState("");
   const [returnDate, setReturnDate] = useState("");
   const [passengers, setPassengers] = useState("1");
 

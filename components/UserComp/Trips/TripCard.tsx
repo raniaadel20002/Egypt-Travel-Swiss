@@ -134,7 +134,7 @@ export default function TripCard({ trip, index = 0 }: TripCardProps) {
             href={detailsPath}
             className="block group-hover:text-[#19B8A5] transition-colors"
           >
-            <h3 className="font-[family-name:var(--font-cormorant)] text-2xl lg:text-[26px] font-bold text-[#013E51] leading-[30px] line-clamp-1">
+            <h3 className="font-[family-name:var(--font-cormorant)] text-2xl lg:text-[26px] font-bold text-[#013E51] leading-[30px] line-clamp-3 min-h-[60px]">
               {trip.name}
             </h3>
           </Link>

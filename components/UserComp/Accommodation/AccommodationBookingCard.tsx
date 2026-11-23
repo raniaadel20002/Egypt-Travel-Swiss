@@ -28,7 +28,7 @@ export default function AccommodationBookingCard({
   const [email, setEmail] = useState("");
   const [whatsApp, setWhatsApp] = useState("");
   const [nationality, setNationality] = useState("");
-  const [bookingDate, setBookingDate] = useState(getTomorrowDateString());
+  const [bookingDate, setBookingDate] = useState("");
   const [nightsCount, setNightsCount] = useState(3);
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);

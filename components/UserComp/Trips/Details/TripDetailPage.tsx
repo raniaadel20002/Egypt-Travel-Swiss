@@ -19,6 +19,7 @@ import { useLocale } from "@/shared/providers/LocaleProvider";
 import {
   isDateAvailableForTrip,
   getNextAvailableDate,
+  toLocalIsoDate,
 } from "@/shared/utils/tripAvailability";
 
 import TripGalleryCard from "./TripGalleryCard";
@@ -68,7 +69,7 @@ export const TripDetailPage: React.FC<TripDetailPageProps> = ({
   const defaultDateStr = useMemo(() => {
     const d = new Date();
     d.setDate(d.getDate() + 1);
-    return d.toISOString().split("T")[0];
+    return toLocalIsoDate(d);
   }, []);
 
   const [leaveDate, setLeaveDate] = useState<string>(defaultDateStr);

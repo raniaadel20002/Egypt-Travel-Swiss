@@ -21,8 +21,8 @@ export default function CartPromoCodeSection({
   const [code, setCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleApply = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleApply = async (e?: React.SyntheticEvent) => {
+    if (e) e.preventDefault();
     const trimmed = code.trim();
     if (!trimmed) return;
 
@@ -77,7 +77,7 @@ export default function CartPromoCodeSection({
   }
 
   return (
-    <form onSubmit={handleApply} className="space-y-1.5">
+    <div className="space-y-1.5">
       <label className="block text-xs font-bold text-[#013E51]">
         <span className="flex items-center gap-1.5">
           <FiTag className="text-[#E8B34A]" />
@@ -89,11 +89,18 @@ export default function CartPromoCodeSection({
           type="text"
           value={code}
           onChange={(e) => setCode(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleApply();
+            }
+          }}
           placeholder={t?.enterPromoCode || "Enter promo code"}
           className="flex-1 px-3.5 py-2 rounded-xl border border-gray-200 bg-[#F8F9FA] text-xs text-slate-800 placeholder:text-gray-400 focus:outline-hidden focus:ring-2 focus:ring-[#013E51] focus:border-[#013E51] transition-all"
         />
         <button
-          type="submit"
+          type="button"
+          onClick={() => handleApply()}
           disabled={!code.trim() || isLoading}
           className="px-4 py-2 rounded-xl bg-[#013E51] hover:bg-[#024f67] disabled:opacity-40 text-white font-bold text-xs transition-colors shrink-0 cursor-pointer flex items-center gap-1.5"
         >
@@ -105,6 +112,6 @@ export default function CartPromoCodeSection({
           <span>{t?.apply || "Apply"}</span>
         </button>
       </div>
-    </form>
+    </div>
   );
 }

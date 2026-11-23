@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { FiCalendar, FiArrowRight, FiX, FiMapPin, FiShield, FiAlertCircle } from "react-icons/fi";
 import { TripApiItem } from "@/models/trip";
 import { ServiceApiItem } from "@/models/service";
-import { PromoCodeItem } from "@/models/promoCode";
 import { Dictionary } from "@/features/i18n/i18nConfig";
 import { useCartStore } from "@/features/cart/useCartStore";
 import { useMatchPrivateVehicleTransfersQuery } from "@/features/privateVehicles/usePrivateVehicleTransfers";
@@ -19,7 +18,6 @@ import {
   getDayNameForDate,
 } from "@/shared/utils/tripAvailability";
 import { TripGuestStepper } from "./TripGuestStepper";
-import TripPromoCodeSection from "./TripPromoCodeSection";
 import TripOnContactNotice from "./TripOnContactNotice";
 import TripPriceBreakdownRows from "./TripPriceBreakdownRows";
 import { toast } from "sonner";
@@ -57,7 +55,6 @@ export const TripBookingSidebar: React.FC<TripBookingSidebarProps> = ({
 }) => {
   const router = useRouter();
   const addCustomConfiguredTrip = useCartStore((s) => s.addCustomConfiguredTrip);
-  const [appliedPromo, setAppliedPromo] = useState<PromoCodeItem | null>(null);
 
   const isOnContact = (trip.adultPrice ?? 0) <= 0;
   const isPrivate = trip.categoryName?.trim().toLowerCase().includes("private");
@@ -83,16 +80,7 @@ export const TripBookingSidebar: React.FC<TripBookingSidebarProps> = ({
     [selectedServices]
   );
 
-  const subtotal = adultTotal + childTotal + infantTotal + transferPrice + servicesTotal;
-
-  const discountAmount = useMemo(() => {
-    if (!appliedPromo) return 0;
-    if (appliedPromo.discountpercent > 0) return (subtotal * appliedPromo.discountpercent) / 100;
-    if (appliedPromo.discountEuro > 0) return Math.min(subtotal, appliedPromo.discountEuro);
-    return 0;
-  }, [appliedPromo, subtotal]);
-
-  const grandTotal = Math.max(0, subtotal - discountAmount);
+  const grandTotal = adultTotal + childTotal + infantTotal + transferPrice + servicesTotal;
 
   const primaryImage =
     trip.images?.find((img) => img.isPrimary)?.imageUrl ||
@@ -110,10 +98,9 @@ export const TripBookingSidebar: React.FC<TripBookingSidebarProps> = ({
     ];
     if (isPrivate && privateTransfer) lines.push(`*Private Transfer:* ${privateTransfer.vehicleName} (${transferPrice} €)`);
     if (selectedServices.length > 0) lines.push(`*Extra Services:* ${selectedServices.map((s) => s.name).join(", ")}`);
-    if (appliedPromo) lines.push(`*Promo Code:* ${appliedPromo.code}`);
     lines.push(`Please let me know the full price and availability details.`);
     return `https://wa.me/201004829104?text=${encodeURIComponent(lines.join("\n"))}`;
-  }, [trip.name, isPrivate, leaveDate, noAdult, noChild, noInf, privateTransfer, transferPrice, selectedServices, appliedPromo]);
+  }, [trip.name, isPrivate, leaveDate, noAdult, noChild, noInf, privateTransfer, transferPrice, selectedServices]);
 
   const todayStr = useMemo(() => new Date().toISOString().split("T")[0], []);
   const isDateValid = isDateAvailableForTrip(leaveDate, trip.availableDays);
@@ -150,7 +137,6 @@ export const TripBookingSidebar: React.FC<TripBookingSidebarProps> = ({
       })),
       transferPrice: isPrivate ? transferPrice : undefined,
       transferVehicleName: isPrivate ? privateTransfer?.vehicleName : undefined,
-      promoCode: appliedPromo,
     });
 
     toast.success(dict.bookingAddedSuccess || "Trip added to your booking!");
@@ -235,11 +221,6 @@ export const TripBookingSidebar: React.FC<TripBookingSidebarProps> = ({
         </div>
       )}
 
-      {/* Promo Code Input */}
-      <div className="pt-2 border-t border-gray-100">
-        <TripPromoCodeSection tripId={trip.id} appliedPromo={appliedPromo} onApplyPromo={setAppliedPromo} dict={dict} />
-      </div>
-
       {/* On Contact WhatsApp Notice */}
       {isOnContact && <TripOnContactNotice whatsappUrl={whatsappUrl} dict={dict} />}
 
@@ -256,7 +237,7 @@ export const TripBookingSidebar: React.FC<TripBookingSidebarProps> = ({
         transferPrice={transferPrice}
         vehicleName={privateTransfer?.vehicleName}
         servicesTotal={servicesTotal}
-        discountAmount={discountAmount}
+        discountAmount={0}
         dict={dict}
       />
 

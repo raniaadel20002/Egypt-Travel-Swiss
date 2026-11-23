@@ -2,11 +2,9 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { FiArrowRight, FiCompass, FiLoader } from "react-icons/fi";
-import { toast } from "sonner";
 import { getTomorrowIsoDate } from "@/shared/utils/cartPricing";
-import { createDivingCourseBooking } from "@/clientApi/divingCourseBookingsApi";
+import { useCourseBookingSubmit } from "@/features/divingCourses/useCourseBookingSubmit";
 import CourseGuestDetailsFields from "./CourseGuestDetailsFields";
 
 interface CourseBookingSidebarProps {
@@ -31,7 +29,7 @@ export default function CourseBookingSidebar({
   locale,
   t,
 }: CourseBookingSidebarProps) {
-  const router = useRouter();
+  const { isSubmitting, submitCourseBooking } = useCourseBookingSubmit();
   const [date, setDate] = useState(getTomorrowIsoDate());
   const [participants, setParticipants] = useState(2);
   const [fullName, setFullName] = useState("");
@@ -39,7 +37,6 @@ export default function CourseBookingSidebar({
   const [phone, setPhone] = useState("");
   const [hotelName, setHotelName] = useState("");
   const [roomNo, setRoomNo] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const code = (currency || "EUR").toUpperCase();
   const symbol =
@@ -55,69 +52,22 @@ export default function CourseBookingSidebar({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName.trim() || !email.trim() || !phone.trim()) {
-      toast.error(t.errorMessage);
-      return;
-    }
-
-    try {
-      setIsSubmitting(true);
-      const res = await createDivingCourseBooking({
-        fullName: fullName.trim(),
-        email: email.trim(),
-        phone: phone.trim(),
-        hotelName: hotelName.trim() || "To be confirmed",
-        roomNo: roomNo.trim() || "To be confirmed",
-        items: [
-          {
-            divingCourseId: courseId,
-            bookingDate: date,
-            numberOfParticipants: participants,
-          },
-        ],
-      });
-
-      toast.success(t.successMessage);
-      const responseData = ((res as Record<string, any>)?.data || res) as Record<string, any>;
-      const targetBookingId = responseData?.bookingId || responseData?.booking?.id;
-      const bookingData = responseData?.booking;
-
-      if (targetBookingId && bookingData) {
-        const params = new URLSearchParams({
-          type: "diving",
-          id: targetBookingId,
-          name: fullName.trim(),
-          divingId: targetBookingId,
-          divingName: bookingData.fullName || fullName.trim(),
-          divingEmail: bookingData.email || email.trim(),
-          divingPhone: bookingData.phone || phone.trim(),
-          roomNo: bookingData.roomNo || roomNo.trim(),
-          divingHotel: bookingData.hotelName || hotelName.trim(),
-          divingTotal: bookingData.totalPrice?.toString() || totalPrice.toString(),
-          divingDeposit: bookingData.depositAmount?.toString() || "0",
-          divingRemaining: bookingData.remainingAmount?.toString() || bookingData.totalPrice?.toString() || totalPrice.toString(),
-          divingCurrency: bookingData.currency || currency,
-          divingStatus: bookingData.status || "Pending",
-          divingPaymentStatus: bookingData.paymentStatus || "Pending",
-          divingItems: JSON.stringify(bookingData.items || [{
-            courseName: courseName,
-            bookingDate: date,
-            numberOfParticipants: participants,
-            unitPrice: unitPrice,
-            totalPrice: totalPrice
-          }])
-        });
-        router.push(`/${locale}/booking-success?${params.toString()}`);
-      } else {
-        router.push(
-          `/${locale}/booking-success?type=diving&id=${targetBookingId || "unknown"}&name=${encodeURIComponent(fullName.trim())}`
-        );
-      }
-    } catch {
-      toast.error(t.errorMessage);
-    } finally {
-      setIsSubmitting(false);
-    }
+    await submitCourseBooking({
+      courseId,
+      courseName,
+      date,
+      participants,
+      unitPrice,
+      totalPrice,
+      currency,
+      fullName,
+      email,
+      phone,
+      hotelName,
+      roomNo,
+      locale,
+      errorMessage: t.errorMessage,
+    });
   };
 
   return (

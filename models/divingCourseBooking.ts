@@ -32,6 +32,8 @@ export interface DivingCourseBookingApiItem {
   currency: string;
   status: string | number;
   paymentStatus: string;
+  payPalOrderId?: string;
+  payPalCaptureId?: string;
   createdAt: string;
 }
 

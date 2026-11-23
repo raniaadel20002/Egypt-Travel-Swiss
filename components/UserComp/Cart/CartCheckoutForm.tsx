@@ -7,6 +7,9 @@ import { toast } from "sonner";
 import { useLocale } from "@/shared/providers/LocaleProvider";
 import { useCartStore } from "@/features/cart/useCartStore";
 import { useCreateBookingMutation } from "@/features/bookings/useBookings";
+import { useInitializePayPalPaymentMutation } from "@/features/payments/usePayments";
+import { savePendingPaymentSession } from "@/features/payments/paymentSessionStorage";
+import { extractErrorMessage } from "@/shared/utils/errorHandler";
 import { CartPricingSummary } from "@/models/cart";
 import {
   isDateAvailableForTrip,
@@ -14,17 +17,24 @@ import {
   getDayNameForDate,
 } from "@/shared/utils/tripAvailability";
 import CartGuestInputFields from "./CartGuestInputFields";
+import CartPromoCodeSection from "./CartPromoCodeSection";
 
 interface CartCheckoutFormProps {
   summary: CartPricingSummary;
+  onRedirecting?: () => void;
 }
 
-export default function CartCheckoutForm({ summary }: CartCheckoutFormProps) {
+export default function CartCheckoutForm({
+  summary,
+  onRedirecting,
+}: CartCheckoutFormProps) {
   const { locale, dictionary } = useLocale();
   const t = dictionary.cartPage;
   const router = useRouter();
-  const { items, promoCode, clearCart } = useCartStore();
+  const { items, promoCode, setPromoCode } = useCartStore();
   const createBookingMutation = useCreateBookingMutation();
+  const initializePaymentMutation = useInitializePayPalPaymentMutation();
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -44,54 +54,37 @@ export default function CartCheckoutForm({ summary }: CartCheckoutFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (items.length === 0) {
-      toast.error("Your cart is empty.");
-      return;
-    }
-
+    if (items.length === 0) return toast.error("Your cart is empty.");
     if (!formData.firstName.trim() || !formData.lastName.trim()) {
-      toast.error("Please enter your full first and last name.");
-      return;
+      return toast.error("Please enter your full first and last name.");
     }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email.trim())) {
-      toast.error("Please enter a valid email address.");
-      return;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
+      return toast.error("Please enter a valid email address.");
     }
-
     if (!formData.phone.trim() || formData.phone.trim().length < 6) {
-      toast.error("Please enter a valid phone or WhatsApp number.");
-      return;
+      return toast.error("Please enter a valid phone or WhatsApp number.");
     }
-
     if (!formData.nationality.trim()) {
-      toast.error("Please provide your nationality.");
-      return;
+      return toast.error("Please provide your nationality.");
     }
-
     if (!formData.hotelName.trim()) {
-      toast.error("Please specify your hotel or pickup accommodation.");
-      return;
+      return toast.error("Please specify your hotel or pickup accommodation.");
     }
 
     const todayIso = new Date().toISOString().split("T")[0];
     for (const item of items) {
       if (!item.leaveDate || item.leaveDate < todayIso) {
-        toast.error(`Please select a valid departure date for "${item.name}".`);
-        return;
+        return toast.error(`Please select a valid departure date for "${item.name}".`);
       }
       if (!isDateAvailableForTrip(item.leaveDate, item.availableDays)) {
         const daysText = getAvailableDaysText(item.availableDays);
         const dayName = getDayNameForDate(item.leaveDate);
-        toast.error(
+        return toast.error(
           `"${item.name}" does not operate on ${dayName}. Available days: ${daysText}. Please choose an operating date in your cart.`
         );
-        return;
       }
       if (item.noAdult < 1) {
-        toast.error(`At least one adult is required for "${item.name}".`);
-        return;
+        return toast.error(`At least one adult is required for "${item.name}".`);
       }
     }
 
@@ -120,16 +113,13 @@ export default function CartCheckoutForm({ summary }: CartCheckoutFormProps) {
 
     try {
       const response = await createBookingMutation.mutateAsync(payload);
-      const bookingId = response?.id || Date.now();
+      const bookingId = response?.id || 0;
       const guestFullName = `${formData.firstName.trim()} ${formData.lastName.trim()}`;
       const primaryTrip = items[0]?.name || "Excursion";
 
-      clearCart();
-      toast.success("Booking submitted successfully!");
-
-      const searchParams = new URLSearchParams({
+      const successParams: Record<string, string> = {
         type: "trip",
-        id: String(bookingId),
+        id: String(bookingId || Date.now()),
         name: guestFullName,
         title: primaryTrip,
         trips: String(items.length),
@@ -138,11 +128,52 @@ export default function CartCheckoutForm({ summary }: CartCheckoutFormProps) {
         pickup: formData.hotelName.trim(),
         total: summary.finalTotal.toFixed(0),
         onContact: summary.hasOnContactTrip ? "1" : "0",
-      });
+      };
 
+      const requiresOnlinePayment =
+        !summary.hasOnContactTrip && summary.finalTotal > 0 && bookingId > 0;
+
+      if (requiresOnlinePayment) {
+        const initialized = await initializePaymentMutation.mutateAsync({
+          bookingId,
+        });
+        savePendingPaymentSession({
+          bookingType: "trip",
+          bookingId,
+          paymentId: Number(initialized.paymentId),
+          payPalOrderId: initialized.payPalOrderId,
+          amount: Number(initialized.amount || summary.finalTotal),
+          currency: initialized.currency || "EUR",
+          bookingReference: initialized.bookingReference || `#${bookingId}`,
+          title:
+            items.length > 1
+              ? `${primaryTrip} (+${items.length - 1})`
+              : primaryTrip,
+          customerName: guestFullName,
+          successParams,
+        });
+        setIsRedirecting(true);
+        onRedirecting?.();
+        router.push(
+          `/${locale}/checkout/payment?type=trip&paymentId=${initialized.paymentId}`
+        );
+        return;
+      }
+
+      setIsRedirecting(true);
+      onRedirecting?.();
+      toast.success("Booking submitted successfully!");
+
+      const searchParams = new URLSearchParams(successParams);
       router.push(`/${locale}/booking-success?${searchParams.toString()}`);
-    } catch {
-      toast.error("Failed to complete booking. Please review your details and try again.");
+    } catch (err) {
+      setIsRedirecting(false);
+      toast.error(
+        extractErrorMessage(
+          err,
+          "Failed to complete booking. Please review your details and try again."
+        )
+      );
     }
   };
 
@@ -174,6 +205,17 @@ export default function CartCheckoutForm({ summary }: CartCheckoutFormProps) {
         onChange={handleChange}
       />
 
+      {/* Embedded Promo Code Field directly in the Form */}
+      <div className="pt-2 border-t border-gray-100">
+        <label className="text-xs font-bold text-[#013E51] uppercase tracking-wider block mb-2">
+          {t?.promoCode || "Promo Code"}
+        </label>
+        <CartPromoCodeSection
+          appliedPromo={promoCode}
+          onApplyPromo={setPromoCode}
+        />
+      </div>
+
       <div className="pt-2">
         {hasInvalidDateItem && (
           <div className="mb-3 p-3 rounded-xl bg-amber-50 border border-amber-300 text-xs text-amber-900 flex items-start gap-2">
@@ -186,16 +228,33 @@ export default function CartCheckoutForm({ summary }: CartCheckoutFormProps) {
 
         <button
           type="submit"
-          disabled={createBookingMutation.isPending || items.length === 0 || hasInvalidDateItem}
+          disabled={
+            createBookingMutation.isPending ||
+            initializePaymentMutation.isPending ||
+            isRedirecting ||
+            items.length === 0 ||
+            hasInvalidDateItem
+          }
           className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-[#E8B34A] to-[#D49E35] text-[#013E51] font-bold text-base shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-all flex items-center justify-center gap-2"
         >
-          {createBookingMutation.isPending ? (
-            <div className="w-5 h-5 border-2 border-[#013E51] border-t-transparent rounded-full animate-spin" />
+          {createBookingMutation.isPending ||
+          initializePaymentMutation.isPending ||
+          isRedirecting ? (
+            <>
+              <div className="w-5 h-5 border-2 border-[#013E51] border-t-transparent rounded-full animate-spin" />
+              <span>
+                {summary.hasOnContactTrip
+                  ? "Redirecting to confirmation..."
+                  : "Preparing secure card payment..."}
+              </span>
+            </>
           ) : (
             <>
               <FiCheckCircle className="w-5 h-5 text-[#013E51]" />
               <span>
-                {t?.confirmAndBook || "Confirm & Book"} ({summary.itemCount} {summary.itemCount === 1 ? "Trip" : "Trips"})
+                {summary.hasOnContactTrip
+                  ? `${t?.confirmAndBook || "Confirm & Book"} (${summary.itemCount} ${summary.itemCount === 1 ? "Trip" : "Trips"})`
+                  : `${t?.continueToPayment || "Continue to Card Payment"} (${summary.itemCount} ${summary.itemCount === 1 ? "Trip" : "Trips"})`}
               </span>
             </>
           )}
@@ -209,7 +268,13 @@ export default function CartCheckoutForm({ summary }: CartCheckoutFormProps) {
 
         <div className="mt-3 flex items-center justify-center gap-2 text-xs text-[#013E51]/70">
           <FiLock className="w-3.5 h-3.5 text-[#E8B34A]" />
-          <span>{t?.noPrepayment || "No prepayment required. Secure confirmation via WhatsApp concierge."}</span>
+          <span>
+            {summary.hasOnContactTrip
+              ? t?.noPrepayment ||
+                "No prepayment required. Secure confirmation via WhatsApp concierge."
+              : t?.secureCardCheckout ||
+                "Pay securely by card on our website via PayPal."}
+          </span>
         </div>
       </div>
     </form>

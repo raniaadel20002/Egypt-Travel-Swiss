@@ -14,7 +14,10 @@ export default function TripCardSkeleton() {
           </div>
 
           {/* Title Placeholder */}
-          <div className="h-7 w-3/4 bg-gray-200 rounded-sm" />
+          <div className="space-y-2 min-h-[60px]">
+            <div className="h-6 w-3/4 bg-gray-200 rounded-sm" />
+            <div className="h-6 w-1/2 bg-gray-200 rounded-sm" />
+          </div>
 
           {/* Price & Rating Placeholder */}
           <div className="flex items-center justify-between pt-1">

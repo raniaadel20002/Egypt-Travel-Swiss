@@ -29,7 +29,6 @@ export const TripReviewModal: React.FC<TripReviewModalProps> = ({
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [comment, setComment] = useState("");
 
   if (!isOpen) return null;
@@ -48,7 +47,6 @@ export const TripReviewModal: React.FC<TripReviewModalProps> = ({
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         email: email.trim(),
-        phone: phone.trim() || undefined,
         comment: comment.trim(),
         rate,
       });
@@ -58,7 +56,6 @@ export const TripReviewModal: React.FC<TripReviewModalProps> = ({
       setFirstName("");
       setLastName("");
       setEmail("");
-      setPhone("");
       setComment("");
       setRate(5);
     } catch {
@@ -161,33 +158,19 @@ export const TripReviewModal: React.FC<TripReviewModalProps> = ({
               </div>
             </div>
 
-            {/* Email & Phone */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  {dict.emailAddress} *
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#E8B34A] focus:border-[#E8B34A] transition-all"
-                  placeholder="name@example.com"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  {dict.phoneNumber}
-                </label>
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#E8B34A] focus:border-[#E8B34A] transition-all"
-                  placeholder="+41 79 000 00 00"
-                />
-              </div>
+            {/* Email Address */}
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">
+                {dict.emailAddress} *
+              </label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#E8B34A] focus:border-[#E8B34A] transition-all"
+                placeholder="name@example.com"
+              />
             </div>
 
             {/* Comment */}

@@ -10,7 +10,6 @@ import {
   FiChevronLeft,
   FiChevronRight,
   FiMail,
-  FiPhone,
   FiCalendar,
 } from "react-icons/fi";
 import { toast } from "sonner";
@@ -41,7 +40,7 @@ export default function AdminReviewsProjectPage() {
   // Filter reviews by rating and search
   const filtered = reviews.filter((item) => {
     const matchesSearch = searchQuery.trim()
-      ? `${item.firstName} ${item.lastName} ${item.email} ${item.phone} ${item.comment}`
+      ? `${item.firstName} ${item.lastName} ${item.email} ${item.comment}`
           .toLowerCase()
           .includes(searchQuery.toLowerCase())
       : true;
@@ -205,12 +204,6 @@ export default function AdminReviewsProjectPage() {
                           <span className="flex items-center gap-1">
                             <FiMail className="w-3 h-3 text-[#013E51]/50" />
                             <span>{item.email}</span>
-                          </span>
-                        )}
-                        {item.phone && (
-                          <span className="flex items-center gap-1">
-                            <FiPhone className="w-3 h-3 text-[#013E51]/50" />
-                            <span>{item.phone}</span>
                           </span>
                         )}
                         {item.createdAt && (

@@ -1,14 +1,16 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
-import { FiBriefcase, FiClock, FiShield } from "react-icons/fi";
+import { FiBriefcase, FiClock } from "react-icons/fi";
 import { FaCrown } from "react-icons/fa";
-import { MdFlight } from "react-icons/md";
 import { useLocale } from "@/shared/providers/LocaleProvider";
+import {
+  FlightsBannerWatermark,
+  FlightsPillPlaneIcon,
+} from "./FlightsBannerWatermark";
 
 export default function FlightsTrustAndTransfer() {
-  const { locale, dictionary } = useLocale();
+  const { dictionary } = useLocale();
   const t = dictionary.flightsPage;
 
   const trustCards = [
@@ -56,47 +58,39 @@ export default function FlightsTrustAndTransfer() {
         })}
       </div>
 
-      {/* Airport & Ground Cross-Sell Banner */}
-      <Link
-        href={`/${locale}/transfers`}
-        className="block relative overflow-hidden rounded-[28px] bg-[#013E51] text-white p-7 sm:p-10 shadow-md hover:shadow-lg transition-shadow group"
-      >
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute right-24 top-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full border border-white/10 flex items-center justify-center opacity-20"
-        >
-          <MdFlight className="w-32 h-32 text-white/70 rotate-45" />
-        </div>
+      {/* Airport & Ground Banner (Static, no link to transfer page) */}
+      <div className="relative overflow-hidden rounded-[28px] bg-[#013E51] text-white px-7 py-8 sm:px-11 sm:py-10 shadow-md">
+        <FlightsBannerWatermark className="-right-20 sm:-right-8 lg:-right-6" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div className="max-w-xl">
+          <div className="max-w-lg">
             <div className="flex items-center gap-2.5 mb-2.5">
               <span className="w-6 h-[1.5px] bg-[#E8B34A]" />
               <span className="text-[11px] font-bold tracking-[0.22em] uppercase text-[#E8B34A]">
                 {t.transferEyebrow}
               </span>
             </div>
-            <h3 className="font-[family-name:var(--font-cormorant)] text-2xl sm:text-3xl font-bold text-white mb-2">
+            <h3 className="font-[family-name:var(--font-cormorant)] text-2xl sm:text-3xl lg:text-[34px] font-semibold text-white leading-[1.18] mb-2.5 max-w-md">
               {t.transferTitle}
             </h3>
-            <p className="font-[family-name:var(--font-lato)] text-xs sm:text-sm text-white/75 leading-relaxed">
+            <p className="font-[family-name:var(--font-lato)] text-xs sm:text-sm text-white/75 leading-relaxed max-w-md">
               {t.transferDesc}
             </p>
           </div>
 
-          <div className="flex flex-wrap lg:flex-col items-start lg:items-end gap-2 shrink-0">
+          <div className="flex flex-wrap lg:flex-col items-start lg:items-end gap-2.5 shrink-0">
             {[t.transferPill1, t.transferPill2, t.transferPill3].map((pill) => (
               <span
                 key={pill}
-                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-xs font-semibold text-white group-hover:border-[#E8B34A]/60 transition-colors"
+                className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-white/10 backdrop-blur-[2px] border border-white/20 text-xs font-semibold text-white"
               >
-                <FiShield className="w-3.5 h-3.5 text-[#E8B34A]" />
+                <FlightsPillPlaneIcon />
                 <span>{pill}</span>
               </span>
             ))}
           </div>
         </div>
-      </Link>
+      </div>
     </div>
   );
 }

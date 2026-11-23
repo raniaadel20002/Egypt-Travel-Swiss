@@ -74,17 +74,17 @@ export function buildPublicFlightPayload(
   const isEgyptToCountry = params.bookingType === FlightBookingTypeEnum.EgyptToCountry;
 
   const resolvedFromCountryId = isCountryToEgypt
-    ? params.fromCountryId ?? params.fallbackFromCountryId ?? 5
+    ? params.fromCountryId ?? null
     : null;
   const resolvedFromCityId = isCountryToEgypt
-    ? params.fromCityId ?? params.fallbackFromCityId ?? 3
+    ? params.fromCityId ?? null
     : null;
 
   const resolvedToCountryId = isEgyptToCountry
-    ? params.toCountryId ?? params.fallbackToCountryId ?? 6
+    ? params.toCountryId ?? null
     : null;
   const resolvedToCityId = isEgyptToCountry
-    ? params.toCityId ?? params.fallbackToCityId ?? 4
+    ? params.toCityId ?? null
     : null;
 
   return {

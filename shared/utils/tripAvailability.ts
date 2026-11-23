@@ -101,6 +101,13 @@ export function getDayNameForDate(dateStr: string): string {
   return DAY_NAMES[targetDate.getDay()] || "";
 }
 
+export function toLocalIsoDate(d: Date): string {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 export function getNextAvailableDate(
   fromDate: Date = new Date(),
   availableDays?: (string | number)[] | null
@@ -111,15 +118,15 @@ export function getNextAvailableDate(
   check.setDate(check.getDate() + 1);
 
   if (allowed.length === 7) {
-    return check.toISOString().split("T")[0];
+    return toLocalIsoDate(check);
   }
 
   for (let i = 0; i < 14; i++) {
     if (allowed.includes(check.getDay())) {
-      return check.toISOString().split("T")[0];
+      return toLocalIsoDate(check);
     }
     check.setDate(check.getDate() + 1);
   }
 
-  return check.toISOString().split("T")[0];
+  return toLocalIsoDate(check);
 }

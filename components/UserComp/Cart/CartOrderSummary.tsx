@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import { FiTrash2, FiShoppingBag, FiInfo } from "react-icons/fi";
+import { FiTrash2, FiShoppingBag, FiInfo, FiArrowRight } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
 import { CartPricingSummary } from "@/models/cart";
 import { useLocale } from "@/shared/providers/LocaleProvider";
@@ -133,17 +133,25 @@ export default function CartOrderSummary({
       {/* Actions */}
       <div className="space-y-2.5 pt-2 border-t border-gray-100">
         <Link
-          href={`/${locale}/trips`}
-          className="w-full py-3.5 px-4 rounded-xl bg-[#013E51] hover:bg-[#024f67] text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2 text-center shadow-xs"
+          href={`/${locale}/bookings`}
+          className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#E8B34A] to-[#D49E35] text-[#013E51] font-bold text-sm tracking-wide shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 text-center"
         >
-          <FiShoppingBag className="w-4 h-4" />
+          <span>{t?.proceedToBooking || "Proceed to Booking"}</span>
+          <FiArrowRight className="w-4 h-4 text-[#013E51]" />
+        </Link>
+
+        <Link
+          href={`/${locale}/trips`}
+          className="w-full py-3 px-4 rounded-xl bg-[#013E51] hover:bg-[#024f67] text-white text-xs font-semibold transition-colors flex items-center justify-center gap-2 text-center shadow-xs"
+        >
+          <FiShoppingBag className="w-3.5 h-3.5" />
           <span>{t?.addMoreTrips || "Add More Trips"}</span>
         </Link>
 
         <button
           type="button"
           onClick={onClearCart}
-          className="w-full py-2.5 px-4 rounded-xl text-xs text-[#888888] hover:text-red-600 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+          className="w-full py-2 px-4 rounded-xl text-xs text-[#888888] hover:text-red-600 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
         >
           <FiTrash2 className="w-3.5 h-3.5" />
           <span>{t?.clearCart || "Clear Cart"}</span>

@@ -46,10 +46,10 @@ export function useTransferPageForm() {
   const [isRoundTrip, setIsRoundTrip] = useState<boolean>(false);
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>("");
 
-  const [tripDate, setTripDate] = useState<string>(getTomorrowDateString());
-  const [tripTime, setTripTime] = useState<string>("10:00");
+  const [tripDate, setTripDate] = useState<string>("");
+  const [tripTime, setTripTime] = useState<string>("");
   const [returnDate, setReturnDate] = useState<string>("");
-  const [returnTime, setReturnTime] = useState<string>("10:00");
+  const [returnTime, setReturnTime] = useState<string>("");
   const [additionalHours, setAdditionalHours] = useState<number>(0);
 
   const [name, setName] = useState<string>("");
@@ -68,30 +68,21 @@ export function useTransferPageForm() {
     const qAdults = searchParams.get("adults");
 
     if (qFrom) setSelectedFromId(qFrom);
-    else if (!selectedFromId && fromLocations.length > 0) setSelectedFromId(fromLocations[0].id);
-
     if (qTo) setSelectedToId(qTo);
-    else if (!selectedToId && toLocations.length > 0) {
-      const defaultTo = toLocations.find((l) => l.id !== fromLocations[0]?.id) || toLocations[0];
-      setSelectedToId(defaultTo.id);
-    }
 
     if (qDate) setTripDate(qDate);
     if (qAdults) {
       const parsed = parseInt(qAdults, 10);
       if (!isNaN(parsed) && parsed >= 1) setAdults(parsed);
     }
-  }, [searchParams, fromLocations, toLocations, selectedFromId, selectedToId]);
+  }, [searchParams]);
 
   useEffect(() => {
     if (countryTransferId === 0 && countries.length > 0) {
       const first = countries[0];
       setCountryTransferId(first.id);
-      if (first.code && !phone) {
-        setPhone(`${first.code} `);
-      }
     }
-  }, [countries, countryTransferId, phone]);
+  }, [countries, countryTransferId]);
 
   const handleCountryChange = (newCountryId: number) => {
     setCountryTransferId(newCountryId);
@@ -140,6 +131,10 @@ export function useTransferPageForm() {
   }, [previewData, vehicles, selectedVehicleId]);
 
   const handleSwap = () => {
+    if (!selectedFromId || !selectedToId) {
+      toast.info("Please select both pickup and destination first");
+      return;
+    }
     const matchToInFrom = fromLocations.find((f) => f.name === selectedToName);
     const matchFromInTo = toLocations.find((t) => t.name === selectedFromName);
     if (matchToInFrom && matchFromInTo) {
@@ -159,17 +154,17 @@ export function useTransferPageForm() {
   };
 
   const handleReset = () => {
-    if (fromLocations[0]) setSelectedFromId(fromLocations[0].id);
-    if (toLocations[0]) setSelectedToId(toLocations[0].id);
+    setSelectedFromId("");
+    setSelectedToId("");
     setAdults(2);
     setChildrenCount(0);
     setIsRoundTrip(false);
     setAdditionalHours(0);
-    setTripDate(getTomorrowDateString());
-    setTripTime("10:00");
+    setTripDate("");
+    setTripTime("");
     setReturnDate("");
-    setReturnTime("10:00");
-    toast.info("Form reset to defaults");
+    setReturnTime("");
+    toast.info("Form cleared");
   };
 
   const handleSubmit = async () => {

@@ -55,17 +55,15 @@ export function useTripFormState({
   const [category, setCategory] = useState<TripCategoryEnum>(
     TripCategoryEnum.Normal
   );
-  const [timeFrom, setTimeFrom] = useState<string>("08:00");
-  const [durationValue, setDurationValue] = useState<number>(8);
+  const [timeFrom, setTimeFrom] = useState<string>("");
+  const [durationValue, setDurationValue] = useState<number>(0);
   const [durationType, setDurationType] = useState<DurationTypeEnum>(
     DurationTypeEnum.Hours
   );
-  const [adultPrice, setAdultPrice] = useState<number>(50);
-  const [childPrice, setChildPrice] = useState<number>(25);
+  const [adultPrice, setAdultPrice] = useState<number>(0);
+  const [childPrice, setChildPrice] = useState<number>(0);
   const [infPrice, setInfPrice] = useState<number>(0);
-  const [availabilityDayNo, setAvailabilityDayNo] = useState<number[]>([
-    0, 1, 2, 3, 4, 5, 6,
-  ]);
+  const [availabilityDayNo, setAvailabilityDayNo] = useState<number[]>([]);
 
   const [name, setName] = useState<TripTranslationInput>(emptyTranslation);
   const [description, setDescription] = useState<TripTranslationInput>(
@@ -110,16 +108,16 @@ export function useTripFormState({
       setWhatToBring(detailsData.whatToBring || []);
       setInitialFiles([]);
     } else if (!isEdit) {
-      setDestinationId(destinations[0]?.id || 0);
-      setTripTypeId(tripTypes[0]?.id || 0);
+      setDestinationId(0);
+      setTripTypeId(0);
       setCategory(TripCategoryEnum.Normal);
-      setTimeFrom("08:00");
-      setDurationValue(8);
+      setTimeFrom("");
+      setDurationValue(0);
       setDurationType(DurationTypeEnum.Hours);
-      setAdultPrice(50);
-      setChildPrice(25);
+      setAdultPrice(0);
+      setChildPrice(0);
       setInfPrice(0);
-      setAvailabilityDayNo([0, 1, 2, 3, 4, 5, 6]);
+      setAvailabilityDayNo([]);
       setName(emptyTranslation());
       setDescription(emptyTranslation());
       setHighlights([]);

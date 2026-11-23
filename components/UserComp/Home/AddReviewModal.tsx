@@ -20,7 +20,6 @@ export default function AddReviewModal({
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [rating, setRating] = useState(5);
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState("");
@@ -43,7 +42,6 @@ export default function AddReviewModal({
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         email: email.trim(),
-        phone: phone.trim() || "+2000000000",
         comment: comment.trim(),
         rate: rating || 5,
       });
@@ -52,7 +50,6 @@ export default function AddReviewModal({
       setFirstName("");
       setLastName("");
       setEmail("");
-      setPhone("");
       setComment("");
       setRating(5);
       onReviewSubmitted?.();
@@ -132,20 +129,6 @@ export default function AddReviewModal({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="info@example.com"
-              className="w-full h-[50px] bg-[#F3F4F6] rounded-2xl px-4 font-[family-name:var(--font-lato)] text-sm text-[#013E51] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 border border-transparent"
-            />
-          </div>
-
-          {/* Phone */}
-          <div>
-            <label className="block font-[family-name:var(--font-lato)] text-xs sm:text-sm font-bold text-[#013E51] mb-1.5">
-              Phone Number
-            </label>
-            <input
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+20 100 000 0000"
               className="w-full h-[50px] bg-[#F3F4F6] rounded-2xl px-4 font-[family-name:var(--font-lato)] text-sm text-[#013E51] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#013E51]/20 border border-transparent"
             />
           </div>

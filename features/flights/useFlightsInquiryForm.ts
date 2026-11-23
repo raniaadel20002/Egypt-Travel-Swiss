@@ -43,15 +43,15 @@ export function useFlightsInquiryForm() {
   const [toCityId, setToCityId] = useState<number | null>(null);
   const [toCustomCity, setToCustomCity] = useState("");
 
-  const [departureAirport, setDepartureAirport] = useState("Frankfurt (FRA)");
-  const [arrivalAirport, setArrivalAirport] = useState("Hurghada (HRG)");
-  const [departureDate, setDepartureDate] = useState(getTomorrowIsoDate());
-  const [departureTime, setDepartureTime] = useState("09:30");
+  const [departureAirport, setDepartureAirport] = useState("");
+  const [arrivalAirport, setArrivalAirport] = useState("");
+  const [departureDate, setDepartureDate] = useState("");
+  const [departureTime, setDepartureTime] = useState("");
 
-  const [returnDepartureAirport, setReturnDepartureAirport] = useState("Hurghada (HRG)");
-  const [returnArrivalAirport, setReturnArrivalAirport] = useState("Frankfurt (FRA)");
+  const [returnDepartureAirport, setReturnDepartureAirport] = useState("");
+  const [returnArrivalAirport, setReturnArrivalAirport] = useState("");
   const [returnDate, setReturnDate] = useState("");
-  const [returnTime, setReturnTime] = useState("14:45");
+  const [returnTime, setReturnTime] = useState("");
 
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -91,6 +91,22 @@ export function useFlightsInquiryForm() {
     }
   }, [searchParams]);
 
+  const handleBookingTypeChange = (type: FlightBookingTypeEnum) => {
+    setBookingType(type);
+    if (type !== FlightBookingTypeEnum.CountryToEgypt) {
+      setFromCountryId(null);
+      setFromCustomCountry("");
+      setFromCityId(null);
+      setFromCustomCity("");
+    }
+    if (type !== FlightBookingTypeEnum.EgyptToCountry) {
+      setToCountryId(null);
+      setToCustomCountry("");
+      setToCityId(null);
+      setToCustomCity("");
+    }
+  };
+
   const handleDepartureAirportChange = (val: string) => {
     setDepartureAirport(val);
     setReturnArrivalAirport(val);
@@ -103,25 +119,17 @@ export function useFlightsInquiryForm() {
 
   const handleSwapDirection = () => {
     if (bookingType === FlightBookingTypeEnum.EgyptToCountry) {
-      setBookingType(FlightBookingTypeEnum.CountryToEgypt);
+      handleBookingTypeChange(FlightBookingTypeEnum.CountryToEgypt);
       setFromCountryId(toCountryId);
       setFromCustomCountry(toCustomCountry);
       setFromCityId(toCityId);
       setFromCustomCity(toCustomCity);
-      setToCountryId(null);
-      setToCustomCountry("");
-      setToCityId(null);
-      setToCustomCity("");
     } else if (bookingType === FlightBookingTypeEnum.CountryToEgypt) {
-      setBookingType(FlightBookingTypeEnum.EgyptToCountry);
+      handleBookingTypeChange(FlightBookingTypeEnum.EgyptToCountry);
       setToCountryId(fromCountryId);
       setToCustomCountry(fromCustomCountry);
       setToCityId(fromCityId);
       setToCustomCity(fromCustomCity);
-      setFromCountryId(null);
-      setFromCustomCountry("");
-      setFromCityId(null);
-      setFromCustomCity("");
     }
     const prevDep = departureAirport;
     setDepartureAirport(arrivalAirport);
@@ -143,19 +151,12 @@ export function useFlightsInquiryForm() {
   const createMutation = useCreateFlightBookingMutation();
 
   const handleClear = () => {
-    setFromCountryId(null);
-    setFromCustomCountry("");
-    setFromCityId(null);
-    setFromCustomCity("");
-    setToCountryId(null);
-    setToCustomCountry("");
-    setToCityId(null);
-    setToCustomCity("");
+    handleBookingTypeChange(FlightBookingTypeEnum.CountryToEgypt);
     setDepartureAirport("");
     setArrivalAirport("");
     setReturnDepartureAirport("");
     setReturnArrivalAirport("");
-    setDepartureDate(getTomorrowIsoDate());
+    setDepartureDate("");
     setReturnDate("");
     setEmail("");
     setPhone("");
@@ -209,10 +210,6 @@ export function useFlightsInquiryForm() {
       returnDate,
       returnTime,
       passengers,
-      fallbackFromCountryId: countriesRes?.data?.[0]?.id,
-      fallbackFromCityId: fromCitiesRes?.data?.[0]?.id,
-      fallbackToCountryId: countriesRes?.data?.[0]?.id,
-      fallbackToCityId: toCitiesRes?.data?.[0]?.id,
     });
 
     try {
@@ -240,7 +237,7 @@ export function useFlightsInquiryForm() {
 
   return {
     bookingType,
-    setBookingType,
+    setBookingType: handleBookingTypeChange,
     tripType,
     setTripType,
     fromCountryId,

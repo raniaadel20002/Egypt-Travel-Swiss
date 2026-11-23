@@ -31,6 +31,9 @@ export interface BookingApiItem {
   roomNo: string;
   totalPrice: number;
   status: string;
+  paymentStatus?: string;
+  payPalOrderId?: string;
+  payPalCaptureId?: string;
   createdAt: string;
   tripsBookings: TripBookingItem[];
 }

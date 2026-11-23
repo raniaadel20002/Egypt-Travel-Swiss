@@ -7,7 +7,6 @@ import { useCartStore } from "@/features/cart/useCartStore";
 import { calculateCartSummary } from "@/shared/utils/cartPricing";
 import CartItemCard from "./CartItemCard";
 import CartOrderSummary from "./CartOrderSummary";
-import CartCheckoutForm from "./CartCheckoutForm";
 import CartEmptyState from "./CartEmptyState";
 
 export default function CartPage() {
@@ -76,29 +75,24 @@ export default function CartPage() {
           <CartEmptyState />
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* Left Column: Cart Items List + Checkout Form */}
-            <div className="lg:col-span-8 space-y-8">
-              <div className="space-y-5">
-                {items.map((item) => (
-                  <CartItemCard
-                    key={item.tripId}
-                    item={item}
-                    onUpdateTravelers={(counts) =>
-                      updateTravelers(item.tripId, counts)
-                    }
-                    onUpdateLeaveDate={(date) =>
-                      updateLeaveDate(item.tripId, date)
-                    }
-                    onRemove={() => removeTrip(item.tripId)}
-                  />
-                ))}
-              </div>
-
-              {/* Checkout Form */}
-              <CartCheckoutForm summary={summary} />
+            {/* Left Column: Cart Items List */}
+            <div className="lg:col-span-8 space-y-5">
+              {items.map((item) => (
+                <CartItemCard
+                  key={item.tripId}
+                  item={item}
+                  onUpdateTravelers={(counts) =>
+                    updateTravelers(item.tripId, counts)
+                  }
+                  onUpdateLeaveDate={(date) =>
+                    updateLeaveDate(item.tripId, date)
+                  }
+                  onRemove={() => removeTrip(item.tripId)}
+                />
+              ))}
             </div>
 
-            {/* Right Column: Order Summary */}
+            {/* Right Column: Order Summary with Proceed to Booking */}
             <div className="lg:col-span-4">
               <CartOrderSummary summary={summary} onClearCart={clearCart} />
             </div>

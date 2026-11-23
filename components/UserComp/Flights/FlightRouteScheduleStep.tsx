@@ -152,6 +152,7 @@ export default function FlightRouteScheduleStep({
           onAirportChange={onDepartureAirportChange}
           datalistId={isInbound ? "intl-airports" : "egypt-airports"}
           requiredCountryCity={isInbound}
+          isEgyptLocked={!isInbound}
         />
 
         <FlightLocationEndpointCard
@@ -171,19 +172,16 @@ export default function FlightRouteScheduleStep({
           onAirportChange={onArrivalAirportChange}
           datalistId={isOutbound ? "intl-airports" : "egypt-airports"}
           requiredCountryCity={isOutbound}
+          isEgyptLocked={!isOutbound}
         />
       </div>
 
       {/* Airport Datalists */}
       <datalist id="egypt-airports">
-        {EGYPT_AIRPORTS.map((ap) => (
-          <option key={ap} value={ap} />
-        ))}
+        {EGYPT_AIRPORTS.map((ap) => <option key={ap} value={ap} />)}
       </datalist>
       <datalist id="intl-airports">
-        {INTERNATIONAL_AIRPORTS.map((ap) => (
-          <option key={ap} value={ap} />
-        ))}
+        {INTERNATIONAL_AIRPORTS.map((ap) => <option key={ap} value={ap} />)}
       </datalist>
 
       {/* Outbound Departure Date & Time */}
@@ -237,27 +235,29 @@ export default function FlightRouteScheduleStep({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-[10px] font-bold uppercase tracking-wider text-[#013E51]/60 mb-1">
-                {t.returnFrom} *
+                {t.returnFrom}
               </label>
-              <input
-                type="text"
-                required
-                value={returnDepartureAirport}
-                onChange={(e) => onReturnDepartureAirportChange(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E5DDD0] text-xs font-semibold text-[#013E51] focus:outline-hidden focus:ring-2 focus:ring-[#E8B34A]"
-              />
+              <div className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E5DDD0] text-xs font-semibold text-[#013E51] flex items-center justify-between shadow-2xs">
+                <span className="truncate">
+                  {arrivalAirport || returnDepartureAirport || t.airportPlaceholder}
+                </span>
+                <span className="text-[10px] text-[#E8B34A] font-bold uppercase tracking-wider ml-2 shrink-0">
+                  Auto
+                </span>
+              </div>
             </div>
             <div>
               <label className="block text-[10px] font-bold uppercase tracking-wider text-[#013E51]/60 mb-1">
-                {t.returnTo} *
+                {t.returnTo}
               </label>
-              <input
-                type="text"
-                required
-                value={returnArrivalAirport}
-                onChange={(e) => onReturnArrivalAirportChange(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E5DDD0] text-xs font-semibold text-[#013E51] focus:outline-hidden focus:ring-2 focus:ring-[#E8B34A]"
-              />
+              <div className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E5DDD0] text-xs font-semibold text-[#013E51] flex items-center justify-between shadow-2xs">
+                <span className="truncate">
+                  {departureAirport || returnArrivalAirport || t.airportPlaceholder}
+                </span>
+                <span className="text-[10px] text-[#E8B34A] font-bold uppercase tracking-wider ml-2 shrink-0">
+                  Auto
+                </span>
+              </div>
             </div>
           </div>
 

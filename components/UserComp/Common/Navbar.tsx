@@ -35,15 +35,6 @@ const navLinkVariants: Variants = {
   }),
 };
 
-const ctaVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.94 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: { delay: 0.45, duration: 0.28, ease: BRAND_EASE },
-  },
-};
-
 const dropdownVariants: Variants = {
   hidden: { opacity: 0, y: -6, scale: 0.98 },
   visible: {
@@ -80,6 +71,7 @@ export default function Navbar() {
     { key: "divingCourses", label: dict.nav.divingCourses, href: `/${locale}/diving-courses` },
     { key: "accommodation", label: dict.nav.accommodation, href: `/${locale}/accommodation` },
     { key: "transfers", label: dict.nav.transfers, href: `/${locale}/transfers` },
+    { key: "flights", label: dict.nav.flights, href: `/${locale}/flights` },
   ];
 
   const aboutDropdownItems = [
@@ -219,19 +211,6 @@ export default function Navbar() {
               </span>
             )}
           </Link>
-
-          <motion.div
-            variants={shouldReduce ? undefined : ctaVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <Link
-              href={`/${locale}/trips`}
-              className="hidden md:inline-flex items-center justify-center px-6 sm:px-7 py-2.5 sm:py-3 rounded-full bg-[#013E51] text-white font-[family-name:var(--font-lato)] text-[14px] sm:text-[15px] font-semibold hover:bg-[#024f67] transition-colors shadow-xs whitespace-nowrap"
-            >
-              {dict.nav.bookNow}
-            </Link>
-          </motion.div>
 
           <button
             type="button"

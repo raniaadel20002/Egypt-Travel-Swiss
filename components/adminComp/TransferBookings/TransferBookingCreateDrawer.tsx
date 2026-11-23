@@ -34,7 +34,7 @@ export default function TransferBookingCreateDrawer({
   const [adults, setAdults] = useState<number>(1);
   const [children, setChildren] = useState<number>(0);
   const [tripDate, setTripDate] = useState("");
-  const [tripTime, setTripTime] = useState("10:00");
+  const [tripTime, setTripTime] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");

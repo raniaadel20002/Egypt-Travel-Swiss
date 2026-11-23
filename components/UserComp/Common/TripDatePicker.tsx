@@ -7,6 +7,7 @@ import {
   getAvailableDaysText,
   getDayNameForDate,
   getNextAvailableDate,
+  toLocalIsoDate,
 } from "@/shared/utils/tripAvailability";
 
 interface TripDatePickerProps {
@@ -52,7 +53,7 @@ export default function TripDatePicker({
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const todayIso = useMemo(() => new Date().toISOString().split("T")[0], []);
+  const todayIso = useMemo(() => toLocalIsoDate(new Date()), []);
   const effectiveMinIso = minDate || todayIso;
 
   // Initial view year and month based on selected value or today
@@ -63,6 +64,16 @@ export default function TripDatePicker({
     }
     return new Date();
   });
+
+  // Sync view calendar month if value changes
+  useEffect(() => {
+    if (value && value.includes("-")) {
+      const [y, m] = value.split("-").map(Number);
+      if (!isNaN(y) && !isNaN(m)) {
+        setViewDate(new Date(y, m - 1, 1));
+      }
+    }
+  }, [value]);
 
   const viewYear = viewDate.getFullYear();
   const viewMonth = viewDate.getMonth();

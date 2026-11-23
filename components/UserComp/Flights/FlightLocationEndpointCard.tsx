@@ -22,6 +22,7 @@ interface FlightLocationEndpointCardProps {
   onAirportChange: (val: string) => void;
   datalistId: string;
   requiredCountryCity?: boolean;
+  isEgyptLocked?: boolean;
 }
 
 export default function FlightLocationEndpointCard({
@@ -41,6 +42,7 @@ export default function FlightLocationEndpointCard({
   onAirportChange,
   datalistId,
   requiredCountryCity = false,
+  isEgyptLocked = false,
 }: FlightLocationEndpointCardProps) {
   const { dictionary } = useLocale();
   const t = dictionary.flightsPage;
@@ -116,22 +118,20 @@ export default function FlightLocationEndpointCard({
         </span>
       </div>
 
-      {/* Country Selection or Manual Text */}
+      {/* Country Selection */}
       <div>
-        <div className="flex items-center justify-between mb-1">
-          <label className="block text-[10px] font-bold uppercase tracking-wider text-[#013E51]/60">
-            {t.countryLabel} {requiredCountryCity && "*"}
-          </label>
-          <button
-            type="button"
-            onClick={() => setIsManualCountry(!isManualCountry)}
-            className="text-[10px] font-bold text-[#013E51]/75 hover:text-[#013E51] hover:underline cursor-pointer"
-          >
-            {isManualCountry ? t.selectFromList : t.typeManually}
-          </button>
-        </div>
+        <label className="block text-[10px] font-bold uppercase tracking-wider text-[#013E51]/60 mb-1">
+          {t.countryLabel} {requiredCountryCity && !isEgyptLocked && "*"}
+        </label>
 
-        {isManualCountry ? (
+        {isEgyptLocked ? (
+          <div className="w-full px-3.5 py-2.5 rounded-xl bg-amber-50/70 border border-amber-200/80 text-xs font-bold text-[#013E51] flex items-center justify-between">
+            <span>{t.egyptLabel || "Egypt"}</span>
+            <span className="text-[10px] font-semibold text-[#013E51]/60 uppercase tracking-wider">
+              Domestic / Egypt
+            </span>
+          </div>
+        ) : isManualCountry ? (
           <div>
             <input
               type="text"
@@ -165,57 +165,59 @@ export default function FlightLocationEndpointCard({
         )}
       </div>
 
-      {/* City Selection or Manual Text */}
-      <div>
-        <div className="flex items-center justify-between mb-1">
-          <label className="block text-[10px] font-bold uppercase tracking-wider text-[#013E51]/60">
-            {t.cityLabel} {requiredCountryCity && "*"}
-          </label>
-          <button
-            type="button"
-            onClick={() => setIsManualCity(!isManualCity)}
-            className="text-[10px] font-bold text-[#013E51]/75 hover:text-[#013E51] hover:underline cursor-pointer"
-          >
-            {showManualCityInput ? t.selectFromList : t.typeManually}
-          </button>
-        </div>
-
-        {showManualCityInput ? (
-          <div>
-            <input
-              type="text"
-              required={requiredCountryCity}
-              list={`${datalistId}-city-list`}
-              value={customCity}
-              onChange={(e) => handleManualCityType(e.target.value)}
-              placeholder={t.customCityPlaceholder}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E5DDD0] text-xs font-semibold text-[#013E51] placeholder:text-[#013E51]/35 focus:outline-hidden focus:ring-2 focus:ring-[#E8B34A] [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:opacity-0"
-            />
-            <datalist id={`${datalistId}-city-list`}>
-              {cities.map((ct) => (
-                <option key={ct.id} value={ct.name} />
-              ))}
-            </datalist>
+      {/* City Selection (Only when not Egypt-locked) */}
+      {!isEgyptLocked && (
+        <div>
+          <div className="flex items-center justify-between mb-1">
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#013E51]/60">
+              {t.cityLabel} {requiredCountryCity && "*"}
+            </label>
+            <button
+              type="button"
+              onClick={() => setIsManualCity(!isManualCity)}
+              className="text-[10px] font-bold text-[#013E51]/75 hover:text-[#013E51] hover:underline cursor-pointer"
+            >
+              {showManualCityInput ? t.selectFromList : t.typeManually}
+            </button>
           </div>
-        ) : (
-          <select
-            required={requiredCountryCity && cities.length > 0}
-            disabled={!countryId && !customCountry}
-            value={cityId ?? ""}
-            onChange={(e) => handleCitySelect(e.target.value)}
-            className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E5DDD0] text-xs font-semibold text-[#013E51] disabled:bg-gray-100/80 focus:outline-hidden focus:ring-2 focus:ring-[#E8B34A] cursor-pointer"
-          >
-            <option value="">
-              {countryId || customCountry ? t.selectCity : t.selectCountryFirst}
-            </option>
-            {cities.map((city) => (
-              <option key={city.id} value={city.id}>
-                {city.name}
+
+          {showManualCityInput ? (
+            <div>
+              <input
+                type="text"
+                required={requiredCountryCity}
+                list={`${datalistId}-city-list`}
+                value={customCity}
+                onChange={(e) => handleManualCityType(e.target.value)}
+                placeholder={t.customCityPlaceholder}
+                className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E5DDD0] text-xs font-semibold text-[#013E51] placeholder:text-[#013E51]/35 focus:outline-hidden focus:ring-2 focus:ring-[#E8B34A] [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:opacity-0"
+              />
+              <datalist id={`${datalistId}-city-list`}>
+                {cities.map((ct) => (
+                  <option key={ct.id} value={ct.name} />
+                ))}
+              </datalist>
+            </div>
+          ) : (
+            <select
+              required={requiredCountryCity && cities.length > 0}
+              disabled={!countryId && !customCountry}
+              value={cityId ?? ""}
+              onChange={(e) => handleCitySelect(e.target.value)}
+              className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E5DDD0] text-xs font-semibold text-[#013E51] disabled:bg-gray-100/80 focus:outline-hidden focus:ring-2 focus:ring-[#E8B34A] cursor-pointer"
+            >
+              <option value="">
+                {countryId || customCountry ? t.selectCity : t.selectCountryFirst}
               </option>
-            ))}
-          </select>
-        )}
-      </div>
+              {cities.map((city) => (
+                <option key={city.id} value={city.id}>
+                  {city.name}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+      )}
 
       {/* Airport Input */}
       <div>

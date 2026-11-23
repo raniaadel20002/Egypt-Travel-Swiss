@@ -199,6 +199,7 @@ export default function BestTripsSection() {
               <BestTripCard
                 key={trip.id}
                 trip={trip}
+                rawTrip={trips.find((t) => t.id === trip.id)}
                 index={index}
                 locale={locale}
                 dict={dict}
