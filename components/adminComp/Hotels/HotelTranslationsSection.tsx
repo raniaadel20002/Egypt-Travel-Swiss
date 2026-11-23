@@ -60,7 +60,7 @@ export default function HotelTranslationsSection({
                     {lang.code}
                   </span>
                   <span>{lang.label}</span>
-                  {isEn && <span className="text-red-500">*</span>}
+                  {isEn && <span>*</span>}
                 </span>
                 {!isEn && (
                   <span className="text-[10px] text-gray-400 font-medium">

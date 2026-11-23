@@ -113,16 +113,16 @@ export default function AdminDivingCourseBookingsPage() {
       eyebrow="Reservations"
       title="Diving Course Bookings"
       subtitle="Monitor and manage all diving course reservations and payments in EUR (&euro;)."
-      action={
-        <button
-          type="button"
-          onClick={() => setIsCreateOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#013E51] text-white text-xs sm:text-sm font-semibold hover:bg-[#024f67] transition-colors shadow-xs cursor-pointer"
-        >
-          <FiPlus className="w-4 h-4 text-[#E8B34A]" />
-          <span>New Course Booking</span>
-        </button>
-      }
+      // action={
+      //   <button
+      //     type="button"
+      //     onClick={() => setIsCreateOpen(true)}
+      //     className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#013E51] text-white text-xs sm:text-sm font-semibold hover:bg-[#024f67] transition-colors shadow-xs cursor-pointer"
+      //   >
+      //     <FiPlus className="w-4 h-4 text-[#E8B34A]" />
+      //     <span>New Course Booking</span>
+      //   </button>
+      // }
     >
       <div className="space-y-6 font-[family-name:var(--font-lato)]">
         {/* Top Metric Cards */}

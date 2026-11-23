@@ -52,7 +52,7 @@ export default function TripTranslationsSection({
                     {lang.code}
                   </span>
                   <span>{lang.label}</span>
-                  {isEn && <span className="text-red-500">*</span>}
+                  {isEn && <span>*</span>}
                 </span>
                 {!isEn && (
                   <span className="text-[10px] text-gray-400 font-medium">
@@ -79,7 +79,7 @@ export default function TripTranslationsSection({
               <div className="space-y-1.5">
                 <label className="flex items-center gap-1.5 text-[11px] font-bold text-gray-600">
                   <LanguageFlag code={lang.code} size="xs" />
-                  <span>Detailed Description ({lang.code})</span>
+                  <span>Detailed Description ({lang.code}) {isEn ? "*" : ""}</span>
                 </label>
                 <textarea
                   rows={3}

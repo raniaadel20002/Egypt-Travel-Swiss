@@ -99,14 +99,14 @@ export default function CountryTransfersSection({
             </span>
           </div>
 
-          <button
+          {/* <button
             type="button"
             onClick={handleCreate}
             className="inline-flex items-center gap-2 bg-[#013E51] hover:bg-[#025670] text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-sm cursor-pointer"
           >
             <FiPlus className="w-4 h-4 text-[#E8B34A]" />
             <span>Add Country</span>
-          </button>
+          </button> */}
         </div>
       </div>
 

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { toast } from "sonner";
+import "@/shared/utils/toastDeduplication";
 
 export function extractApiError(error: unknown): string {
   if (axios.isAxiosError(error)) {

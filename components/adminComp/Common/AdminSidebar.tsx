@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { FiLogOut, FiX, FiUser, FiKey } from "react-icons/fi";
@@ -9,6 +9,12 @@ import { useLogoutMutation } from "@/features/auth/useAuthMutations";
 import { useModalDismiss } from "@/shared/utils/useModalDismiss";
 import { getAdminNavGroups } from "./adminNavConfig";
 import ChangePasswordModal from "./ChangePasswordModal";
+
+const useIsomorphicLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
+let cachedSidebarScrollTop = 0;
+const SIDEBAR_SCROLL_STORAGE_KEY = "admin_sidebar_scroll_top";
 
 interface AdminSidebarProps {
   isOpen: boolean;
@@ -22,10 +28,58 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const logoutMutation = useLogoutMutation();
   const [mounted, setMounted] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useIsomorphicLayoutEffect(() => {
+    if (cachedSidebarScrollTop === 0 && typeof window !== "undefined") {
+      try {
+        const saved = sessionStorage.getItem(SIDEBAR_SCROLL_STORAGE_KEY);
+        if (saved) {
+          cachedSidebarScrollTop = Number(saved) || 0;
+        }
+      } catch {
+        // ignore storage errors
+      }
+    }
+
+    if (navRef.current && cachedSidebarScrollTop > 0) {
+      navRef.current.scrollTop = cachedSidebarScrollTop;
+      requestAnimationFrame(() => {
+        if (navRef.current) {
+          navRef.current.scrollTop = cachedSidebarScrollTop;
+        }
+      });
+    }
+  }, [pathname]);
+
+  const handleScroll = (e: React.UIEvent<HTMLElement>) => {
+    const top = e.currentTarget.scrollTop;
+    cachedSidebarScrollTop = top;
+    try {
+      sessionStorage.setItem(SIDEBAR_SCROLL_STORAGE_KEY, String(top));
+    } catch {
+      // ignore storage errors
+    }
+  };
+
+  const handleItemClick = () => {
+    if (navRef.current) {
+      cachedSidebarScrollTop = navRef.current.scrollTop;
+      try {
+        sessionStorage.setItem(
+          SIDEBAR_SCROLL_STORAGE_KEY,
+          String(cachedSidebarScrollTop)
+        );
+      } catch {
+        // ignore storage errors
+      }
+    }
+    onClose();
+  };
 
   const handleSignOut = () => {
     logoutMutation.mutate(undefined, {
@@ -116,7 +170,11 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
           </div>
         </div>
 
-        <nav className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 space-y-5">
+        <nav
+          ref={navRef}
+          onScroll={handleScroll}
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 space-y-5"
+        >
           {navGroups.map((group) => (
             <div key={group.title} className="space-y-1">
               <span className="px-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[#888888]">
@@ -129,7 +187,8 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                     <Link
                       key={item.href}
                       href={item.href}
-                      onClick={onClose}
+                      scroll={false}
+                      onClick={handleItemClick}
                       className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 ${
                         item.active
                           ? "bg-[#013E51] text-white shadow-xs"
