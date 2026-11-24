@@ -67,14 +67,14 @@ export default function HotelBookingsFiltersBar({
         </div>
 
         {/* Right Action: Create Booking */}
-        <button
+        {/* <button
           type="button"
           onClick={onCreateClick}
           className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[#013E51] hover:bg-[#024f67] text-white text-xs sm:text-sm font-semibold transition-colors cursor-pointer shadow-xs shrink-0"
         >
           <FiPlus className="w-4 h-4 text-[#E8B34A]" />
           <span>New Hotel Booking</span>
-        </button>
+        </button> */}
       </div>
 
       {/* Search & Hotel / Nationality Filters */}

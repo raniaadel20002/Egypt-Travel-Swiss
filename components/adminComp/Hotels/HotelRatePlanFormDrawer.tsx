@@ -102,6 +102,11 @@ export default function HotelRatePlanFormDrawer({
       return;
     }
 
+    if (!description.en.trim()) {
+      toast.error("English detailed description is required.");
+      return;
+    }
+
     const payloadName: RatePlanTranslationInput = {
       en: name.en.trim(),
       fr: name.fr.trim() || name.en.trim(),
@@ -164,11 +169,10 @@ export default function HotelRatePlanFormDrawer({
               return (
                 <div
                   key={lang.code}
-                  className={`p-4 rounded-2xl border space-y-3 ${
-                    isEn
-                      ? "border-[#013E51]/20 bg-[#FAF7F2]/50 ring-1 ring-[#013E51]/10"
-                      : "border-gray-200 bg-white"
-                  }`}
+                  className={`p-4 rounded-2xl border space-y-3 ${isEn
+                    ? "border-[#013E51]/20 bg-[#FAF7F2]/50 ring-1 ring-[#013E51]/10"
+                    : "border-gray-200 bg-white"
+                    }`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-[#013E51] uppercase tracking-wider flex items-center gap-2">
@@ -177,7 +181,7 @@ export default function HotelRatePlanFormDrawer({
                         {lang.code}
                       </span>
                       <span>{lang.label}</span>
-                      {isEn && <span className="text-red-500">*</span>}
+                      {isEn && <span>*</span>}
                     </span>
                     {!isEn && (
                       <span className="text-[10px] text-gray-400 font-medium">
@@ -201,11 +205,13 @@ export default function HotelRatePlanFormDrawer({
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-gray-600 block">
-                      Description ({lang.code})
+                    <label className="text-[11px] font-bold text-[#013E51] block">
+                      Detailed Description ({lang.code}){" "}
+                      {isEn && <span className="text-red-500">*</span>}
                     </label>
                     <textarea
                       rows={2}
+                      required={isEn}
                       value={description[key] || ""}
                       onChange={(e) =>
                         handleDescriptionChange(key, e.target.value)

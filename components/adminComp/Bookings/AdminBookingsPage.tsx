@@ -146,16 +146,16 @@ export default function AdminBookingsPage() {
       eyebrow="Reservations"
       title="Tour Bookings & Excursions"
       subtitle="Review, confirm, or modify traveler bookings across Egyptian tours and marine safaris in EUR (&euro;)."
-      action={
-        <button
-          type="button"
-          onClick={() => setIsCreateOpen(true)}
-          className="inline-flex items-center gap-2 bg-[#013E51] hover:bg-[#025670] text-white px-5 py-2.5 rounded-xl font-[family-name:var(--font-lato)] text-xs font-bold uppercase tracking-wider transition shadow-sm cursor-pointer"
-        >
-          <FiPlus className="w-4 h-4 text-[#E8B34A]" />
-          <span>New Booking</span>
-        </button>
-      }
+      // action={
+      //   <button
+      //     type="button"
+      //     onClick={() => setIsCreateOpen(true)}
+      //     className="inline-flex items-center gap-2 bg-[#013E51] hover:bg-[#025670] text-white px-5 py-2.5 rounded-xl font-[family-name:var(--font-lato)] text-xs font-bold uppercase tracking-wider transition shadow-sm cursor-pointer"
+      //   >
+      //     <FiPlus className="w-4 h-4 text-[#E8B34A]" />
+      //     <span>New Booking</span>
+      //   </button>
+      // }
     >
       <div className="space-y-6">
         {/* Metric Badges */}

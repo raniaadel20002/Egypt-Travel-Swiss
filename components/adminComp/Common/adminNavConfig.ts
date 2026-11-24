@@ -125,12 +125,12 @@ export function getAdminNavGroups(pathname: string): NavGroupConfig[] {
           icon: FiBookOpen,
           active: pathname.startsWith("/admin/blogs"),
         },
-        {
-          label: "Media Gallery",
-          href: "/admin/gallery",
-          icon: FiImage,
-          active: pathname.startsWith("/admin/gallery"),
-        },
+        // {
+        //   label: "Media Gallery",
+        //   href: "/admin/gallery",
+        //   icon: FiImage,
+        //   active: pathname.startsWith("/admin/gallery"),
+        // },
         {
           label: "Hotels & Resorts",
           href: "/admin/hotels",
@@ -157,12 +157,12 @@ export function getAdminNavGroups(pathname: string): NavGroupConfig[] {
           icon: FiGlobe,
           active: pathname.startsWith("/admin/flight-locations"),
         },
-        {
-          label: "Team Members",
-          href: "/admin/team-members",
-          icon: FiUsers,
-          active: pathname.startsWith("/admin/team-members"),
-        },
+        // {
+        //   label: "Team Members",
+        //   href: "/admin/team-members",
+        //   icon: FiUsers,
+        //   active: pathname.startsWith("/admin/team-members"),
+        // },
       ],
     },
     {

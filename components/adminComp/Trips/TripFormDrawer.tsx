@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { FiCheck, FiLoader } from "react-icons/fi";
 import { toast } from "sonner";
 import { DestinationApiItem } from "@/models/destination";
@@ -37,6 +38,17 @@ export default function TripFormDrawer({
   onClose,
 }: TripFormDrawerProps) {
   const isEdit = mode === "edit";
+  const [photosError, setPhotosError] = useState<string | null>(null);
+  const [timeFromError, setTimeFromError] = useState<string | null>(null);
+  const [daysError, setDaysError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setPhotosError(null);
+      setTimeFromError(null);
+      setDaysError(null);
+    }
+  }, [isOpen]);
 
   const multiLangQuery = useTripMultiLangQuery(
     isEdit && item ? item.id : null,
@@ -74,6 +86,24 @@ export default function TripFormDrawer({
     }
     if (!form.name.en.trim()) {
       toast.error("English excursion title is required.");
+      return;
+    }
+    if (!form.timeFrom || !form.timeFrom.trim()) {
+      const errorMsg = "Time From is required. Please select a start time.";
+      setTimeFromError(errorMsg);
+      toast.error(errorMsg);
+      return;
+    }
+    if (!form.availabilityDayNo || form.availabilityDayNo.length === 0) {
+      const errorMsg = "Please select at least one available day of the week.";
+      setDaysError(errorMsg);
+      toast.error(errorMsg);
+      return;
+    }
+    if (!isEdit && form.initialFiles.length === 0) {
+      const errorMsg = "At least one excursion photo is required.";
+      setPhotosError(errorMsg);
+      toast.error(errorMsg);
       return;
     }
 
@@ -166,7 +196,10 @@ export default function TripFormDrawer({
             category={form.category}
             onCategoryChange={form.setCategory}
             timeFrom={form.timeFrom}
-            onTimeFromChange={form.setTimeFrom}
+            onTimeFromChange={(val) => {
+              form.setTimeFrom(val);
+              if (val.trim()) setTimeFromError(null);
+            }}
             durationValue={form.durationValue}
             onDurationValueChange={form.setDurationValue}
             durationType={form.durationType}
@@ -178,9 +211,20 @@ export default function TripFormDrawer({
             infPrice={form.infPrice}
             onInfPriceChange={form.setInfPrice}
             availabilityDayNo={form.availabilityDayNo}
-            onAvailabilityDayToggle={form.handleDayToggle}
+            onAvailabilityDayToggle={(dayNo) => {
+              form.handleDayToggle(dayNo);
+              setDaysError(null);
+            }}
+            onSelectAllDaysToggle={(selectAll) => {
+              form.handleSelectAllDays(selectAll);
+              if (selectAll) {
+                setDaysError(null);
+              }
+            }}
             destinations={destinations}
             tripTypes={tripTypes}
+            timeFromError={timeFromError}
+            daysError={daysError}
           />
 
           <TripTranslationsSection
@@ -208,7 +252,13 @@ export default function TripFormDrawer({
           {!isEdit && (
             <TripInitialPhotosPicker
               initialFiles={form.initialFiles}
-              onFilesChange={form.setInitialFiles}
+              onFilesChange={(files) => {
+                form.setInitialFiles(files);
+                if (files.length > 0) {
+                  setPhotosError(null);
+                }
+              }}
+              error={photosError}
             />
           )}
         </form>

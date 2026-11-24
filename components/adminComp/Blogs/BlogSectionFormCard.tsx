@@ -1,6 +1,7 @@
 import Image from "next/image";
-import { FiTrash2, FiUpload, FiImage } from "react-icons/fi";
+import { FiTrash2, FiUpload, FiImage, FiCopy } from "react-icons/fi";
 import { BlogLocalizedText } from "@/models/blog";
+import LanguageFlag from "@/components/adminComp/Common/LanguageFlag";
 import { BLOG_LANGUAGES, resolveBlogImageUrl } from "./blogHelpers";
 
 export interface BlogSectionDraft {
@@ -14,7 +15,7 @@ export interface BlogSectionDraft {
 
 interface BlogSectionFormCardProps {
   index: number;
-  activeLang: keyof BlogLocalizedText;
+  activeLang?: keyof BlogLocalizedText;
   section: BlogSectionDraft;
   canRemove: boolean;
   onChange: (updated: BlogSectionDraft) => void;
@@ -23,7 +24,6 @@ interface BlogSectionFormCardProps {
 }
 
 export default function BlogSectionFormCard({
-  activeLang,
   section,
   canRemove,
   onChange,
@@ -34,10 +34,6 @@ export default function BlogSectionFormCard({
   const previewUrl = section.newImageFile
     ? URL.createObjectURL(section.newImageFile)
     : existingUrl;
-
-  const currentLangMeta =
-    BLOG_LANGUAGES.find((l) => l.key === activeLang) || BLOG_LANGUAGES[0];
-  const isEn = activeLang === "en";
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -50,17 +46,35 @@ export default function BlogSectionFormCard({
     onChange({ ...section, newImageFile: null });
   };
 
+  const handleCopyEnToAll = () => {
+    const enTitle = section.title.en?.trim();
+    const enContent = section.content.en?.trim();
+    if (!enTitle && !enContent) return;
+    onChange({
+      ...section,
+      title: {
+        en: section.title.en,
+        fr: section.title.fr?.trim() || enTitle,
+        ru: section.title.ru?.trim() || enTitle,
+        ro: section.title.ro?.trim() || enTitle,
+        it: section.title.it?.trim() || enTitle,
+      },
+      content: {
+        en: section.content.en,
+        fr: section.content.fr?.trim() || enContent,
+        ru: section.content.ru?.trim() || enContent,
+        ro: section.content.ro?.trim() || enContent,
+        it: section.content.it?.trim() || enContent,
+      },
+    });
+  };
+
   return (
-    <div className="bg-[#F8F9FA] p-4 rounded-2xl border border-gray-200 space-y-3 font-[family-name:var(--font-lato)]">
+    <div className="bg-[#F8F9FA] p-4 rounded-2xl border border-gray-200 space-y-4 font-[family-name:var(--font-lato)]">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-extrabold uppercase tracking-wider text-[#013E51]">
-            Section #{section.sectionNumber}
-          </span>
-          <span className="px-2 py-0.5 rounded-md bg-[#013E51]/10 text-[#013E51] text-[10px] font-bold">
-            Editing {currentLangMeta.code}
-          </span>
-        </div>
+        <span className="text-xs font-extrabold uppercase tracking-wider text-[#013E51]">
+          Section #{section.sectionNumber}
+        </span>
         {canRemove && (
           <button
             type="button"
@@ -73,72 +87,8 @@ export default function BlogSectionFormCard({
         )}
       </div>
 
-      <div className="space-y-1.5">
-        <div className="flex items-center justify-between">
-          <label className="block text-[11px] text-gray-500 font-bold uppercase">
-            Section Title ({currentLangMeta.label}) {isEn && "*"}
-          </label>
-          {!isEn &&
-            !section.title[activeLang]?.trim() &&
-            section.title.en?.trim() && (
-              <span className="text-[10px] text-amber-600 font-medium">
-                Fallback: {section.title.en.slice(0, 32)}
-              </span>
-            )}
-        </div>
-        <input
-          type="text"
-          value={section.title[activeLang] || ""}
-          onChange={(e) =>
-            onChange({
-              ...section,
-              title: { ...section.title, [activeLang]: e.target.value },
-            })
-          }
-          placeholder={
-            isEn
-              ? "e.g. Diving Gear & Coral Reefs"
-              : `Section title in ${currentLangMeta.label} (optional)...`
-          }
-          required={isEn}
-          className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs text-[#013E51] bg-white font-semibold"
-        />
-      </div>
-
-      <div className="space-y-1.5">
-        <div className="flex items-center justify-between">
-          <label className="block text-[11px] text-gray-500 font-bold uppercase">
-            Section Content ({currentLangMeta.label}) {isEn && "*"}
-          </label>
-          {!isEn &&
-            !section.content[activeLang]?.trim() &&
-            section.content.en?.trim() && (
-              <span className="text-[10px] text-amber-600 font-medium">
-                Auto-falls back to EN
-              </span>
-            )}
-        </div>
-        <textarea
-          rows={3}
-          value={section.content[activeLang] || ""}
-          onChange={(e) =>
-            onChange({
-              ...section,
-              content: { ...section.content, [activeLang]: e.target.value },
-            })
-          }
-          placeholder={
-            isEn
-              ? "Detailed insights, paragraphs, and descriptions..."
-              : `Section content in ${currentLangMeta.label} (optional)...`
-          }
-          required={isEn}
-          className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs text-[#013E51] bg-white leading-relaxed"
-        />
-      </div>
-
       {/* Section Image Selector */}
-      <div className="pt-2 border-t border-gray-200/80 space-y-2">
+      <div className="space-y-2">
         <label className="block text-[11px] text-gray-500 font-bold uppercase">
           Section Image (Optional)
         </label>
@@ -192,6 +142,105 @@ export default function BlogSectionFormCard({
                 </button>
               )}
           </div>
+        </div>
+      </div>
+
+      {/* Section Translations Across All 5 Languages */}
+      <div className="pt-3 border-t border-gray-200/80 space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <label className="text-xs font-bold text-[#013E51] uppercase tracking-wider block">
+              Section #{section.sectionNumber} Translations
+            </label>
+            <span className="text-[11px] text-[#888888]">
+              English is required; other languages auto-fallback to English if left blank.
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={handleCopyEnToAll}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#013E51]/20 bg-white text-xs font-bold text-[#013E51] hover:bg-[#013E51] hover:text-white transition cursor-pointer"
+          >
+            <FiCopy className="w-3.5 h-3.5 text-[#E8B34A]" />
+            <span>Fill Empty from EN</span>
+          </button>
+        </div>
+
+        <div className="space-y-3">
+          {BLOG_LANGUAGES.map((lang) => {
+            const isEn = lang.key === "en";
+            return (
+              <div
+                key={lang.key}
+                className={`p-3 rounded-xl border space-y-2 transition ${
+                  isEn
+                    ? "border-[#013E51]/30 bg-[#FAF7F2]/60 ring-1 ring-[#013E51]/10"
+                    : "border-gray-200 bg-white"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <LanguageFlag code={lang.code} size="xs" />
+                    <span className="text-xs font-bold text-[#013E51]">
+                      {lang.label} ({lang.code})
+                    </span>
+                    {isEn && <span className="text-red-500 font-bold">*</span>}
+                  </div>
+                  {!isEn && (
+                    <span className="text-[10px] text-gray-400 font-medium">
+                      Auto-falls back to EN
+                    </span>
+                  )}
+                </div>
+
+                <div className="space-y-1">
+                  <input
+                    type="text"
+                    required={isEn}
+                    value={section.title[lang.key] || ""}
+                    onChange={(e) =>
+                      onChange({
+                        ...section,
+                        title: {
+                          ...section.title,
+                          [lang.key]: e.target.value,
+                        },
+                      })
+                    }
+                    placeholder={
+                      isEn
+                        ? "e.g. Diving Gear & Coral Reefs"
+                        : `Section title in ${lang.label}...`
+                    }
+                    className="w-full px-3 py-1.5 text-xs rounded-xl border border-gray-200 bg-white text-[#013E51] font-semibold focus:outline-hidden focus:border-[#013E51]"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <textarea
+                    rows={2}
+                    required={isEn}
+                    value={section.content[lang.key] || ""}
+                    onChange={(e) =>
+                      onChange({
+                        ...section,
+                        content: {
+                          ...section.content,
+                          [lang.key]: e.target.value,
+                        },
+                      })
+                    }
+                    placeholder={
+                      isEn
+                        ? "Detailed insights, paragraphs, and descriptions..."
+                        : `Section content in ${lang.label}...`
+                    }
+                    className="w-full px-3 py-1.5 text-xs rounded-xl border border-gray-200 bg-white text-[#013E51] leading-relaxed focus:outline-hidden focus:border-[#013E51]"
+                  />
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

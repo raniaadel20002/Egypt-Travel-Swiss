@@ -10,6 +10,7 @@ import {
   TripCategoryEnum,
   TripMultiLangDetails,
   TripTranslationInput,
+  TRIP_DAYS_OF_WEEK,
 } from "@/models/trip";
 
 const emptyTranslation = (): TripTranslationInput => ({
@@ -143,6 +144,12 @@ export function useTripFormState({
     );
   };
 
+  const handleSelectAllDays = (selectAll: boolean) => {
+    setAvailabilityDayNo(
+      selectAll ? TRIP_DAYS_OF_WEEK.map((d) => d.dayNo) : []
+    );
+  };
+
   const buildPayload = (): CreateTripPayload => {
     const isPrivate = category === TripCategoryEnum.Private;
     return {
@@ -189,6 +196,7 @@ export function useTripFormState({
     setInfPrice,
     availabilityDayNo,
     handleDayToggle,
+    handleSelectAllDays,
     name,
     setName,
     description,
